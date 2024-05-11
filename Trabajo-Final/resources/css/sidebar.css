@@ -1,0 +1,23 @@
+.sub-menu {
+    display: block;
+    padding: 0.5rem 1rem; /* Ajusta el espaciado según sea necesario */
+    color: #fff;
+    background-color: #007bff; /* Color de fondo del botón de "Libros" */
+    border: 1px solid #007bff; /* Borde del botón de "Libros" */
+    border-radius: 0.25rem; /* Borde redondeado */
+    text-decoration: none;
+}
+
+.sub-menu li a:hover {
+    background-color: #0056b3; /* Color de fondo al pasar el cursor sobre el enlace */
+}
+
+.sub-menu a {
+    color: #fff;
+    text-decoration: none;
+}
+
+/* Estilos adicionales para los elementos de navegación */
+.nav-link:hover + .sub-menu {
+    display: block;
+}
