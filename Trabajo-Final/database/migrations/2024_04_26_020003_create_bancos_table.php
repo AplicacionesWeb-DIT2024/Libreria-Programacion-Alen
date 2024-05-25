@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('bancos', function (Blueprint $table) {
             $table->id();
             $table->string('nombre');
-            $table->foreignId('pais_origen');
+            $table->unsignedBigInteger('pais_origen');
+            $table->foreign('pais_origen')->references('id')->on('paises');
             $table->timestamps();
         });
     }

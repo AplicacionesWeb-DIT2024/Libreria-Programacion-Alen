@@ -8,4 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class Subcategoria extends Model
 {
     use HasFactory;
+
+    public function libros() {
+        return $this->hasMany('App\Models\Libro');
+    }
 }

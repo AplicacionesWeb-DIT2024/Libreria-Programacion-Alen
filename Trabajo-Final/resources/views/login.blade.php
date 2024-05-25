@@ -1,4 +1,4 @@
-@extends('main')
+@extends('login_layout')
 @section('title', 'Iniciar Sesion')
 @section('css')
 <link rel ="stylesheet" href=  {{ asset('css/login.css') }}>

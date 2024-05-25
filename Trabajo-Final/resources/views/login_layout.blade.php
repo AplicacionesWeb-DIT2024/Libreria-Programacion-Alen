@@ -16,17 +16,9 @@
     
 </head>
 <body>
-
-   <div class="row"> 
-        <div class="col-3">
-            @include('sidebar')
-        </div>
-        <div class="col-9">
-            <div class = "container-fluid">
-                @yield('body')
-                @yield('js')
-            </div>
-        </div>
+    <div class = "container-fluid">
+        @yield('body')
+        @yield('js')
     </div>
 </body>
 </html>

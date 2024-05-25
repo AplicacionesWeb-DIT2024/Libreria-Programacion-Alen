@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('nombre');
             $table->enum('tipo', ['Debito', 'Credito']);
-            $table->foreignId('codigo_banco');
+            $table->unsignedBigInteger('codigo_banco');
+            $table->foreign('codigo_banco')->references('id')->on('bancos');
             $table->timestamps();
         });
     }

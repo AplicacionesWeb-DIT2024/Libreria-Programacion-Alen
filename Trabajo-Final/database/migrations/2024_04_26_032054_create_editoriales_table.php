@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('editoriales', function (Blueprint $table) {
             $table->id();
             $table->string('nombre');
-            $table->foreignId('pais');
+            $table->unsignedBigInteger('pais');
+            $table->foreign('pais')->references('id')->on('paises');
             $table->timestamps();
         });
     }
