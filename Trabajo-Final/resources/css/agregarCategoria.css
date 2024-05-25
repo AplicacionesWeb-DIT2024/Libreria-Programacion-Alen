@@ -1,0 +1,28 @@
+.container {
+    border: 1px solid #ccc;
+    padding: 1rem;
+    margin: calc(10vh) auto 2rem; /* Margen superior de 10vh menos 2rem */
+    max-width: 300px;
+    box-sizing: border-box;
+    background-color: whitesmoke;
+  
+}
+
+
+  
+.form-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.form-group label {
+    margin-bottom: 0.5rem;
+}
+  
+.form-control {
+    display: block;
+    width: 80%;
+    margin: 0 auto;
+    border: 1px solid #000; 
+}
