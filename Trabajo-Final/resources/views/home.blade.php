@@ -3,7 +3,8 @@
 @section('title', 'Home')
 @section('body')
     <div class= "container mt-4">
-        <h1> Bienvenido al panel de administracion de la libreria para programadores Bytebooks </h1>
+        <h1> Bienvenido al panel de administracion de la libreria para programadores Bytebooks</h1>
+       
         <p> En este panel usted podrá realizar las siguientes acciones: </p>
         <ul> 
             <li> <b> ABM de libros:</b>  Podras crear libros, listarlos, modificarlos y eliminarlos.  </li>

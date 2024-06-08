@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Contracts\Session\Session;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class LoginController extends Controller
@@ -25,5 +27,13 @@ class LoginController extends Controller
             return redirect()->back()->withErrors(['error' => 'Nombre de usuario o contraseña incorrectos']);
         }
 
+    }
+
+
+    public function desloguear(Request $request) {
+        Auth::logout(); 
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect('/login');
     }
 }

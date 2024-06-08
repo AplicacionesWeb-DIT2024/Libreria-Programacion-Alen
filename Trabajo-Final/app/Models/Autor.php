@@ -12,7 +12,7 @@ class Autor extends Model
     protected $table = 'autores';
 
     public function pais() {
-        return $this->belongsTo('App\Models\Pais');
+        return $this->belongsTo('App\Models\Pais', 'pais_origen');
     }
 
     public function libros() {

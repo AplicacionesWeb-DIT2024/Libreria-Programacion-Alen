@@ -12,6 +12,6 @@ class Entidad extends Model
     protected $table = 'entidades_crediticias';
 
     public function banco() {
-        return $this->belongsTo('App\Models\Banco');
+        return $this->belongsTo('App\Models\Banco', 'codigo_banco');
     }
 }

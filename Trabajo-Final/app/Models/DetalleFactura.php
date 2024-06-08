@@ -5,17 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Editorial extends Model
+class DetalleFactura extends Model
 {
     use HasFactory;
 
-    protected $table = 'editoriales';
-
-    public function pais_origen() {
-        return $this->belongsTo('App\Models\Pais', 'pais');
-    }
-
     public function libros() {
         return $this->hasMany('App\Models\Libro');
+    }
+
+    public function factura() {
+        return $this->belongsTo('App\Models\Factura');
     }
 }

@@ -20,6 +20,8 @@ class DatabaseSeeder extends Seeder
             'name' => 'Alen Morillo Meneses',
             'username' => 'alen123',
             'email' => 'alenmisaelmorillomeneses@gmail.com',
+            'domicilio' => 'Avenida Siempre Viva 242',
+            'admin' => True, 
             'password' => Hash::make('alen123'),
         ]);
 

@@ -9,7 +9,7 @@
           </button>
         </div>
         <div class="modal-body">
-          ¿Está seguro de que desea eliminar el elemento "{{$nombre}}" ? Luego de eliminarlo no se puede deshacer.
+          ¿Está seguro de que desea eliminar el elemento "{{$nombre}} " ? Luego de eliminarlo no se puede deshacer.
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-danger" data-dismiss="modal" >No</button>

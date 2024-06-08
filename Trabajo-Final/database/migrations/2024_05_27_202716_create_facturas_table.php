@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('autores', function (Blueprint $table) {
+        Schema::create('facturas', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre');
-            $table->string('apellido');
-            $table->unsignedBigInteger('pais_origen');
-            $table->foreign('pais_origen')->references('id')->on('paises');
-            $table->date('fecha_nacimiento');
+            $table->unsignedBigInteger('cliente');
+            $table->foreign('cliente')->references('id')->on('users');
+            $table->float('precioTotal');
+            $table->date('fecha');
             $table->timestamps();
         });
     }
@@ -27,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('autores');
+        Schema::dropIfExists('facturas');
     }
 };

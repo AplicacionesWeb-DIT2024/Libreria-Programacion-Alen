@@ -20,6 +20,14 @@ return new class extends Migration
             $table->foreign('autor')->references('id')->on('autores');
             $table->integer('stock');
 
+            //Autor 2
+            $table->unsignedBigInteger('autor2')->nullable();
+            $table->foreign('autor2')->references('id')->on('autores');
+
+            //Autor 3
+            $table->unsignedBigInteger('autor3')->nullable();
+            $table->foreign('autor3')->references('id')->on('autores');
+
             //Pais de origen y de impresion
             $table->unsignedBigInteger('pais_origen');
             $table->unsignedBigInteger('pais_impresion');
@@ -42,6 +50,8 @@ return new class extends Migration
             //Editorial
             $table->unsignedBigInteger('editorial');
             $table->foreign('editorial')->references('id')->on('editoriales');
+
+            $table->string('imagen_referencia')->nullable();
 
             $table->timestamps();
         });

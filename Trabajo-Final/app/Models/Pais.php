@@ -26,4 +26,8 @@ class Pais extends Model
     public function editoriales() {
         return $this->hasMany('App\Models\Editorial');
     }
+
+    public function libros() {
+        return $this->hasMany('App\Models\Libro');
+    }
 }

@@ -10,7 +10,7 @@ class Banco extends Model
     use HasFactory;
 
     public function pais() {
-        return $this->belongsTo('App\Models\Pais');
+        return $this->belongsTo('App\Models\Pais', 'pais_origen');
     }
 
     public function entidades() {
