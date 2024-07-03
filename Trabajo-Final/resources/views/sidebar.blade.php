@@ -172,37 +172,27 @@
         </ul>
       </li>
       <li class="nav-item">
-        <a href="#" class="nav-link text-white">
-          <i class="fa-solid fa-user"></i>
+        <a href="{{ route('usuarios.index') }}" class="nav-link text-white">
+          <i class="fa-solid fa-users"></i>
           Usuarios
         </a>
-        <ul class= "nav nav-pills flex-column mb-auto" style="display: none;">
-          <li>
-            <a href="{{ route('usuarios.create') }}" class="nav-link text-white"> 
-              <i class="fa-solid fa-arrow-right"></i>
-              Agregar usuario
-            </a>
-          </li>
-          <li>
-            <a href="{{ route('usuarios.index') }}" class="nav-link text-white">
-              <i class="fa-solid fa-arrow-right"></i>
-              Listar usuarios
-            </a>
-          </li>
-        </ul>
       </li>
       <div class="d-flex" >
         <ul class = "nav nav-pills flex-column mb-auto"> 
+          <li class = "nav-item">
+            <a href = "{{ route('usuario.perfil') }}" class = "nav-link text-white" style = "position:absolute; bottom:12em">
+              <i class="fa-solid fa-user"></i>             
+              Ver perfil
+          </li> 
           <li class="nav-item">
             <a href="{{ route('logout')}}" class="nav-link text-white" style= "position:absolute; bottom:10em;">
-              <i class="fa-solid fa-power-off"></i>
+              <i class="fa-solid fa-arrow-right-from-bracket"></i>
               Cerrar Sesion
             </a>
           </li>
         </ul>
       </div>
     </ul>
-    
     <script src="{{asset('js/sidebar.js') }} "></script>
   </div>
 </div>

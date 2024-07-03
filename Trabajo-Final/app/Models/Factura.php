@@ -10,6 +10,6 @@ class Factura extends Model
     use HasFactory;
 
     public function detalles() {
-        return $this->hasMany('App\Models\DetalleFactura');
+        return $this->hasMany('App\Models\DetalleFactura', 'factura');
     }
 }

@@ -12,7 +12,6 @@
             <li>
                 <ul> <b> Nombre: </b> {{$nombre}} </ul>
                 <ul> <b> Domicilio: </b> {{$domicilio}} </ul>
-                <ul> <b> Es admin: </b> {{$admin}}  </ul>
                 <ul> <b> Fecha de creacion: </b> {{$creado}} </ul>
                 <ul> <b> Fecha de actualizacion: </b> {{$actualizado}} </ul>
             </li>

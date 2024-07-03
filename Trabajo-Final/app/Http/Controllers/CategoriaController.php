@@ -45,7 +45,11 @@ class CategoriaController extends Controller
     } 
 
     public function delete(Categoria $categoria) {
-        $categoria->delete();
+        try {
+            $categoria->delete();
+        } catch (\Exception $error) {
+            return redirect() -> back() -> withErrors(['msg' => 'No se puede eliminar la categoria']);
+        }
         return redirect() -> route('categorias.index');
     }
 

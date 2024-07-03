@@ -44,7 +44,12 @@ class PaisController extends Controller
     }
 
     public function delete(Pais $pais) {
-        $pais->delete();
+        try {
+            $pais->delete();
+        }
+        catch (\Exception $error) {
+            return redirect() -> back() -> withErrors(['msg' => 'No se puede eliminar el pais']);
+        }
         return redirect() -> route('paises.index');
     }
 

@@ -2,6 +2,15 @@
 @section('title', 'Listar paises')
 @section('body')
 <div class="container mt-5">
+    @if ($errors -> any())
+    <div class = "alert alert-danger mt-3"> 
+        <ul>
+            @foreach ($errors->all() as $error)
+            <li> {{ $error }} </li>
+            @endforeach
+        </ul>
+    </div>
+    @endif
     <h1>Listado de paises</h1>
     <ul class="list-group">
         @foreach ($paises as $pais)
@@ -12,20 +21,25 @@
                         @include('modal', ['id' => $pais->id, 'nombre' => $pais->nombre, 'creado' => $pais->created_at,
                          'actualizado' => $pais->updated_at])
                             
-                            <div class="float-right ml-5">
-                            
-                                {{ $pais->nombre }}
+                            <div class="row">
+                                <div class = "col-10">
+                                    {{ $pais->nombre }}
+                                </div>
+                                <div class = "col">
+                                    <div class = "btn-group">
                                 
-                                <button type = "button" class="btn btn-info btn-sm float-right ml-2" data-toggle = "modal" data-target = "#modal{{ $pais->id }}" title="Ver categoria">
-                                    <i class="fas fa-info-circle"></i>
-                                </button>
-                                <a href = "{{route('paises.edit', $pais)}}" class="btn btn-warning btn-sm float-right ml-2" title="Modificar">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                @method('delete')
-                                <button type= "button" class="btn btn-danger btn-sm float-right ml-2" title="Eliminar" data-toggle = "modal" data-target = "#deleteModal{{ $pais->id }}">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
+                                        <button type = "button" class="btn btn-info btn-sm float-right ml-2" data-toggle = "modal" data-target = "#modal{{ $pais->id }}" title="Ver categoria">
+                                            <i class="fas fa-info-circle"></i>
+                                        </button>
+                                        <a href = "{{route('paises.edit', $pais)}}" class="btn btn-warning btn-sm float-right ml-2" title="Modificar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        @method('delete')
+                                        <button type= "button" class="btn btn-danger btn-sm float-right ml-2" title="Eliminar" data-toggle = "modal" data-target = "#deleteModal{{ $pais->id }}">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                     </form>
                 </li>                  
@@ -36,6 +50,8 @@
         {{ $paises->links() }}
     </div>
 </div>
+<script src="{{asset('js/revelar.js') }} "></script>
+
 @endsection
 
 

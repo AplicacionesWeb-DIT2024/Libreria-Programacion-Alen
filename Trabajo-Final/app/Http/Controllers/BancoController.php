@@ -48,7 +48,12 @@ class BancoController extends Controller
     }
 
     public function delete(Banco $banco) {
-        $banco->delete();
+        try {
+            $banco->delete();
+
+        }catch(\Exception $error) {
+            return redirect() -> back() -> withErrors(['msg' => 'No se puede eliminar el banco']);
+        }
         return redirect() -> route('bancos.index');
     }
 

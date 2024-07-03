@@ -25,5 +25,9 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('alen123'),
         ]);
 
+      
+
+
+
     }
 }

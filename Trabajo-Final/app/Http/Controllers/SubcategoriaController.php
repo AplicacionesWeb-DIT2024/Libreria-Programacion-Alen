@@ -40,7 +40,11 @@ class SubcategoriaController extends Controller
     }
 
     public function delete(Subcategoria $subcategoria) {
-        $subcategoria->delete();
+        try {
+            $subcategoria->delete();
+        } catch(\Exception $error) {
+            return redirect() -> back() -> withErrors(['msg' => 'No se puede eliminar la subcategoria']); 
+        }
         return redirect() -> route('subcategorias.index');
     }
 

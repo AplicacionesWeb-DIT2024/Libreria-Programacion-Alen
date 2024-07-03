@@ -25,12 +25,20 @@
         <div class="form-group">
             <label for="username">Usuario</label>
             <input type="text" class="form-control" required = "" id="username" name = "username">
-          </div>
+        </div>
         <div class="form-group">
             <label for="password">Contraseña</label>
             <input type="password" class="form-control" required = "" id="password" name = "password">
+            <div class = "mt-3 form-check">
+                <input type = "checkbox" class = "form-check-input" id = "revealPassword">
+                <label class = "form-check-label" for = "revealPassword"> Mostrar contraseña </label>
+            </div>
+            
         </div>
         <button type="submit" class="btn btn-primary btn-block btn-login align-items-center">Iniciar Sesion</button>
     </form>
+
 </div>
+<script src="{{asset('js/revelar.js') }} "></script>
+
 @endsection

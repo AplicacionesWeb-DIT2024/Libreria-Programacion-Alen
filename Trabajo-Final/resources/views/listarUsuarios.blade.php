@@ -1,5 +1,5 @@
 @extends('main')
-@section('title', 'Listar autores')
+@section('title', 'Listar usuarios')
 @section('body')
 <div class="container mt-5">
     <h1>Listado de usuarios</h1>
@@ -9,25 +9,26 @@
                     <form action="{{route('usuarios.delete', $usuario)}}" id = "deleteForm{{ $usuario->id }}" method ="POST">
                         @csrf
                         @include('delete_modal', ['id' => $usuario->id, 'nombre' => $usuario->username])
-                        @include('modal_usuario', ['id' => $usuario->id, 'nombre' => $usuario->nombre, 
+                        @include('modal_usuario', ['id' => $usuario->id, 'nombre' => $usuario->name, 
                         'domicilio' => $usuario->domicilio, 'admin' => $usuario->admin, 'creado' => $usuario->created_at,
                          'actualizado' => $usuario->updated_at])
-                            
-                            <div class="float-right ml-5">
+                        <div class = "row">
+                            <div class="col-10">
                             
                                 {{$usuario->username}}
-                                
-                                <button type = "button" class="btn btn-info btn-sm float-right ml-2" data-toggle = "modal" data-target = "#modal{{ $usuario->id }}" title="Ver usuario">
-                                    <i class="fas fa-info-circle"></i>
-                                </button>
-                                <a href = "{{route('usuarios.edit', $usuario)}}" class="btn btn-warning btn-sm float-right ml-2" title="Modificar">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                @method('delete')
-                                <button type= "button" class="btn btn-danger btn-sm float-right ml-2" title="Eliminar" data-toggle = "modal" data-target = "#deleteModal{{ $usuario->id}}">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
                             </div>
+                            <div class = "col">
+                                <div class = "btn-group">
+                                    <button type = "button" class="btn btn-info btn-sm float-right ml-2" data-toggle = "modal" data-target = "#modal{{ $usuario->id }}" title="Ver usuario">
+                                        <i class="fas fa-info-circle"></i>
+                                    </button>
+                                    @method('delete')
+                                    <button type= "button" class="btn btn-danger btn-sm float-right ml-2" title="Eliminar" data-toggle = "modal" data-target = "#deleteModal{{ $usuario->id}}">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </form>
                 </li>                  
         @endforeach

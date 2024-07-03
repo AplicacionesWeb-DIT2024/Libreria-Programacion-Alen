@@ -48,7 +48,12 @@ class EditorialController extends Controller
 
   
     public function delete(Editorial $editorial) {
-        $editorial->delete();
+
+        try {
+            $editorial->delete();
+        } catch (\Exception $error) {
+            return redirect()->back()->withErrors(['msg' => 'No se puede eliminar la editorial']);
+        }
         return redirect() -> route('editoriales.index');
     }
 

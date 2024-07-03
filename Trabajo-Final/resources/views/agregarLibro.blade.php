@@ -70,7 +70,7 @@
                     <div class="form-group mt-3 mb-3">
                         <label for="editorial"> Editorial </label>
                     </div>
-                    <select class = "form-control" id = "editorial" name = "editorial"> 
+                    <select class = "form-control" id = "editorial" name = "editorial" required=""> 
                         @foreach ($editoriales as $editorial) 
                             <option value = "{{$editorial->id}}"> {{$editorial->nombre}} </option>
                         @endforeach
@@ -107,7 +107,7 @@
 
                     <div class="form-control mt-3 mb-3">
                         <label for="imagen"> Imagen principal </label>
-                        <input type= "file" name = "imagen" class = "form-control" id = "imagen" >
+                        <input type= "file" name = "imagen" class = "form-control" id = "imagen" required = "">
                     </div>
                 </div>
             </div>

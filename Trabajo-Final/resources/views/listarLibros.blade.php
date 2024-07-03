@@ -37,7 +37,7 @@
                         'precio' => $libro->precio,'creado' => $libro->created_at,
                          'actualizado' => $libro->updated_at])
                             
-                            <div class="float-right ml-5">                                
+                            <div class="btn-group">                                
                                 <button type = "button" class="btn btn-info btn-sm float-right ml-2" data-toggle = "modal" data-target = "#modal{{ $libro->id }}" title="Mas información">
                                     <i class="fas fa-info-circle"></i>
                                 </button>
@@ -58,5 +58,14 @@
     <div class = "mt-4 d-flex justify-content-start">
         {{ $libros->links() }}
     </div>
+    @if ($errors -> any())
+    <div class = "alert alert-danger mt-3"> 
+        <ul>
+            @foreach ($errors->all() as $error)
+            <li> {{ $error }} </li>
+            @endforeach
+        </ul>
+    </div>
+    @endif
 </div>
 @endsection

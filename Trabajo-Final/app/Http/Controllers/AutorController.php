@@ -60,7 +60,11 @@ class AutorController extends Controller
     } 
 
     public function delete(Autor $autor) {
-        $autor->delete();
+        try {
+            $autor->delete();
+        } catch (\Exception $error) {
+            return redirect() -> back() -> withErrors(['msg' => 'No se puede eliminar el autor']);
+        }
         return redirect() -> route('autores.index');
     }
 

@@ -15,7 +15,7 @@
             <li> <b> ABM de subcategorias:</b> Podras crear subcategorias para los libros, listarlos, modificarlos y eliminarlos. </li>
             <li> <b> ABM de bancos:</b> Podras crear los bancos que seran usados para las tarjetas, listarlos, modificarlos y eliminarlos. </li>
             <li> <b> ABM de entidades crediticias:</b>  Podras crear entidades para las tarjetas, listarlos, modificarlos y eliminarlos. </li>
-            <li> <b> ABM de usuarios:</b>  Podras crear usuarios, listarlos, modificarlos y eliminarlos. </li>
+            <li> <b> Baja de usuarios:</b>  Podras listar y eliminar usuarios. </li>
         </ul>
     </div>
 @endsection

@@ -25,6 +25,11 @@
                 <label for="pais"> Contraseña </label>
                 <input type="password" class = "form-control" id="password" name="password">
             </div>
+
+            <div class="form-group mt-3 mb-3">
+                <label for="pais"> Confirmar contraseña </label>
+                <input type="password2" class = "form-control" id="password2" name="password2">
+            </div>
             
             <div class="form-group mt-3 mb-3">
                 <button type="submit" class="btn btn-primary btn-block btn-login align-items-center"> Agregar usuario</button>

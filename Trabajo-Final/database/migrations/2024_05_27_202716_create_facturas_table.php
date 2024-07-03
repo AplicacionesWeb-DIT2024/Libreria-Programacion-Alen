@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('cliente');
             $table->foreign('cliente')->references('id')->on('users');
-            $table->float('precioTotal');
+            $table->float('precioTotal') -> nullable();
             $table->date('fecha');
             $table->timestamps();
         });

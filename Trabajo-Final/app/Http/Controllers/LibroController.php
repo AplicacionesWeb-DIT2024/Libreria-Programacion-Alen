@@ -17,6 +17,26 @@ class LibroController extends Controller
         return view('listarLibros', compact('libros'));
     }
 
+
+    public function index_api() {
+        $libros = Libro::orderBy('nombre', 'asc')->get();
+        return response()->json($libros, 200);
+
+    }
+
+
+    public function show_api(Request $request) {
+        $libro = Libro::where ('id', $request->id) -> first();
+        if ($libro) {
+            return response()->json($libro, 200);
+        }
+        else {
+            return response()->json(['message' => 'libro no encontrado'], 404);
+
+        }
+
+    }
+
     public function store(Request $request) {
 
 
@@ -130,7 +150,18 @@ class LibroController extends Controller
     }
 
     public function delete(Libro $libro) {
-        $libro->delete();
+        try {
+            $imagen = public_path($libro->imagen_referencia);
+            $libro->delete();
+
+            if (file_exists($imagen)) {
+                unlink($imagen);
+            }
+
+
+        }catch (\Exception $error) {
+            redirect()->back()->withErrors(['msg' => 'No se puede eliminar el libro']);
+        }
         return redirect() -> route('libros.index');
     }
 

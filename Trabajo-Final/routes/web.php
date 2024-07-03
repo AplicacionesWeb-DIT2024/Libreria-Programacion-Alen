@@ -194,7 +194,7 @@ Route::controller(UsuarioController::class)-> group(function() {
     
     Route::post('usuarios/store', 'store') -> name('usuarios.store')->middleware('auth');
     
-    Route::get('usuarios/{usuario}/edit', 'edit') -> name('usuarios.edit')->middleware('auth');
+    Route::get('perfil', 'edit') -> name('usuario.perfil')->middleware('auth');
     
     Route::put('usuarios/{usuario}', 'update') -> name('usuarios.update')->middleware('auth');
     

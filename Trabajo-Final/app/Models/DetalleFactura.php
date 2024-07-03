@@ -9,11 +9,13 @@ class DetalleFactura extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['libro', 'cantidad'];
+
     public function libros() {
         return $this->hasMany('App\Models\Libro');
     }
 
-    public function factura() {
+    public function factura_pertenece() {
         return $this->belongsTo('App\Models\Factura');
     }
 }

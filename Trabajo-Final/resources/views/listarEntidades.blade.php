@@ -12,20 +12,24 @@
                         @include('modal-entidad', ['id' => $entidad->id, 'nombre' => $entidad->nombre, 'creado' => $entidad->created_at,
                          'actualizado' => $entidad->updated_at, 'tipo' => $entidad->tipo, 'banco_origen' => $entidad->banco->nombre])
                             
-                            <div class="float-right ml-5">
-                            
-                                {{ $entidad->nombre }}
-                                
-                                <button type = "button" class="btn btn-info btn-sm float-right ml-2" data-toggle = "modal" data-target = "#modal{{ $entidad->id }}" title="Ver editorial">
-                                    <i class="fas fa-info-circle"></i>
-                                </button>
-                                <a href = "{{route('entidades.edit', $entidad)}}" class="btn btn-warning btn-sm float-right ml-2" title="Modificar">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                @method('delete')
-                                <button type= "button" class="btn btn-danger btn-sm float-right ml-2" title="Eliminar" data-toggle = "modal" data-target = "#deleteModal{{ $entidad->id}}">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
+                            <div class="row">
+                                <div class = "col-10">
+                                    {{ $entidad->nombre }}
+                                </div>
+                                <div class = "col">
+                                    <div class = "btn-group">
+                                        <button type = "button" class="btn btn-info btn-sm float-right ml-2" data-toggle = "modal" data-target = "#modal{{ $entidad->id }}" title="Ver editorial">
+                                            <i class="fas fa-info-circle"></i>
+                                        </button>
+                                        <a href = "{{route('entidades.edit', $entidad)}}" class="btn btn-warning btn-sm float-right ml-2" title="Modificar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        @method('delete')
+                                        <button type= "button" class="btn btn-danger btn-sm float-right ml-2" title="Eliminar" data-toggle = "modal" data-target = "#deleteModal{{ $entidad->id}}">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                     </form>
                 </li>                  
