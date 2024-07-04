@@ -24,7 +24,7 @@
                 <td> {{ $libro->editorial_perteneciente->nombre }} </td>
                 <td> {{$libro->getAutores()}} </td>
                 <td> 
-                    <img src = "{{ asset($libro->imagen_referencia)}} " alt ="{{ $libro->nombre }}" class = "img-fluid img-thumbnail" width="120px">
+                    <img src = "{{ $libro->imagen_referencia}} " alt ="{{ $libro->nombre }}" class = "img-fluid img-thumbnail" width="120px">
                 </td>
                 <td> 
                     <form action="{{route('libros.delete', $libro)}}" id = "deleteForm{{ $libro->id }}" method ="POST">

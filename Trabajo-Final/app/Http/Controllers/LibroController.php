@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use App\Models\Autor;
 use App\Models\Categoria;
 use App\Models\Editorial;
@@ -69,12 +71,20 @@ class LibroController extends Controller
         $libro->categoria = $request->categoria; 
         $libro->subcategoria = $request->subcategoria;
 
+
         if ($request->hasFile('imagen')) {
-            $file = $request->file('imagen');
-            $destinationPath = 'images/libros/';
-            $filename = time() . '-' . $file->getClientOriginalName();
-            $uploadSuccess = $request->file('imagen')->move($destinationPath,$filename);
-            $libro->imagen_referencia = $destinationPath . $filename;
+
+            $cloudinaryImage = $request->file('imagen')->storeOnCloudinary('libros');
+            $url = $cloudinaryImage->getSecurePath();
+            $public_id = $cloudinaryImage->getPublicId();
+
+
+            //$file = $request->file('imagen');
+            //$destinationPath = 'images/libros/';
+            //$filename = time() . '-' . $file->getClientOriginalName();
+            //$uploadSuccess = $request->file('imagen')->move($destinationPath,$filename);
+            //$libro->imagen_referencia = $destinationPath . $filename;
+            $libro->imagen_referencia = $url;
         }
         
 
@@ -134,11 +144,18 @@ class LibroController extends Controller
         $libro->subcategoria = $request->subcategoria;
 
         if ($request->hasFile('imagen')) {
-            $file = $request->file('imagen');
-            $destinationPath = 'images/libros/';
-            $filename = time() . '-' . $file->getClientOriginalName();
-            $uploadSuccess = $request->file('imagen')->move($destinationPath,$filename);
-            $libro->imagen_referencia = $destinationPath . $filename;
+            Cloudinary::destroy($libro->imagen_referencia);
+            $cloudinaryImage = $request->file('imagen')->storeOnCloudinary('libros');
+            $url = $cloudinaryImage->getSecurePath();
+            $public_id = $cloudinaryImage->getPublicId();
+
+            $libro->imagen_referencia = $url;
+
+            //$file = $request->file('imagen');
+            //$destinationPath = 'images/libros/';
+            //$filename = time() . '-' . $file->getClientOriginalName();
+            //$uploadSuccess = $request->file('imagen')->move($destinationPath,$filename);
+            //$libro->imagen_referencia = $destinationPath . $filename;
         }
         
 
@@ -151,12 +168,16 @@ class LibroController extends Controller
 
     public function delete(Libro $libro) {
         try {
-            $imagen = public_path($libro->imagen_referencia);
+
+            Cloudinary::destroy($libro->imagen_referencia);
+
+
+            //$imagen = public_path($libro->imagen_referencia);
             $libro->delete();
 
-            if (file_exists($imagen)) {
-                unlink($imagen);
-            }
+            //if (file_exists($imagen)) {
+            //    unlink($imagen);
+            //}
 
 
         }catch (\Exception $error) {
