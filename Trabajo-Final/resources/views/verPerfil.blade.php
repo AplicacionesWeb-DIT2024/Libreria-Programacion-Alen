@@ -1,17 +1,22 @@
 @extends('main')
 
 @section('title', 'Ver perfil')
+@section('css')
+<link rel ="stylesheet" href=  {{ asset('css/password.css') }}>
+
+@endsection
 @section('body')
-    <div class = "container mt-5" >
+    <div class = "container mt-5 perfil-form" >
         <h1> Ver perfil </h1>
         <form action = "{{route('usuarios.update',$usuario) }}" method = "POST">
             @csrf
             @method('put')
             <div class="form-group mt-3 mb-3">
-                <label for="nombre">Nombre de nacimiento </label>
+                <label for="nombre"><i class="fa-solid fa-person"></i> Nombre y apellido </label>
                 <input type="text" class="form-control" required = "" id="nombre" name = "nombre" value = "{{$usuario->name}}">
-            <div class="form-group mt-3 mb-3">
-                <label for="username"> Nombre de usuario</label>
+            </div> 
+                <div class="form-group mt-3 mb-3">
+                <label for="username"> <i class="fa-solid fa-user"></i> Nombre de usuario</label>
                 <input type="text" class="form-control" required = "" id="username" name = "username" value = "{{$usuario->username}}">
             </div>
             <div class="form-group mt-3 mb-3">
@@ -23,24 +28,21 @@
                 <input type="text" class = "form-control" id="domicilio" name="domicilio" value = "{{$usuario->domicilio}}">
             </div>
 
-            <div class="form-group mt-3 mb-3">
-                <label for="password"> Contraseña </label>
-                <input type="password" class = "form-control" id="password" name="password">
-                <div class = "mt-3 form-check">
-                    <input type = "checkbox" class = "form-check-input" id = "revealPassword">
-                    <label class = "form-check-label" for = "revealPassword"> Mostrar contraseña </label>
+            <div class="form-group mt-3 mb-3 position-relative">
+                <label for="password"><i class="fa-solid fa-key"></i> Contraseña</label>
+                <div class="password-wrapper">
+                    <input type="password" class="form-control" required="" id="password" name="password">
+                    <i class="fa-solid fa-eye" data-toggle-password="password"></i>
                 </div>
             </div>
 
-            <div class="form-group mt-3 mb-3">
-                <label for="password_confirmation"> Confirmar contraseña </label>
-                <input type="password" class = "form-control" id="password_confirmation" name="password_confirmation">
-                <div class = "mt-3 form-check">
-                    <input type = "checkbox" class = "form-check-input" id = "revealPassword2">
-                    <label class = "form-check-label" for = "revealPassword"> Mostrar contraseña </label>
+            <div class="form-group mt-3 mb-3 position-relative">
+                <label for="password_confirmation"><i class="fa-solid fa-key"></i> Confirmar Contraseña</label>
+                <div class="password-wrapper">
+                    <input type="password" class="form-control" required="" id="password_confirmation" name="password_confirmation">
+                    <i class="fa-solid fa-eye" data-toggle-password="password_confirmation"></i>
                 </div>
             </div>
-            
             <div class="form-group mt-3 mb-3">
                 <button type="submit" class="btn btn-primary btn-block btn-login align-items-center"> Guardar cambios </button>
             </div>
@@ -49,6 +51,11 @@
         <div class = "alert alert-success">
             {{ session('success') }}
         </div>
+        @endif
+        @if (session('aviso'))
+            <div class="alert alert-warning">
+                {{ session('aviso') }}
+            </div>
         @endif
         @if ($errors->any())
         <div class="alert alert-danger">
@@ -60,6 +67,6 @@
         </div>
         @endif
     </div>
-    <script src="{{asset('js/revelar.js') }} "></script>
+    <script src="{{asset('js/revelar_pass.js') }} "></script>
 
 @endsection

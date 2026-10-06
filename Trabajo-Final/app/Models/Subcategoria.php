@@ -12,4 +12,18 @@ class Subcategoria extends Model
     public function libros() {
         return $this->hasMany('App\Models\Libro');
     }
+
+     public function categoria_perteneciente() {
+        return $this->belongsTo('App\Models\Categoria', 'categoria');
+    }
+
+     public function usuarioCreacion()
+    {
+        return $this->belongsTo(User::class, 'usuario_creacion');
+    }
+
+    public function usuarioModificacion()
+    {
+        return $this->belongsTo(User::class, 'usuario_modificacion');
+    }
 }

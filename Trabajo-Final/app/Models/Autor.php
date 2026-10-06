@@ -11,9 +11,21 @@ class Autor extends Model
 
     protected $table = 'autores';
 
-    public function pais() {
-        return $this->belongsTo('App\Models\Pais', 'pais_origen');
+    protected $casts = [
+        'fecha_nacimiento' => 'date',
+    ];
+
+    public function usuarioCreacion()
+    {
+        return $this->belongsTo(User::class, 'usuario_creacion');
     }
+
+    public function usuarioModificacion()
+    {
+        return $this->belongsTo(User::class, 'usuario_modificacion');
+    }
+
+   
 
     public function libros() {
         return $this->hasMany('App\Models\Libro');

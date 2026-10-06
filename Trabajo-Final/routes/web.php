@@ -15,7 +15,7 @@ use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
 
 Route::get('/home', function() {
@@ -47,6 +47,9 @@ Route::controller(CategoriaController::class) -> group(function() {
     Route::put('categorias/{categoria}','update') -> name('categorias.update')->middleware('auth');
     
     Route::delete('categorias/{categoria}','delete') -> name('categorias.delete')->middleware('auth');
+
+    Route::patch('categorias/{categoria}', 'activar')->name('categorias.activar')->middleware('auth');
+
 });
 
 
@@ -67,27 +70,8 @@ Route::controller(SubcategoriaController::class) -> group(function() {
 
     Route::delete('subcategorias/{subcategoria}', 'delete') -> name('subcategorias.delete')->middleware('auth');
 
-});
+    Route::patch('subcategorias/{subcategoria}', 'activar')->name('subcategorias.activar')->middleware('auth');
 
-//Paises
-
-Route::controller(PaisController::class) -> group(function() {
-
-    Route::get('paises', 'index') -> name('paises.index')->middleware('auth');
-
-    Route::get('paises/create', 'create') -> name('paises.create')->middleware('auth');
-    
-    Route::post('paises/store', 'store') -> name('paises.store')->middleware('auth');
-    
-    //Editar pais
-    
-    Route::get('paises/{pais}/edit', 'edit') -> name('paises.edit')->middleware('auth');
-    
-    Route::put('paises/{pais}',  'update') -> name('paises.update')->middleware('auth');
-    
-    //Eliminar pais
-    
-    Route::delete('paises/{pais}', 'delete') -> name('paises.delete')->middleware('auth');
 });
 
 
@@ -106,25 +90,15 @@ Route::controller(AutorController::class) -> group(function() {
     Route::put('autores/{autor}',  'update') -> name('autores.update')->middleware('auth');
 
     Route::delete('autores/{autor}', 'delete') -> name('autores.delete')->middleware('auth');
-});
-
-
-
-//Bancos
-Route::controller(BancoController::class)-> group(function() {
-
-    Route::get('bancos', 'index') -> name('bancos.index')->middleware('auth');
-
-    Route::get('bancos/create', 'create') -> name('bancos.create')->middleware('auth');
     
-    Route::post('bancos/store',  'store') -> name('bancos.store')->middleware('auth');
-    
-    Route::get('bancos/{banco}/edit',  'edit') -> name('bancos.edit')->middleware('auth');
-    
-    Route::put('bancos/{banco}',  'update') -> name('bancos.update')->middleware('auth');
-    
-    Route::delete('bancos/{banco}',  'delete') -> name('bancos.delete')->middleware('auth');
-});
+    Route::patch('autores/{autor}', 'activar')->name('autores.activar')->middleware('auth');
+
+
+    });
+
+
+
+
 
 
 //Editoriales
@@ -135,31 +109,12 @@ Route::controller(EditorialController::class)-> group(function() {
     Route::get('editoriales/create', 'create') -> name('editoriales.create')->middleware('auth');
     
     Route::post('editoriales/store', 'store') -> name('editoriales.store')->middleware('auth');
-    
-    Route::get('editoriales/{editorial}/edit', 'edit') -> name('editoriales.edit')->middleware('auth');
-    
+        
     Route::put('editoriales/{editorial}', 'update') -> name('editoriales.update')->middleware('auth');
     
     Route::delete('editoriales/{editorial}',  'delete') -> name('editoriales.delete')->middleware('auth');
-});
 
-
-
-//Entidades
-
-Route::controller(EntidadController::class)-> group(function() {
-
-    Route::get('entidades',  'index') -> name('entidades.index')->middleware('auth');
-
-    Route::get('entidades/create', 'create') -> name('entidades.create')->middleware('auth');
-    
-    Route::post('entidades/store', 'store') -> name('entidades.store')->middleware('auth');
-    
-    Route::get('entidades/{entidad}/edit', 'edit') -> name('entidades.edit')->middleware('auth');
-    
-    Route::put('entidades/{entidad}', 'update') -> name('entidades.update')->middleware('auth');
-    
-    Route::delete('entidades/{entidad}', 'delete') -> name('entidades.delete')->middleware('auth');
+    Route::patch('/editoriales/{editorial}', 'activar')->name('editoriales.activar')->middleware('auth');
 });
 
 
@@ -179,6 +134,9 @@ Route::controller(LibroController::class)-> group(function() {
     Route::put('libros/{libro}', 'update') -> name('libros.update')->middleware('auth');
     
     Route::delete('libros/{libro}', 'delete') -> name('libros.delete')->middleware('auth');
+
+    Route::patch('libros/{libro}', 'activar')->name('libros.activar')->middleware('auth');
+
 });
 
 
@@ -199,6 +157,9 @@ Route::controller(UsuarioController::class)-> group(function() {
     Route::put('usuarios/{usuario}', 'update') -> name('usuarios.update')->middleware('auth');
     
     Route::delete('usuarios/{usuario}', 'delete') -> name('usuarios.delete')->middleware('auth');
+
+    Route::patch('usuarios/{usuario}', 'activar')->name('usuarios.activar')->middleware('auth');
+
 });
 
 

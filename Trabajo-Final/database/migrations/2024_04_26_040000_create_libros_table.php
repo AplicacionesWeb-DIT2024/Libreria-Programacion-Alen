@@ -14,46 +14,44 @@ return new class extends Migration
         Schema::create('libros', function (Blueprint $table) {
             $table->id();
             $table->string('nombre');
-
-            //Autor
+            $table->string('idioma');
             $table->unsignedBigInteger('autor');
             $table->foreign('autor')->references('id')->on('autores');
             $table->integer('stock');
 
-            //Autor 2
             $table->unsignedBigInteger('autor2')->nullable();
             $table->foreign('autor2')->references('id')->on('autores');
 
-            //Autor 3
             $table->unsignedBigInteger('autor3')->nullable();
             $table->foreign('autor3')->references('id')->on('autores');
 
-            //Pais de origen y de impresion
-            $table->unsignedBigInteger('pais_origen');
-            $table->unsignedBigInteger('pais_impresion');
-
-            $table->foreign('pais_origen')->references('id')->on('paises');
-            $table->foreign('pais_impresion')->references('id')->on('paises');
+            $table->string('pais_origen');
+            $table->string('pais_impresion');
 
             $table->integer('edicion');
             $table->year('anio_publicacion');
             $table->float('precio');
 
-            //Categoria
             $table->unsignedBigInteger('categoria');
             $table->foreign('categoria')->references('id')->on('categorias');
 
-            //Subcategoria
             $table->unsignedBigInteger('subcategoria');
             $table->foreign('subcategoria')->references('id')->on('subcategorias');
 
-            //Editorial
             $table->unsignedBigInteger('editorial');
             $table->foreign('editorial')->references('id')->on('editoriales');
 
-            $table->string('imagen_referencia')->nullable();
+            $table->string('imagen_original');
+            $table->string('imagen_original_public_id');
+            $table->string('imagen_referencia_2')->nullable();
+            $table->string('imagen_referencia_2_public_id')->nullable();
+            $table->string('imagen_referencia_3')->nullable();
+            $table->string('imagen_referencia_3_public_id')->nullable();
 
             $table->timestamps();
+            $table->string('usuario_creacion');
+            $table->string('usuario_modificacion');
+            $table->boolean('activo');
         });
     }
 

@@ -38,6 +38,16 @@ class Libro extends Model
         return $this->belongsTo('App\Models\Pais', 'pais_origen');
     }
 
+     public function usuarioCreacion()
+    {
+        return $this->belongsTo(User::class, 'usuario_creacion');
+    }
+
+    public function usuarioModificacion()
+    {
+        return $this->belongsTo(User::class, 'usuario_modificacion');
+    }
+
     public function pais_de_impresion() {
         return $this->belongsTo('App\Models\Pais', 'pais_impresion');
     }
@@ -57,7 +67,8 @@ class Libro extends Model
             $autores[] = $this->autor_secundario2->apellido . ' ' . $this->autor_secundario2->nombre;
         }
 
-        return implode(', ', $autores);
+        return $autores;
+
     }
     
 

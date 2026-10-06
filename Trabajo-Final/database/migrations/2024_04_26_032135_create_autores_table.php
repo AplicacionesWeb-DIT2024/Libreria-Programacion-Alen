@@ -15,10 +15,12 @@ return new class extends Migration
             $table->id();
             $table->string('nombre');
             $table->string('apellido');
-            $table->unsignedBigInteger('pais_origen');
-            $table->foreign('pais_origen')->references('id')->on('paises');
+            $table->string('pais_origen');
             $table->date('fecha_nacimiento');
             $table->timestamps();
+            $table->string('usuario_creacion');
+            $table->string('usuario_modificacion');
+            $table->boolean('activo');
         });
     }
 

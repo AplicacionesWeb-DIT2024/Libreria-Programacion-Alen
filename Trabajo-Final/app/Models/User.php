@@ -38,6 +38,16 @@ class User extends Authenticatable
         'two_factor_secret',
     ];
 
+     public function usuarioCreacion()
+    {
+        return $this->belongsTo(User::class, 'usuario_creacion');
+    }
+
+    public function usuarioModificacion()
+    {
+        return $this->belongsTo(User::class, 'usuario_modificacion');
+    }
+
 
     /**
      * Get the attributes that should be cast.
@@ -49,6 +59,10 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_admin' => 'boolean',
+            'activo' => 'boolean',
+            'debe_cambiar_password' => 'boolean',
+
         ];
     }
 }

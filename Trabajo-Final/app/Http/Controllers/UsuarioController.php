@@ -5,19 +5,24 @@ namespace App\Http\Controllers;
 use App\Models\DetalleFactura;
 use App\Models\Factura;
 use App\Models\User;
+use App\Mail\NuevoAdmin;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Console\Migrations\StatusCommand;
 use Illuminate\Http\Request;
 
 class UsuarioController extends Controller
 {
     public function index() {
-        $usuarios = User::where('admin', false) -> orderBy('username', 'asc')-> paginate(3);
+        $usuarios = User::query()
+        ->orderBy('id')
+        ->get();
         return view('listarUsuarios', compact('usuarios'));
     }
 
     public function index_api() {
         $usuarios = User::orderBy('username', 'asc') -> get();
-        //dd($usuarios);
         return response()->json($usuarios, 200);
 
     }
@@ -51,21 +56,33 @@ class UsuarioController extends Controller
 
     public function store(Request $request) {
 
+        $request->validate([
+            'nombre'   => ['required', 'string', 'max:255'],
+            'apellido' => ['required', 'string', 'max:255'],
+            'username' => ['required', 'string', 'unique:users,username'],
+            'email'    => ['required', 'email', 'unique:users,email'],
+        ]);
+        $passwordTemporal = Str::password(12);
+
         $usuario = new User(); 
         $usuario->name = $request->nombre; 
+        $usuario->apellido = $request->apellido;
         $usuario->username = $request->username;
         $usuario->email = $request->email;
         $usuario->domicilio = $request->domicilio;
-        $usuario->password = $request->password;
-        $usuario->admin = False;
+        $usuario->password = Hash::make($passwordTemporal);
+        $usuario->is_admin = true;
+        $usuario->activo = true;
+        $usuario->debe_cambiar_password = true;
         $usuario->save();
+
+        Mail::to($usuario->email)->send(new NuevoAdmin($usuario, $passwordTemporal));
 
         return redirect() ->back() -> with('success', 'Usuario creado exitosamente');
     }
 
 
     public function store_api(Request $request) {
-        //dd($request -> all());
         try {
             $usuario = new User(); 
             $usuario->name = $request->nombre; 
@@ -102,25 +119,38 @@ class UsuarioController extends Controller
             'nombre' => 'required|string|max:255',
             'username' => 'required|string|max:255',
             'email' => 'required|email|max:255',
-            'domicilio' => 'required|string|max:255',
-            'password' => 'nullable|string | confirmed'
+            'domicilio' => 'nullable|string|max:255',
+            'password' => 'nullable|string | confirmed | min:8'
         ]);
         $usuario->name = $request->nombre; 
         $usuario->username = $request->username;
         $usuario->email = $request->email;
         $usuario->domicilio = $request->domicilio;
         if ($request->filled('password')) {
-            $usuario->password = bcrypt($request->password);
+            $usuario->password = $request->password;
+            $usuario->debe_cambiar_password = false;
         }
 
         $usuario->save();
-        return redirect() -> route('usuarios.index') -> with('success', 'Usuario actualizado correctamente.');
+        return redirect() -> route('usuario.perfil') -> with('success', 'Usuario actualizado correctamente.');
 
     }
 
     public function delete(User $usuario) {
-        $usuario->delete();
+        if ($usuario->id === auth()->id()) {
+            return redirect()->back()->with('error', 'No podés desactivar tu propia cuenta.');
+        }
+        $usuario->activo = false;
+        $usuario->save();
         return redirect() -> route('usuarios.index');
+    }
+
+    public function activar(User $usuario)
+    {
+        $usuario->activo = true;
+        $usuario->save();
+
+        return redirect()->route('usuarios.index')->with('success', 'Usuario reactivado correctamente');
     }
 
 }

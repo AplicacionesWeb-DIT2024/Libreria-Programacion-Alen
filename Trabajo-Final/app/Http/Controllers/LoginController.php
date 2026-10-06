@@ -19,12 +19,15 @@ class LoginController extends Controller
             'password' => ['required', 'string'],
         ]);
 
+        $credentials['is_admin'] = true;
+        $credentials['activo'] = true;
+
        
         if (auth() -> attempt( $credentials)) {
             return redirect()->route('home');
         }
         else {
-            return redirect()->back()->withErrors(['error' => 'Nombre de usuario o contraseña incorrectos']);
+            return redirect()->back()->withErrors(['error' => 'Nombre de usuario o contraseña incorrectos.']);
         }
 
     }

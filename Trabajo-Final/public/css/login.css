@@ -7,7 +7,7 @@ body {
 .container {
   border: 1px solid #ccc;
   padding: 1rem;
-  margin: calc(10vh) auto 2rem; /* Margen superior de 10vh menos 2rem */
+  margin: calc(10vh) auto 2rem; 
   max-width: 300px;
   box-sizing: border-box;
   background-color: whitesmoke;
@@ -56,5 +56,6 @@ body {
   display: flex;
   justify-content: center;
 }
+
 
 

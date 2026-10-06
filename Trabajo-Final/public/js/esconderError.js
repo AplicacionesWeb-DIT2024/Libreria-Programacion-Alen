@@ -3,11 +3,11 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
     if (error) {
         setTimeout(() => {
-            error.style.transition = 'opacity 0.5s';
+            error.style.transition = 'opacity 1s';
             error.style.opacity = '0';
             setTimeout(() => {
                 error.remove();
-            }, 500); 
+            }, 1000); 
         }, 2000); 
     }
 });

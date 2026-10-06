@@ -3,6 +3,12 @@
 @section('title', 'Agregar autor')
 @section('body')
     <div class = "container mt-5" >
+         @if (session('success'))
+            <div class = "alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
+
         <h1> Agregar autor</h1>
         <form action = "{{route('autores.store')}}" method = "POST">
             @csrf
@@ -22,17 +28,13 @@
             </div>
             <select class = "form-control" id = "paisOrigen" name = "pais"> 
                 @foreach ($paises as $pais) 
-                    <option value = "{{$pais->id}}"> {{$pais->nombre}} </option>
+                    <option value = "{{$pais}}"> {{$pais}} </option>
                 @endforeach
             </select>
             <div class="form-group mt-3 mb-3">
                 <button type="submit" class="btn btn-primary btn-block btn-login align-items-center"> Agregar autor</button>
             </div>
         </form>
-        @if (session('success'))
-        <div class = "alert alert-success">
-            {{ session('success') }}
-        </div>
-    @endif
+       
     </div>
 @endsection

@@ -14,9 +14,11 @@ return new class extends Migration
         Schema::create('editoriales', function (Blueprint $table) {
             $table->id();
             $table->string('nombre');
-            $table->unsignedBigInteger('pais');
-            $table->foreign('pais')->references('id')->on('paises');
+            $table->string('pais');
             $table->timestamps();
+            $table->foreignId('usuario_creacion')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('usuario_modificacion')->constrained('users')->cascadeOnDelete();
+            $table->boolean('activo');
         });
     }
 

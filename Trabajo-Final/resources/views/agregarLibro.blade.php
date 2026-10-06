@@ -34,16 +34,19 @@
                         <label for="pais_origen"> Pais de origen </label>
                     </div>
                     <select class = "form-control" id = "pais_origen" name = "pais_origen"> 
+                        <option value="">Seleccione una opción</option>
                         @foreach ($paises as $pais) 
-                            <option value = "{{$pais->id}}"> {{$pais->nombre}} </option>
+                            <option value="{{ $pais }}">{{ $pais }}</option>
                         @endforeach
                     </select>
                     <div class="form-group mt-3 mb-3">
                         <label for="pais_impresion"> Pais donde se imprimió </label>
                     </div>
                     <select class = "form-control" id = "pais_impresion" name = "pais_impresion"> 
+                        <option value="">Seleccione una opción</option>
+
                         @foreach ($paises as $pais) 
-                            <option value = "{{$pais->id}}"> {{$pais->nombre}} </option>
+                            <option value="{{ $pais }}">{{ $pais }}</option>
                         @endforeach
                     </select>
 

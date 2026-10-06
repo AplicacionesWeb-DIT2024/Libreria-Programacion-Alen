@@ -5,11 +5,16 @@ namespace App\Http\Controllers;
 use App\Models\Categoria;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
 
 class CategoriaController extends Controller
 {
-    public function index() {
-        $categorias = Categoria::orderBy('nombre', 'asc') -> paginate(3);
+    public function index(Request $request) {
+
+        $categorias = Categoria::query()
+        ->orderBy('id')
+        ->get();
         return view('listarCategorias', compact('categorias'));
     }
 
@@ -18,6 +23,9 @@ class CategoriaController extends Controller
 
         $categoria = new Categoria(); 
         $categoria->nombre = $request->nombre; 
+        $categoria->activo = true;
+        $categoria->usuario_creacion = Auth::id();
+        $categoria->usuario_modificacion = Auth::id();
         $categoria->save();
 
         return redirect() ->back() -> with('success', 'Categoria creada exitosamente');
@@ -34,6 +42,7 @@ class CategoriaController extends Controller
 
     public function update(Request $request, Categoria $categoria) {
         $categoria -> nombre = $request -> nombre; 
+        $categoria->usuario_modificacion = Auth::id();
 
         $categoria->save();
         return redirect() -> route('categorias.index');
@@ -45,12 +54,19 @@ class CategoriaController extends Controller
     } 
 
     public function delete(Categoria $categoria) {
-        try {
-            $categoria->delete();
-        } catch (\Exception $error) {
-            return redirect() -> back() -> withErrors(['msg' => 'No se puede eliminar la categoria']);
-        }
+        $categoria->activo = false;
+        $categoria->usuario_modificacion = Auth::id();
+        $categoria->save();
         return redirect() -> route('categorias.index');
+    }
+
+    public function activar(Categoria $categoria)
+    {
+        $categoria->activo = true;
+        $categoria->usuario_modificacion = Auth::id();
+        $categoria->save();
+
+        return redirect()->route('categorias.index')->with('success', 'Categoria reactivada correctamente');
     }
 
 }

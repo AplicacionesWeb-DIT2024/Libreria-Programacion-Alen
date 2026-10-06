@@ -11,12 +11,31 @@ use App\Models\Libro;
 use App\Models\Pais;
 use App\Models\Subcategoria;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
 
 class LibroController extends Controller
 {
     public function index() {
-        $libros = Libro::orderBy('nombre', 'asc') -> paginate(3);
-        return view('listarLibros', compact('libros'));
+        $libros = Libro::with([
+            'categoria_perteneciente',
+            'subcategoria_perteneciente',
+            'editorial_perteneciente',
+            'autor_origen',
+            'autor_secundario',
+            'autor_secundario2',
+        ])->orderBy('id')
+        ->get();
+         $autores = Autor::all();
+         $editoriales = Editorial::all();
+         $categorias = Categoria::all();
+         $subcategorias = Subcategoria::all();
+         $paises = config('countries');
+         $idiomas = config('languages');
+        return view('listarLibros', compact('libros','autores','editoriales',
+        'paises',
+        'categorias',
+        'subcategorias','idiomas'));
     }
 
 
@@ -42,26 +61,35 @@ class LibroController extends Controller
     public function store(Request $request) {
 
 
-        //$libro = Libro::create($request->all());
+
+        $request->validate([
+            'nombre' => 'required|string',
+            'anio_publicacion' => 'required|integer|min:1000|max:' . date('Y'),
+            'autor'  => 'required|not_in:""|different:autor2|different:autor3',
+            'autor2' => 'nullable|exists:autores,id|different:autor',
+            'autor3' => 'nullable|exists:autores,id|different:autor|different:autor2',
+            'idioma' => 'required|string',
+            'imagen_original' => 'required|image',
+            'imagen_referencia_2' => 'nullable|image',
+            'imagen_referencia_3' => 'nullable|image',
+            'stock' => 'required | integer | min:0',
+            'precio' => 'required | numeric | min:0',
+            'pais_origen'          => 'required|string',
+            'pais_impresion'       => 'required|string',
+            'edicion'              => 'required|integer|min:1',
+            'categoria'            => 'required|exists:categorias,id',
+            'subcategoria'         => 'required|exists:subcategorias,id',
+            'editorial'            => 'required|exists:editoriales,id',
+        ]);
 
         $libro = new Libro(); 
         $libro->nombre = $request->nombre; 
         $libro->stock = $request->stock;
         $libro->autor = $request->autor;
-
-        if ($request->autor2 == $request->autor) {
-            $libro->autor2 == null;
-        }
-        else {
-                $request->autor2 == $libro->autor2;
-        }
-
-        if ($request->autor3 == $request->autor || $request->autor3 == $request->autor2) {
-            $libro->autor3 = null;
-        } else {
-            $libro->autor3 = $request->autor3;
-        }
-
+        $libro->autor2 = $request->autor2 ?: null;
+        $libro->autor3 = $request->autor3 ?: null;
+        
+        $libro->idioma = $request->idioma;
         $libro->editorial = $request->editorial; 
         $libro->pais_origen = $request->pais_origen; 
         $libro->pais_impresion = $request->pais_impresion; 
@@ -70,21 +98,26 @@ class LibroController extends Controller
         $libro->precio = $request->precio;
         $libro->categoria = $request->categoria; 
         $libro->subcategoria = $request->subcategoria;
+        $libro->usuario_creacion = Auth::id();
+        $libro->usuario_modificacion = Auth::id();
+        $libro->activo = true;
 
+        $cloudinaryImagen = $request->file('imagen_original')->storeOnCloudinary('libros');
+        $libro->imagen_original = $cloudinaryImagen->getSecurePath();
+        $libro->imagen_original_public_id = $cloudinaryImagen->getPublicId();
 
-        if ($request->hasFile('imagen')) {
+        if ($request->hasFile('imagen_referencia_2')) {
+            $cloudinaryRef2 = $request->file('imagen_referencia_2')->storeOnCloudinary('libros');
+            $libro->imagen_referencia_2 = $cloudinaryRef2->getSecurePath();
+            $libro->imagen_referencia_2_public_id = $cloudinaryRef2->getPublicId();
 
-            $cloudinaryImage = $request->file('imagen')->storeOnCloudinary('libros');
-            $url = $cloudinaryImage->getSecurePath();
-            $public_id = $cloudinaryImage->getPublicId();
+        }
 
+        if ($request->hasFile('imagen_referencia_3')) {
+            $cloudinaryRef3 = $request->file('imagen_referencia_3')->storeOnCloudinary('libros');
+            $libro->imagen_referencia_3 = $cloudinaryRef3->getSecurePath();
+            $libro->imagen_referencia_3_public_id = $cloudinaryRef3->getPublicId();
 
-            //$file = $request->file('imagen');
-            //$destinationPath = 'images/libros/';
-            //$filename = time() . '-' . $file->getClientOriginalName();
-            //$uploadSuccess = $request->file('imagen')->move($destinationPath,$filename);
-            //$libro->imagen_referencia = $destinationPath . $filename;
-            $libro->imagen_referencia = $url;
         }
         
 
@@ -98,7 +131,7 @@ class LibroController extends Controller
     public function create() {
         $autores = Autor::all();
         $editoriales = Editorial::all();
-        $paises = Pais::all();
+        $paises = config('countries');
         $categorias = Categoria::all();
         $subcategorias = Subcategoria::all();
         return view('agregarLibro', compact('paises','editoriales','autores', 'paises','categorias','subcategorias'));
@@ -117,23 +150,34 @@ class LibroController extends Controller
 
     
     public function update(Request $request, Libro $libro) {
+        $request->validate([
+            'nombre' => 'required|string',
+            'anio_publicacion' => 'required|integer|min:1000|max:' . date('Y'),
+            'autor'  => 'required|not_in:""|different:autor2|different:autor3',
+            'autor2' => 'nullable|exists:autores,id|different:autor',
+            'autor3' => 'nullable|exists:autores,id|different:autor|different:autor2',
+            'idioma' => 'required|string',
+            'imagen_original' => 'nullable|image',
+            'imagen_referencia_2' => 'nullable|image',
+            'imagen_referencia_3' => 'nullable|image',
+            'stock' => 'required | integer | min:0',
+            'precio' => 'required | numeric | min:0',
+            'pais_origen'          => 'required|string',
+            'pais_impresion'       => 'required|string',
+            'edicion'              => 'required|integer|min:1',
+            'categoria'            => 'required|exists:categorias,id',
+            'subcategoria'         => 'required|exists:subcategorias,id',
+            'editorial'            => 'required|exists:editoriales,id',
+            'eliminar_imagen_referencia_2' => 'nullable|boolean',
+            'eliminar_imagen_referencia_3' => 'nullable|boolean',
+        ]);
         $libro->nombre = $request->nombre; 
         $libro->stock = $request->stock;
-        $libro->autor = $request->autor; 
-
-        if ($request->autor2 == $request->autor) {
-            $libro->autor2 = null;
-        }
-        else {
-                $libro->autor2 = $request->autor2;
-        }
-
-        if ($request->autor3 == $request->autor || $request->autor3 == $request->autor2) {
-            $libro->autor3 = null;
-        } else {
-            $libro->autor3 = $request->autor3;
-        }
-
+        $libro->autor = $request->autor;
+        $libro->autor2 = $request->autor2 ?: null;
+        $libro->autor3 = $request->autor3 ?: null;
+        
+        $libro->idioma = $request->idioma;
         $libro->editorial = $request->editorial; 
         $libro->pais_origen = $request->pais_origen; 
         $libro->pais_impresion = $request->pais_impresion; 
@@ -142,48 +186,60 @@ class LibroController extends Controller
         $libro->precio = $request->precio;
         $libro->categoria = $request->categoria; 
         $libro->subcategoria = $request->subcategoria;
+        $libro->usuario_modificacion = Auth::id();
+        $libro->activo = true;
 
-        if ($request->hasFile('imagen')) {
-            Cloudinary::destroy($libro->imagen_referencia);
-            $cloudinaryImage = $request->file('imagen')->storeOnCloudinary('libros');
-            $url = $cloudinaryImage->getSecurePath();
-            $public_id = $cloudinaryImage->getPublicId();
+        if ($request->hasFile('imagen_original')) {
+            if ($libro->imagen_original_public_id) {
+                Cloudinary::destroy($libro->imagen_original_public_id);
+            }
+            $cloudinaryImagen = $request->file('imagen_original')->storeOnCloudinary('libros');
+            $libro->imagen_original = $cloudinaryImagen->getSecurePath();
+            $libro->imagen_original_public_id = $cloudinaryImagen->getPublicId();
+        }
 
-            $libro->imagen_referencia = $url;
+        foreach ([2, 3] as $n) {
+            $campo    = "imagen_referencia_$n";
+            $publicId = "{$campo}_public_id";
 
-            //$file = $request->file('imagen');
-            //$destinationPath = 'images/libros/';
-            //$filename = time() . '-' . $file->getClientOriginalName();
-            //$uploadSuccess = $request->file('imagen')->move($destinationPath,$filename);
-            //$libro->imagen_referencia = $destinationPath . $filename;
+            if ($request->hasFile($campo)) {
+                if ($libro->$publicId) {
+                    Cloudinary::destroy($libro->$publicId);
+                }
+                $subida = $request->file($campo)->storeOnCloudinary('libros');
+                $libro->$campo    = $subida->getSecurePath();
+                $libro->$publicId = $subida->getPublicId();
+
+            } elseif ($request->boolean("eliminar_$campo")) {
+                if ($libro->$publicId) {
+                    Cloudinary::destroy($libro->$publicId);
+                }
+                $libro->$campo    = null;
+                $libro->$publicId = null;
+            }
         }
         
-
-
-
         $libro->save();
-        return redirect() -> route('libros.index');
+        return redirect()->back()->with('success', 'Libro modificado exitosamente');
+
 
     }
 
     public function delete(Libro $libro) {
-        try {
-
-            Cloudinary::destroy($libro->imagen_referencia);
-
-
-            //$imagen = public_path($libro->imagen_referencia);
-            $libro->delete();
-
-            //if (file_exists($imagen)) {
-            //    unlink($imagen);
-            //}
-
-
-        }catch (\Exception $error) {
-            redirect()->back()->withErrors(['msg' => 'No se puede eliminar el libro']);
-        }
+        $libro->activo = false;
+        $libro->usuario_modificacion = Auth::id();
+        $libro->save();
         return redirect() -> route('libros.index');
     }
+
+    public function activar(Libro $libro)
+    {
+        $libro->activo = true;
+        $libro->usuario_modificacion = Auth::id();
+        $libro->save();
+
+        return redirect()->route('libros.index')->with('success', 'Categoria reactivada correctamente');
+    }
+
 
 }

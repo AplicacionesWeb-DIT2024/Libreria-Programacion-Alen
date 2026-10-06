@@ -15,6 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('nombre');
             $table->timestamps();
+            $table->string('usuario_creacion');
+            $table->string('usuario_modificacion');
+            $table->boolean('activo');
+
         });
     }
 

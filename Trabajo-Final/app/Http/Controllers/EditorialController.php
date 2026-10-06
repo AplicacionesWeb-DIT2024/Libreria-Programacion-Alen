@@ -5,12 +5,22 @@ namespace App\Http\Controllers;
 use App\Models\Editorial;
 use App\Models\Pais;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
 
 class EditorialController extends Controller
 {
-    public function index() {
-        $editoriales = Editorial::orderBy('nombre', 'asc') -> paginate(3);
-        return view('listarEditoriales', compact('editoriales'));
+    public function index(Request $request) {
+        $paises = collect(config('countries'))->sort()->values();
+        
+
+        $editoriales = Editorial::query()
+        ->orderBy('id')
+        ->get();
+;
+       
+
+        return view('listarEditoriales', compact('editoriales','paises'));
     }
 
     public function store(Request $request) {
@@ -18,6 +28,9 @@ class EditorialController extends Controller
         $editorial = new Editorial(); 
         $editorial->nombre = $request->nombre; 
         $editorial->pais = $request->pais;
+        $editorial->activo = true; 
+        $editorial->usuario_creacion = Auth::id();
+        $editorial->usuario_modificacion = Auth::id();
         $editorial->save();
 
         return redirect() ->back() -> with('success', 'Editorial creada exitosamente');
@@ -25,7 +38,7 @@ class EditorialController extends Controller
 
 
     public function create() {
-        $paises = Pais::all();
+        $paises = config('countries');
         return view('agregarEditorial', compact('paises'));
     }
 
@@ -40,6 +53,7 @@ class EditorialController extends Controller
 
 
         $editorial->pais = $request->pais;
+        $editorial->usuario_modificacion = Auth::id();
 
         $editorial->save();
         return redirect() -> route('editoriales.index');
@@ -49,12 +63,19 @@ class EditorialController extends Controller
   
     public function delete(Editorial $editorial) {
 
-        try {
-            $editorial->delete();
-        } catch (\Exception $error) {
-            return redirect()->back()->withErrors(['msg' => 'No se puede eliminar la editorial']);
-        }
+        $editorial->activo = false;
+        $editorial->usuario_modificacion = Auth::id();
+        $editorial->save();
         return redirect() -> route('editoriales.index');
+    }
+
+    public function activar(Editorial $editorial)
+    {
+        $editorial->activo = true;
+        $editorial->usuario_modificacion = Auth::id();
+        $editorial->save();
+
+        return redirect()->route('editoriales.index')->with('success', 'Editorial reactivada correctamente');
     }
 
 }
