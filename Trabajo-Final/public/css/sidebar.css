@@ -1,0 +1,23 @@
+.sub-menu {
+    display: block;
+    padding: 0.5rem 1rem; 
+    color: #fff;
+    background-color: #007bff; 
+    border: 1px solid #007bff; 
+    border-radius: 0.25rem; 
+    text-decoration: none;
+}
+
+.sub-menu li a:hover {
+    background-color: #0056b3; 
+}
+
+.sub-menu a {
+    color: #fff;
+    text-decoration: none;
+}
+
+
+.nav-link:hover + .sub-menu {
+    display: block;
+}

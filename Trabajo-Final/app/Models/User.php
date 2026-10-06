@@ -6,10 +6,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Fortify\TwoFactorAuthenticatable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasApiTokens;
+    use HasFactory;
+    use Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -30,7 +34,20 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'two_factor_recovery_codes',
+        'two_factor_secret',
     ];
+
+     public function usuarioCreacion()
+    {
+        return $this->belongsTo(User::class, 'usuario_creacion');
+    }
+
+    public function usuarioModificacion()
+    {
+        return $this->belongsTo(User::class, 'usuario_modificacion');
+    }
+
 
     /**
      * Get the attributes that should be cast.
@@ -42,6 +59,10 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_admin' => 'boolean',
+            'activo' => 'boolean',
+            'debe_cambiar_password' => 'boolean',
+
         ];
     }
 }
