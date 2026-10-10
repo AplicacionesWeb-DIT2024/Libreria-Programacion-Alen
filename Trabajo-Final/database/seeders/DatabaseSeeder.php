@@ -6,6 +6,8 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Enums\Role;
+
 
 class DatabaseSeeder extends Seeder
 {
@@ -21,10 +23,10 @@ class DatabaseSeeder extends Seeder
             'apellido' => 'Morillo Meneses',
             'username' => 'amorillo',
             'activo' => true,
-            'is_admin' => true,
+            'role' => Role::SuperAdmin,
             'email' => 'alenmisaelmorillomeneses@gmail.com',
-            'domicilio' => 'Avenida Siempre Viva 242',
-            'password' => Hash::make('admin'),
+            'password' => 'admin',
+            'debe_cambiar_password' => false
         ]);
 
       

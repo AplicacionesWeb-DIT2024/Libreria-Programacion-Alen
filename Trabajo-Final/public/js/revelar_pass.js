@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
         icon.addEventListener("click", () => {
             const targetId = icon.getAttribute("data-toggle-password");
             const passwordInput = document.getElementById(targetId);
+            if (!passwordInput) return;
 
             const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
             passwordInput.setAttribute("type", type);

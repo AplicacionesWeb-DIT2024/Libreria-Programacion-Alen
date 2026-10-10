@@ -18,10 +18,11 @@ return new class extends Migration
             $table->string('username')->unique();
             $table->string('email')->unique();
             $table->string('domicilio')->nullable();
+            $table->string('telefono')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->boolean('activo')->default(true);
-            $table->boolean('is_admin')->default(false);
+            $table->string('role')->default('cliente')->index();
             $table->boolean('debe_cambiar_password')->default(false);
             $table->rememberToken();
             $table->foreignId('current_team_id')->nullable();

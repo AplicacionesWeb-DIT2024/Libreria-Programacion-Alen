@@ -6,6 +6,8 @@ use Illuminate\Contracts\Session\Session;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Enums\Role;
+
 
 class LoginController extends Controller
 {
@@ -19,16 +21,20 @@ class LoginController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        $credentials['is_admin'] = true;
-        $credentials['activo'] = true;
+        $ok = Auth::attempt([
+            'username' => $credentials['username'],
+            'password' => $credentials['password'],
+            'activo'   => true,
+            fn ($query) => $query->whereIn('role', [Role::Admin->value, Role::SuperAdmin->value]),
+        ]);
 
-       
-        if (auth() -> attempt( $credentials)) {
+        if ($ok) {
+            $request->session()->regenerate();
             return redirect()->route('home');
         }
-        else {
-            return redirect()->back()->withErrors(['error' => 'Nombre de usuario o contraseña incorrectos.']);
-        }
+
+        return redirect()->back()
+        ->withErrors(['error' => 'Nombre de usuario o contraseña incorrectos.']);
 
     }
 

@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Enums\Role;
 
 class User extends Authenticatable
 {
@@ -22,8 +23,14 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'apellido',
+        'username',
         'email',
+        'domicilio',
+        'telefono',
         'password',
+        'activo',
+        'debe_cambiar_password',
     ];
 
     /**
@@ -48,6 +55,11 @@ class User extends Authenticatable
         return $this->belongsTo(User::class, 'usuario_modificacion');
     }
 
+    public function facturas()
+    {
+        return $this->hasMany(Factura::class);
+    }
+
 
     /**
      * Get the attributes that should be cast.
@@ -59,10 +71,25 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'is_admin' => 'boolean',
+            'role' => Role::class,
             'activo' => 'boolean',
             'debe_cambiar_password' => 'boolean',
 
         ];
+    }
+
+    public function isCliente(): bool
+    {
+        return $this->role === Role::Cliente;
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role->esPersonalAdministrativo();
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === Role::SuperAdmin;
     }
 }
