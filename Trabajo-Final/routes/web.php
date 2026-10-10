@@ -142,25 +142,24 @@ Route::controller(LibroController::class)-> group(function() {
 
 
 
-//Usuarios
-
-Route::controller(UsuarioController::class)-> group(function() {
-
-    Route::get('usuarios', 'index') -> name('usuarios.index')->middleware('auth');
-
-    Route::get('usuarios/create', 'create') -> name('usuarios.create')->middleware('auth');
-    
-    Route::post('usuarios/store', 'store') -> name('usuarios.store')->middleware('auth');
-    
-    Route::get('perfil', 'edit') -> name('usuario.perfil')->middleware('auth');
-    
-    Route::put('usuarios/{usuario}', 'update') -> name('usuarios.update')->middleware('auth');
-    
-    Route::delete('usuarios/{usuario}', 'delete') -> name('usuarios.delete')->middleware('auth');
-
-    Route::patch('usuarios/{usuario}', 'activar')->name('usuarios.activar')->middleware('auth');
+//Admins y superadmins
+Route::middleware(['auth', 'role:admin,superadmin'])->controller(UsuarioController::class)->group(function () {
+    Route::get('perfil', 'edit')->name('usuario.perfil');
+    Route::put('perfil', 'update')->name('usuario.perfil.update');
+    Route::get('usuarios', 'index')->name('usuarios.index');
 
 });
+
+//Superadmins
+Route::middleware(['auth', 'role:superadmin'])->controller(UsuarioController::class)->group(function () {
+    Route::get('usuarios/create', 'create')->name('usuarios.create');
+    Route::post('usuarios', 'store')->name('usuarios.store');
+    Route::patch('usuarios/{usuario}/desactivar', 'delete')->name('usuarios.desactivar');
+    Route::patch('usuarios/{usuario}/activar', 'activar')->name('usuarios.activar');
+    Route::patch('usuarios/{usuario}/transferir-superadmin', 'transferirSuperAdmin')->name('usuarios.transferir');
+});
+
+
 
 
 //Primera forma
