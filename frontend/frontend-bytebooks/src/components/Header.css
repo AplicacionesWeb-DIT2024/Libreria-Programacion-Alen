@@ -1,0 +1,23 @@
+.header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px; /* Ajusta según tus necesidades */
+    background-color: #f5f5f5; /* Color de fondo opcional */
+  }
+  
+  .logo-title-container {
+    display: flex;
+    align-items: center;
+  }
+  
+  .logo {
+    width: 50px; /* Ajusta según tus necesidades */
+    height: auto;
+    margin-right: 10px; /* Espacio entre el logo y el título */
+  }
+  
+  h1 {
+    font-size: 24px; /* Ajusta según tus necesidades */
+    margin: 0;
+  }
