@@ -1,35 +1,54 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from 'react';
+import { Header } from './components/Header';
+import { ProductList } from './components/ProductList';
 
 function App() {
-  const [count, setCount] = useState(0)
 
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+	const [allProducts, setAllProducts] = useState([]);
+
+
+	const [total, setTotal] = useState(0);
+	const [countProducts, setCountProducts] = useState(0);
+
+	const [cartProducts, setCartProducts] = useState([]);
+
+	useEffect(() => {
+        fetch('http://127.0.0.1:8000/api/libros')
+            .then(res => res.json())
+            .then(data => {
+                const productsWithQuantity = data.map(product => ({
+                    ...product,
+                    quantity: 1 
+                }));
+                setAllProducts(productsWithQuantity);
+            })
+            .catch(error => console.error('Error fetching products:', error));
+    }, []);
+
+	
+
+	return (
+		<>
+			<Header
+				cartProducts={cartProducts}
+				setCartProducts={setCartProducts}
+				total={total}
+				setTotal={setTotal}
+				countProducts={countProducts}
+				setCountProducts={setCountProducts}
+			/>
+			<ProductList
+				allProducts={allProducts}
+				setAllProducts={setAllProducts}
+				total={total}
+				setTotal={setTotal}
+				countProducts={countProducts}
+				setCountProducts={setCountProducts}
+				cartProducts={cartProducts}
+				setCartProducts={setCartProducts}
+			/>
+		</>
+	);
 }
 
-export default App
+export default App;
