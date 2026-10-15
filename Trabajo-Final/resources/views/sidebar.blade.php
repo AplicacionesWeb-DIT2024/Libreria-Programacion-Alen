@@ -84,12 +84,39 @@
         </a>
       </li>
 
-      <li class="nav-item">
-        <a href="{{ route('usuarios.index') }}" class="nav-link text-white">
-          <i class="fa-solid fa-users"></i>
-          Usuarios
-        </a>
-      </li>
+      @php
+        $enUsuarios = request()->routeIs('administradores.*') || request()->routeIs('clientes.*');
+      @endphp
+
+    <li class="nav-item">
+      <a class="nav-link text-white d-flex justify-content-between align-items-center"
+        data-bs-toggle="collapse"
+        href="#submenuUsuarios"
+        role="button"
+        aria-expanded="{{ $enUsuarios ? 'true' : 'false' }}"
+        aria-controls="submenuUsuarios">
+          <span><i class="fa-solid fa-users"></i> Usuarios</span>
+          <i class="fa-solid fa-chevron-down small"></i>
+      </a>
+
+      <div class="collapse {{ $enUsuarios ? 'show' : '' }}" id="submenuUsuarios">
+          <ul class="nav flex-column ms-3">
+              <li class="nav-item">
+                  <a href="{{ route('administradores.index') }}"
+                    class="nav-link text-white {{ request()->routeIs('administradores.*') ? 'active' : '' }}">
+                      <i class="fa-solid fa-user-shield"></i> Administradores
+                  </a>
+              </li>
+              <li class="nav-item">
+                  <a href="{{ route('clientes.index') }}"
+                    class="nav-link text-white {{ request()->routeIs('clientes.*') ? 'active' : '' }}">
+                      <i class="fa-solid fa-user"></i> Clientes
+                  </a>
+              </li>
+          </ul>
+      </div>
+
+    </li>
 
       <li class="nav-item">
         <a href="#" class="nav-link text-white">

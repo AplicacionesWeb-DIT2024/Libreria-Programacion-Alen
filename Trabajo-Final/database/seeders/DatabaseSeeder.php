@@ -29,8 +29,29 @@ class DatabaseSeeder extends Seeder
             'debe_cambiar_password' => false
         ]);
 
-      
+        User::factory()->create([
+            'name' => 'Prueba',
+            'apellido' => 'Prueba',
+            'username' => 'prueba',
+            'activo' => true,
+            'role' => Role::Cliente,
+            'email' => 'prueba@gmail.com',
+            'password' => 'prueba',
+            'debe_cambiar_password' => false,
+            'domicilio'=> 'Mitre 222',
+            'telefono' => '28041231421'
+        ]);
 
+        User::factory()->create([
+            'name' => 'Admin',
+            'apellido' => 'admin',
+            'username' => 'admin2',
+            'activo' => true,
+            'role' => Role::Admin,
+            'email' => 'admin@gmail.com',
+            'password' => 'admin123',
+            'debe_cambiar_password' => false
+        ]);
 
 
     }

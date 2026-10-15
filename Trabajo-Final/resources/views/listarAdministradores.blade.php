@@ -1,15 +1,15 @@
 @extends('main')
-@section('title', 'Listar usuarios')
+@section('title', 'Listar administradores')
 @section('body')
 
 @php $esSuper = auth()->user()->isSuperAdmin(); @endphp
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="mb-0">Listado de usuarios</h1>
+    <h1 class="mb-0">Listado de administradores</h1>
 
     @if ($esSuper)
         <button class="btn btn-success"
-                title="Agregar usuario"
+                title="Agregar administrador"
                 data-bs-toggle="modal"
                 data-bs-target="#modalAgregarUsuario">
             <i class="fas fa-plus"></i>
@@ -72,17 +72,20 @@
                                 title="Ver usuario">
                                 <i class="fas fa-info-circle"></i>
                             </button>
-                            @if ($esSuper)
-                                @if ($usuario->id === auth()->id())
-                                    <span class="badge bg-secondary" title="No se puede modificar tu propia cuenta">Tu cuenta</span>
-                                @elseif ($usuario->activo)
-
-                                    @if ($usuario->role === \App\Enums\Role::Admin)
-                                        <form action="{{ route('usuarios.transferir', $usuario) }}" method="POST"
-                                            onsubmit='return confirm(@json("Al realizar esta acción dejará de ser superadmin y {$usuario->name} pasará a serlo. ¿Está seguro de proceder?"))'>
+                            @php $puede = auth()->user()->puedeGestionarA($usuario); @endphp
+                            @if ($usuario->id === auth()->id())
+                                <span class="badge bg-secondary" title="No se puede modificar tu propia cuenta">Tu cuenta</span>
+                            @elseif ($puede)
+                                @if ($usuario->activo)
+                                    @if ($esSuper && $usuario->role === \App\Enums\Role::Admin)
+                                        <form action="{{ route('usuarios.transferir', $usuario) }}"
+                                            id="transferForm{{ $usuario->id }}" method="POST">
                                             @csrf
                                             @method('PATCH')
-                                            <button type="submit" class="btn btn-warning btn-sm" title="Transferir superadmin">
+                                            <button type="button" class="btn btn-warning btn-sm"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#transferModal{{ $usuario->id }}"
+                                                    title="Transferir superadmin">
                                                 <i class="fas fa-crown"></i>
                                             </button>
                                         </form>
@@ -112,13 +115,21 @@
                         </div>
                     </td>
                 </tr>
-                @include('delete_modal', ['id' => $usuario->id, 'nombre' => $usuario->username])
+                @if ($puede && $usuario->activo)
+                    @include('delete_modal', ['id' => $usuario->id, 'nombre' => $usuario->username])
+                @endif
+                @if ($esSuper && $usuario->role === \App\Enums\Role::Admin && $usuario->activo)
+                    @include('transferir-superadmin', ['id' => $usuario->id, 'nombre' => $usuario->name . ' ' . $usuario->apellido])
+                @endif
                 @include('modal-usuario', [
                     'id' => $usuario->id,
                     'nombre' => $usuario->name,
                     'apellido' => $usuario->apellido,
                     'usuario' => $usuario->username,
+                    'email' => $usuario->email,
+                    'esCliente' => $usuario->isCliente(),
                     'domicilio' => $usuario->domicilio,
+                    'telefono' => $usuario->telefono,
                     'creado' => $usuario->created_at->format('d/m/Y H:i:s'),
                     'actualizado' => $usuario->updated_at->format('d/m/Y H:i:s'),
                     'usuario_creacion' => optional($usuario->usuarioCreacion)->username,
@@ -134,7 +145,7 @@
             <div class="modal-dialog modal-xl">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <i class="fa-solid fa-tags"></i> <h5 class="modal-title"><i class="fa-solid fa-building-circle-plus opacity-75"></i> Agregar usuario</h5>
+                        <h5 class="modal-title"><i class="fa-solid fa-building-circle-plus opacity-75"></i> Agregar administrador</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">

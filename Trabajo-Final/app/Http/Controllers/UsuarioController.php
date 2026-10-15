@@ -19,12 +19,14 @@ use App\Enums\Role;
 
 class UsuarioController extends Controller
 {
-    public function index() {
-        $usuarios = User::query()
-        ->orderBy('id')
-        ->get();
-        return view('listarUsuarios', compact('usuarios'));
+    public function indexAdmins()
+    {
+        $usuarios = User::whereIn('role', [Role::Admin, Role::SuperAdmin])
+            ->orderBy('id')
+            ->get();
+        return view('listarAdministradores', compact('usuarios'));
     }
+
 
     public function index_api() {
         $usuarios = User::orderBy('username', 'asc') -> get();
@@ -162,20 +164,21 @@ class UsuarioController extends Controller
     }
 
     public function delete(User $usuario) {
-        if ($usuario->id === auth()->id()) {
-            return redirect()->back()->with('error', 'No podés desactivar tu propia cuenta.');
-        }
+         abort_unless(auth()->user()->puedeGestionarA($usuario), 403);
+
         $usuario->activo = false;
         $usuario->save();
-        return redirect() -> route('usuarios.index');
+        $usuario->tokens()->delete();
+        return redirect()->back()->with('success', 'Usuario desactivado correctamente.');
     }
 
     public function activar(User $usuario)
     {
+        abort_unless(auth()->user()->puedeGestionarA($usuario), 403);
+
         $usuario->activo = true;
         $usuario->save();
-
-        return redirect()->route('usuarios.index')->with('success', 'Usuario reactivado correctamente');
+        return redirect()->back()->with('success', 'Usuario reactivado correctamente.');
     }
 
 

@@ -60,11 +60,11 @@
             </div>
 
             <div class="col-md-3">
-                <div onclick="location.href='{{ route('usuarios.index') }}'"
+                <div onclick="location.href='{{ route('administradores.index') }}'"
                     class="card dashboard-card text-white text-center bg-usuarios p-4 h-100">
                     <div class="dashboard-icon"><i class="fa-solid fa-users"></i></div>
-                    <h5 class="fw-bold">Usuarios</h5>
-                    <p class="small opacity-75">Ver y administrar usuarios</p>
+                    <h5 class="fw-bold">Administradores</h5>
+                    <p class="small opacity-75">Gestionar administradores</p>
                 </div>
             </div>
 

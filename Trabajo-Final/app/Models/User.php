@@ -92,4 +92,12 @@ class User extends Authenticatable
     {
         return $this->role === Role::SuperAdmin;
     }
+
+    public function puedeGestionarA(User $objetivo): bool
+    {
+        if ($this->id === $objetivo->id) return false;              
+        if ($objetivo->role === Role::SuperAdmin) return false;    
+        if ($objetivo->role === Role::Admin) return $this->isSuperAdmin();
+        return $this->isAdmin();                                    
+    }
 }
