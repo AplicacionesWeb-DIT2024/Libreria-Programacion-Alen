@@ -37,7 +37,12 @@ Breadcrumbs::for('subcategorias.index', function (BreadcrumbTrail $trail) {
     $trail->push('Listado de subcategorias', route('subcategorias.index'));
 });
 
-Breadcrumbs::for('usuarios.index', function (BreadcrumbTrail $trail) {
+Breadcrumbs::for('administradores.index', function (BreadcrumbTrail $trail) {
     $trail->parent('home');
-    $trail->push('Listado de usuarios', route('usuarios.index'));
+    $trail->push('Listado de administradores', route('administradores.index'));
+});
+
+Breadcrumbs::for('clientes.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('home');
+    $trail->push('Listado de clientes', route('clientes.index'));
 });

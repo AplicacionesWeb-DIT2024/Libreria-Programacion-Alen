@@ -15,8 +15,16 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('cliente');
             $table->foreign('cliente')->references('id')->on('users');
-            $table->float('precioTotal') -> nullable();
+            $table->integer('cantidadTotal')->default(0);
+            $table->decimal('precioTotal',12,2)->default(0);
             $table->date('fecha');
+            $table->time('hora');
+            $table->string('estado'); 
+            $table->string('domicilio_calle');
+            $table->string('domicilio_numero', 20);
+            $table->string('domicilio_localidad');
+            $table->string('domicilio_provincia');
+            $table->string('domicilio_codigo_postal', 4);
             $table->timestamps();
         });
     }

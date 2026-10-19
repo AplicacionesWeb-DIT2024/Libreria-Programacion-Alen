@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Models\Cliente;
 use Illuminate\Support\Facades\Hash;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -29,7 +30,7 @@ class DatabaseSeeder extends Seeder
             'debe_cambiar_password' => false
         ]);
 
-        User::factory()->create([
+        $usuarioCliente = User::factory()->create([
             'name' => 'Prueba',
             'apellido' => 'Prueba',
             'username' => 'prueba',
@@ -38,8 +39,16 @@ class DatabaseSeeder extends Seeder
             'email' => 'prueba@gmail.com',
             'password' => 'prueba',
             'debe_cambiar_password' => false,
-            'domicilio'=> 'Mitre 222',
-            'telefono' => '28041231421'
+        ]);
+
+        Cliente::factory()->create([
+            'user_id' => $usuarioCliente->id,
+            'telefono' => '28041231421',
+            'domicilio_calle' => 'Mitre',
+            'domicilio_numero' => '222',
+            'domicilio_provincia' => 'Chubut',
+            'domicilio_codigo_postal' => '9100',
+            'domicilio_localidad' => 'Trelew'
         ]);
 
         User::factory()->create([

@@ -17,9 +17,9 @@ return new class extends Migration
             $table->foreign('libro')->references('id')->on('libros');
             $table->unsignedBigInteger('factura');
             $table->foreign('factura')->references('id')->on('facturas');
-            $table->float('precio_unitario');
+            $table->decimal('precio_unitario',12,2);
             $table->integer('cantidad');
-            $table->float('precio_total');
+            $table->decimal('precio_total',12,2);
             $table->timestamps();
         });
     }

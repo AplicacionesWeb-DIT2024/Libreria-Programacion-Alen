@@ -1,5 +1,5 @@
 @extends('main')
-@section('title', 'Listar clientes')
+@section('title', 'Listado de clientes')
 @section('body')
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -21,18 +21,18 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($clientes as $cliente)
+            @foreach ($clientes as $usuario)
                 <tr>
                     <td></td>
-                    <td>{{ $cliente->name }}</td>
-                    <td>{{ $cliente->apellido}} </td>
-                    <td> {{ $cliente->username}} </td>
-                    <td> {{ $cliente->email}} </td>
-                    <td> {{ $cliente->domicilio}} </td>
-                    <td> {{ $cliente->telefono}} </td>
+                    <td>{{ $usuario->name }}</td>
+                    <td>{{ $usuario->apellido}} </td>
+                    <td> {{ $usuario->username}} </td>
+                    <td> {{ $usuario->email}} </td>
+                    <td> {{ $usuario->cliente?->domicilio_completo ?? '—' }} </td>
+                    <td>{{ $usuario->cliente?->telefono ?? '—' }}</td>
                     <td>
-                        <span class="d-none">{{ $cliente->activo ? 'Activo' : 'Inactivo' }}</span>
-                        @if ($cliente->activo)
+                        <span class="d-none">{{ $usuario->activo ? 'Activo' : 'Inactivo' }}</span>
+                        @if ($usuario->activo)
                             <span class="badge rounded-pill bg-success-subtle text-success px-3">
                                 Activo
                             </span>
@@ -47,29 +47,29 @@
                             <button type="button"
                                 class="btn btn-info btn-sm"
                                 data-bs-toggle="modal"
-                                data-bs-target="#modal{{ $cliente->id }}"
+                                data-bs-target="#modal{{ $usuario->id }}"
                                 title="Ver usuario">
                                 <i class="fas fa-info-circle"></i>
                             </button>
                             <a href="#" class="btn btn-primary btn-sm" title="Ver pedidos">
                                 <i class="fas fa-receipt"></i>
                             </a>
-                            @php $puede = auth()->user()->puedeGestionarA($cliente); @endphp
+                            @php $puede = auth()->user()->puedeGestionarA($usuario); @endphp
                             @if ($puede)
-                                @if ($cliente->activo)
-                                    <form action="{{ route('usuarios.desactivar', $cliente) }}"
-                                        id="deleteForm{{ $cliente->id }}" method="POST">
+                                @if ($usuario->activo)
+                                    <form action="{{ route('usuarios.desactivar', $usuario) }}"
+                                        id="deleteForm{{ $usuario->id }}" method="POST">
                                         @csrf
                                         @method('PATCH')
                                         <button type="button" class="btn btn-danger btn-sm"
                                                 data-bs-toggle="modal"
-                                                data-bs-target="#deleteModal{{ $cliente->id }}"
+                                                data-bs-target="#deleteModal{{ $usuario->id }}"
                                                 title="Desactivar">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
                                     </form>
                                 @else
-                                    <form action="{{ route('usuarios.activar', $cliente) }}" method="POST" class="d-inline">
+                                    <form action="{{ route('usuarios.activar', $usuario) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('PATCH')
                                         <button type="submit" class="btn btn-success btn-sm" title="Reactivar">
@@ -81,22 +81,22 @@
                         </div>
                     </td>
                 </tr>
-                @if ($cliente->activo)
-                    @include('delete_modal', ['id' => $cliente->id, 'nombre' => $cliente->username])
+                @if ($usuario->activo)
+                    @include('delete_modal', ['id' => $usuario->id, 'nombre' => $usuario->username])
                 @endif
                 @include('modal-usuario', [
-                    'id' => $cliente->id,
-                    'nombre' => $cliente->name,
-                    'apellido' => $cliente->apellido,
-                    'usuario' => $cliente->username,
-                    'email' => $cliente->email,
-                    'esCliente' => $cliente->isCliente(),
-                    'domicilio' => $cliente->domicilio ?? '—',
-                    'telefono' => $cliente->telefono ?? '—',
-                    'creado' => $cliente->created_at->format('d/m/Y H:i:s'),
-                    'actualizado' => $cliente->updated_at->format('d/m/Y H:i:s'),
-                    'usuario_creacion' => optional($cliente->usuarioCreacion)->username,
-                    'usuario_actualizacion' => optional($cliente->usuarioModificacion)->username ?? '—'
+                    'id' => $usuario->id,
+                    'nombre' => $usuario->name,
+                    'apellido' => $usuario->apellido,
+                    'usuario' => $usuario->username,
+                    'email' => $usuario->email,
+                    'esCliente' => $usuario->isCliente(),
+                    'domicilio' => $usuario->cliente?->domicilio_completo ?? '—',
+                    'telefono' => $usuario->cliente?->telefono ?? '—',
+                    'creado' => $usuario->created_at->format('d/m/Y H:i:s'),
+                    'actualizado' => $usuario->updated_at->format('d/m/Y H:i:s'),
+                    'usuario_creacion' => optional($usuario->usuarioCreacion)->username,
+                    'usuario_actualizacion' => optional($usuario->usuarioModificacion)->username ?? '—'
                 ])
             @endforeach
         </tbody>

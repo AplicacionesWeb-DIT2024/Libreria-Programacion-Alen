@@ -30,7 +30,7 @@ return new class extends Migration
 
             $table->integer('edicion');
             $table->year('anio_publicacion');
-            $table->float('precio');
+            $table->decimal('precio',12,2);
 
             $table->unsignedBigInteger('categoria');
             $table->foreign('categoria')->references('id')->on('categorias');

@@ -10,7 +10,8 @@ class ClienteController extends Controller
 {
     public function index() 
     {
-        $clientes = User::where('role', Role::Cliente)
+        $clientes = User::with(['cliente','usuarioCreacion','usuarioModificacion'])
+            ->where('role', Role::Cliente)
             ->orderBy('id')
             ->get();
 

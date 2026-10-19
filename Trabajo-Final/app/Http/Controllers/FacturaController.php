@@ -8,20 +8,13 @@ use App\Models\Libro;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
+use App\Enums\EstadoFactura;
 use Illuminate\Support\Facades\DB;
 
 use function PHPUnit\Framework\throwException;
 
 class FacturaController extends Controller
 {
-    //
-    /*
-    {Viene por React
-    fecha:'',
-    id_cliente: numerico
-    detalles: [{libro_id: 'id', cant: numerico}]
-    }
-     */
 
 
     public function index_api() {
@@ -46,58 +39,89 @@ class FacturaController extends Controller
    
     public function store (Request $request) {
 
+        $cliente = $request->user();
+        if (!$cliente->isCliente() || !$cliente->activo) {
+            return response()->json(['error' => 'El usuario no posee permisos para realizar esta acción'], 403);
+        }
 
-        DB::beginTransaction();
+
+        $request->validate([
+            'detalles' => ['required', 'array', 'min:1'],
+            'detalles.*.libro' => ['required', 'integer', 'exists:libros,id'],
+            'detalles.*.cantidad' => ['required', 'integer', 'min:1'],
+            'domicilio_calle' => ['required', 'string', 'max:255'],
+            'domicilio_numero' => ['required', 'string', 'max:20'],
+            'domicilio_localidad' => ['required', 'string', 'max:255'],
+            'domicilio_provincia' => ['required', 'string', 'max:255'],
+            'domicilio_codigo_postal' => ['required', 'digits:4'],
+        ]);
+
         try {
-            $factura = new Factura();
-            $cliente = User::find($request->id_cliente);
-            if ($cliente != null) {
-                $factura->cliente = $cliente->id;
-                $factura->fecha = $request->fecha; 
-                $factura->save();
+            $factura = DB::transaction(function () use ($request,$cliente) {
 
-                $precio_total_factura = 0;
-                foreach ($request->detalles as $detalle) {
-                    $libro = Libro::find($detalle['libro']);
-                    if ($libro != null) {
-                        $precio_libro = $libro->precio;
-                        $cantidad = $detalle['cantidad']; 
-                        if (($libro->stock - $cantidad) >= 0) {
-                            $precio_total = $precio_libro * $cantidad;
-                            $detalleFactura = new DetalleFactura;
-                            $detalleFactura->libro = $libro->id;
-                            $detalleFactura->factura = $factura->id;
-                            $detalleFactura->precio_unitario = $precio_libro;
-                            $detalleFactura->cantidad = $cantidad;
-                            $detalleFactura->precio_total = $precio_total;
-                            $detalleFactura->save();
-                            
-                            $libro->stock -= $cantidad; 
-                            $libro->save();
+                $factura = Factura::create([
+                    'cliente' => $cliente->id,
+                    'fecha' => now()->toDateString(),
+                    'hora' => now()->toTimeString(),
+                    'estado' => EstadoFactura::Pendiente,
+                    ...$request->only([
+                        'domicilio_calle',
+                        'domicilio_numero',
+                        'domicilio_localidad',
+                        'domicilio_provincia',
+                        'domicilio_codigo_postal',
+                    ]),
+                ]);
 
-                            $precio_total_factura += $precio_total;
-                        }
-                        else {
-                            throw new Exception ("Stock insuficiente para el libro: " . $libro->nombre);
-                            break;
-                        }
+                $detalles = collect($request->detalles)
+                    ->groupBy('libro')
+                    ->map(fn ($items) => $items->sum('cantidad'))
+                    ->sortKeys();
+
+                $total = 0;
+                $cantidadTotal = 0;
+
+                foreach ($detalles as $libroId => $cantidad) {
+                    $libro = Libro::find($libroId);
+
+                    if ($libro === null) {
+                        throw new Exception("El libro con id {$libroId} no existe");
                     }
-                    else {
-                        throw new Exception ("No existe el libro");
+
+                    $afectadas = Libro::where('id', $libroId)
+                        ->where('stock', '>=', $cantidad)
+                        ->decrement('stock', $cantidad);
+
+                    if ($afectadas === 0) {
+                        throw new Exception("Stock insuficiente para el libro: " . $libro->nombre);
                     }
+
+                    $precioTotal = $libro->precio * $cantidad;
+
+                    DetalleFactura::create([
+                        'libro' => $libro->id,
+                        'factura' => $factura->id,
+                        'precio_unitario' => $libro->precio,
+                        'cantidad' => $cantidad,
+                        'precio_total' => $precioTotal,
+                    ]);
+
+
+                    $cantidadTotal += $cantidad;
+                    $total += $precioTotal;
                 }
-                $factura->precioTotal = $precio_total_factura;
-                $factura->save();
-                DB::commit();
-                return response()->json(['message' => "Factura creada correctamente"], 200);
 
-            }
-            else {
-                throw new Exception("No existe el cliente ingresado");
-            }
+                $factura->update(['precioTotal' => $total, 'cantidadTotal' => $cantidadTotal]);
+                 return $factura;
+
+            });
+            return response()->json(
+                ['message' => "Factura creada correctamente",
+                'id' => $factura->id,
+                'estado'=> $factura->estado],
+                200);
     
         }catch (\Exception $error) {
-            DB::rollback();
             return response()->json(['error' => $error->getMessage()], 400);
         } 
     }

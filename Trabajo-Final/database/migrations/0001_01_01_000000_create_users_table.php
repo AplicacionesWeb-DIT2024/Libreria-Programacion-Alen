@@ -17,8 +17,6 @@ return new class extends Migration
             $table->string('apellido');
             $table->string('username')->unique();
             $table->string('email')->unique();
-            $table->string('domicilio')->nullable();
-            $table->string('telefono')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->boolean('activo')->default(true);
@@ -29,6 +27,7 @@ return new class extends Migration
             $table->string('profile_photo_path', 2048)->nullable();
             $table->timestamps();
         });
+
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();

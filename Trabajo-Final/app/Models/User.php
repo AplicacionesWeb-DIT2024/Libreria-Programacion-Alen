@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
@@ -26,12 +27,12 @@ class User extends Authenticatable
         'apellido',
         'username',
         'email',
-        'domicilio',
-        'telefono',
         'password',
         'activo',
         'debe_cambiar_password',
     ];
+
+    
 
     /**
      * The attributes that should be hidden for serialization.
@@ -99,5 +100,10 @@ class User extends Authenticatable
         if ($objetivo->role === Role::SuperAdmin) return false;    
         if ($objetivo->role === Role::Admin) return $this->isSuperAdmin();
         return $this->isAdmin();                                    
+    }
+
+    public function cliente(): HasOne
+    {
+        return $this->hasOne(Cliente::class);
     }
 }

@@ -17,10 +17,10 @@
         @endif
         <h2 class="text-center mt-4" style = "max-width: 300px; margin: 2rem auto;"> Administración</h2>
     </div>
-    <form method = "POST" action='/login'>
+    <form method = "POST" action="{{ url('admin/login') }}">
         @csrf
         <div class = "form-image">
-            <img class="mb-3 img-center" src="images/logobyte.png" alt="50" width="150" height="140">
+            <img class="mb-3 img-center" src="{{ asset('images/logobyte.png') }}" alt="50" width="150" height="140">
         </div>
         <div class="form-group">
             <label for="username"><i class="fa-solid fa-user"></i> Usuario</label>

@@ -9,8 +9,13 @@ class DetalleFactura extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['libro', 'cantidad'];
-
+    protected $fillable = [
+        'libro',
+        'factura',
+        'precio_unitario',
+        'cantidad',
+        'precio_total',
+    ];
     public function libros() {
         return $this->hasMany('App\Models\Libro');
     }
