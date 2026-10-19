@@ -1,0 +1,45 @@
+.dashboard-card {
+    border-radius: 1rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.dashboard-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5px;
+}
+
+.bg-libros { 
+    background-color: #007bff; 
+}
+.bg-autores { 
+    background-color: #28a745; 
+}
+.bg-editoriales { 
+    background-color: #ffc107; 
+}
+.bg-categorias { 
+    background-color: #dc3545; 
+}
+.bg-subcategorias { 
+    background-color: chocolate; 
+}
+
+.bg-usuarios { 
+    background-color: violet; 
+}
+
+.bg-pedidos { 
+    background-color: orange; 
+}
+
+.bg-reporte { 
+    background-color: black; 
+}
+
+

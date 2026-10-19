@@ -1,0 +1,27 @@
+.carousel-control-prev,
+.carousel-control-next {
+    opacity: 1;
+    width: 10%;
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    background-color: rgba(0, 0, 0, 0.6);
+    background-size: 55%;
+    border-radius: 50%;
+}
+
+.carousel-control-prev:hover .carousel-control-prev-icon,
+.carousel-control-next:hover .carousel-control-next-icon {
+    background-color: rgba(0, 0, 0, 0.85);
+}
+
+.carousel-indicators [data-bs-target] {
+    background-color: #6c757d;
+}
+
+.carousel-indicators .active {
+    background-color: #000;
+}
