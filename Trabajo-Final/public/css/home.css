@@ -30,9 +30,14 @@
     background-color: chocolate; 
 }
 
-.bg-usuarios { 
+.bg-administradores { 
     background-color: violet; 
 }
+
+.bg-clientes { 
+    background-color: rgb(3, 88, 38); 
+}
+
 
 .bg-pedidos { 
     background-color: orange; 

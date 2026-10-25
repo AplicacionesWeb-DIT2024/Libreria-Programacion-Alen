@@ -61,10 +61,19 @@
 
             <div class="col-md-3">
                 <div onclick="location.href='{{ route('administradores.index') }}'"
-                    class="card dashboard-card text-white text-center bg-usuarios p-4 h-100">
-                    <div class="dashboard-icon"><i class="fa-solid fa-users"></i></div>
+                    class="card dashboard-card text-white text-center bg-administradores p-4 h-100">
+                    <div class="dashboard-icon"><i class="fa-solid fa-user-shield"></i></div>
                     <h5 class="fw-bold">Administradores</h5>
                     <p class="small opacity-75">Gestionar administradores</p>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div onclick="location.href='{{ route('clientes.index') }}'"
+                    class="card dashboard-card text-white text-center bg-clientes p-4 h-100">
+                    <div class="dashboard-icon"><i class="fa-solid fa-users"></i></div>
+                    <h5 class="fw-bold">Clientes</h5>
+                    <p class="small opacity-75">Gestionar clientes</p>
                 </div>
             </div>
 
