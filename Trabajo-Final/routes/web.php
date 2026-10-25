@@ -1,16 +1,15 @@
 <?php
 
 use App\Http\Controllers\AutorController;
-use App\Http\Controllers\BancoController;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\EditorialController;
-use App\Http\Controllers\EntidadController;
 use App\Http\Controllers\LibroController;
 use App\Http\Controllers\LoginController;
-use App\Http\Controllers\PaisController;
 use App\Http\Controllers\SubcategoriaController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\FacturaController;
+
 
 use App\Models\Libro;
 use Illuminate\Auth\Events\Login;
@@ -151,6 +150,15 @@ Route::middleware(['auth', 'role:admin,superadmin'])->group(function () {
         Route::patch('admin/usuarios/{usuario}/activar', 'activar')->name('usuarios.activar');
 
     });
+
+
+    Route::get('admin/clientes/{usuario}/pedidos', [FacturaController::class, 'listarPorCliente'])->name('clientes.pedidos');
+
+    Route::get('admin/clientes/{usuario}/pedidos/{factura}', [FacturaController::class, 'show'])->name('pedidos.show')->scopeBindings();
+
+    Route::get('admin/pedidos', [FacturaController::class, 'index'])->name('pedidos.index');
+
+    Route::get('admin/pedidos/{factura}', [FacturaController::class, 'showPedidos'])->name('pedidos.detalle');
 });
 
 

@@ -69,7 +69,7 @@
             </div>
 
             <div class="col-md-3">
-                <div onclick="location.href='{{ route('subcategorias.index') }}'"
+                <div onclick="location.href='{{ route('pedidos.index') }}'"
                     class="card dashboard-card text-white text-center bg-pedidos p-4 h-100">
                     <div class="dashboard-icon"><i class="fa-solid fa-truck"></i></div>
                     <h5 class="fw-bold">Pedidos</h5>

@@ -51,7 +51,7 @@
                                 title="Ver usuario">
                                 <i class="fas fa-info-circle"></i>
                             </button>
-                            <a href="#" class="btn btn-primary btn-sm" title="Ver pedidos">
+                            <a href="{{ route('clientes.pedidos', $usuario) }}" class="btn btn-primary btn-sm" title="Ver pedidos">
                                 <i class="fas fa-receipt"></i>
                             </a>
                             @php $puede = auth()->user()->puedeGestionarA($usuario); @endphp

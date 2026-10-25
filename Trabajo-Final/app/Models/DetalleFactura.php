@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Libro;
+use App\Models\Factura;
 
 class DetalleFactura extends Model
 {
@@ -16,11 +18,13 @@ class DetalleFactura extends Model
         'cantidad',
         'precio_total',
     ];
-    public function libros() {
-        return $this->hasMany('App\Models\Libro');
+
+    public function datosLibro() {
+        return $this->belongsTo(Libro::class, 'libro');
     }
 
-    public function factura_pertenece() {
-        return $this->belongsTo('App\Models\Factura');
+    public function facturaPadre()
+    {
+        return $this->belongsTo(Factura::class, 'factura');
     }
 }

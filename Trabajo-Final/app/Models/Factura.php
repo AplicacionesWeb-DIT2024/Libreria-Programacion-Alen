@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Enums\EstadoFactura;
-
+use Illuminate\Support\Facades\DB;
 
 class Factura extends Model
 {
@@ -38,7 +38,13 @@ class Factura extends Model
     protected function casts(): array{
         return [
             'estado' => EstadoFactura::class,
+            'fecha' => 'date',
         ];
+    }
+
+    public function usuarioCliente()
+    {
+        return $this->belongsTo(User::class, 'cliente');
     }
 
 
@@ -59,4 +65,9 @@ class Factura extends Model
         'domicilio_provincia', 
         'domicilio_codigo_postal',
     ];
+
+    public function getDomicilioCompletoAttribute(): string
+    {
+        return "{$this->domicilio_calle} {$this->domicilio_numero}, {$this->domicilio_localidad}, {$this->domicilio_provincia} - ({$this->domicilio_codigo_postal})";
+    }
 }

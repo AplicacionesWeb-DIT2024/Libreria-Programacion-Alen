@@ -89,15 +89,15 @@
       @endphp
 
     <li class="nav-item">
-      <a class="nav-link text-white d-flex justify-content-between align-items-center"
-        data-bs-toggle="collapse"
-        href="#submenuUsuarios"
-        role="button"
-        aria-expanded="{{ $enUsuarios ? 'true' : 'false' }}"
-        aria-controls="submenuUsuarios">
-          <span><i class="fa-solid fa-users"></i> Usuarios</span>
-          <i class="fa-solid fa-chevron-down small"></i>
-      </a>
+        <button class="nav-link text-white d-flex justify-content-between align-items-center w-100 bg-transparent border-0 {{ $enUsuarios ? '' : 'collapsed' }}"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#submenuUsuarios"
+          aria-expanded="{{ $enUsuarios ? 'true' : 'false' }}"
+          aria-controls="submenuUsuarios">
+        <span><i class="fa-solid fa-users"></i> Usuarios</span>
+        <i class="fa-solid fa-chevron-down small"></i>
+      </button>
 
       <div class="collapse {{ $enUsuarios ? 'show' : '' }}" id="submenuUsuarios">
           <ul class="nav flex-column ms-3">
@@ -115,7 +115,13 @@
               </li>
           </ul>
       </div>
+    </li>
 
+    <li class="nav-item">
+      <a href="{{ route('pedidos.index') }}"
+        class="nav-link text-white {{ request()->routeIs('pedidos.index') ? 'active' : '' }}">
+          <i class="fa-solid fa-truck"></i> Pedidos
+      </a>
     </li>
 
       <li class="nav-item">
@@ -128,5 +134,3 @@
 
   </div>
 </div>
-
-<script src="{{ asset('js/sidebar.js') }}"></script>

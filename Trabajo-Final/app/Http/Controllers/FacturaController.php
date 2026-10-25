@@ -34,6 +34,55 @@ class FacturaController extends Controller
 
     }
 
+    public function listarPorCliente(User $usuario) {
+        abort_unless($usuario->isCliente(), 404);
+        $facturas = $usuario->facturas()
+                    ->orderByDesc('created_at')
+                    ->get();
+        return view('listarPedidos', compact('usuario', 'facturas'));
+    }
+
+
+    public function show(User $usuario, Factura $factura)
+    {
+        abort_unless($usuario->isCliente(), 404);
+
+        $factura->load([
+            'usuarioCliente',
+            'detalles.datosLibro.autor_origen',
+            'detalles.datosLibro.autor_secundario',
+            'detalles.datosLibro.autor_secundario2',
+            'detalles.datosLibro.editorial_perteneciente',
+        ]);
+
+        return view('listarDetallesPedido', compact('usuario', 'factura'));
+    }
+
+
+    public function showPedidos(Factura $factura)
+    {
+
+        $factura->load([
+            'usuarioCliente',
+            'detalles.datosLibro.autor_origen',
+            'detalles.datosLibro.autor_secundario',
+            'detalles.datosLibro.autor_secundario2',
+            'detalles.datosLibro.editorial_perteneciente',
+        ]);
+
+        return view('listarDetalles', compact('factura'));
+    }
+
+    public function index()
+    {
+        $facturas = Factura::with('usuarioCliente')
+            ->orderByDesc('created_at')
+            ->get();
+
+        return view('listarPedidosClientes', compact('facturas'));
+    }
+
+
 
     
    
