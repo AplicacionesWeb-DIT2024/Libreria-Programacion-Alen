@@ -16,7 +16,7 @@
             </div>
             <div class="col-md-6">
                 <div class="mb-2"><b>Envío a:</b> {{ $factura->domicilio_completo }}</div>
-                <div class="mb-2"><b>Cantidad de libros:</b> {{ $factura->cantidadTotal }}</div>
+                <div class="mb-2"><b>Cantidad de productos:</b> {{ $factura->cantidadTotal }}</div>
                 <div class="mb-2"><b>Total:</b> ${{ number_format($factura->precioTotal, 2, ',', '.') }}</div>
             </div>
         </div>
