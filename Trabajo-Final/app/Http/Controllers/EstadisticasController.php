@@ -135,7 +135,7 @@ class EstadisticasController extends Controller
      private function rango(?string $periodo): array{
         return match ($periodo) {
             'dia'    => [now()->startOfDay(), now()->endOfDay()],
-            'semana' => [now()->startOfWeek(), now()->endOfWeek()],
+            'semana' => [now()->subDays(6)->startOfDay(), now()->endOfDay()], 
             'anio'   => [now()->startOfYear(), now()->endOfYear()],
             default  => [now()->startOfMonth(), now()->endOfMonth()],
         };

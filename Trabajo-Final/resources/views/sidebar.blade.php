@@ -1,10 +1,10 @@
-<div class="offcanvas-md offcanvas-start text-bg-dark min-vh-100" tabindex="-1" id="sidebar" style="width: 250px;">
+<div class="offcanvas-md offcanvas-start text-bg-dark" tabindex="-1" id="sidebar" style="width: 250px;">
 
   <div class="offcanvas-header">
     <button type="button" class="btn-close btn-close-white d-md-none" data-bs-dismiss="offcanvas" data-bs-target="#sidebar" aria-label="Close"></button>
   </div>
 
-  <div class="offcanvas-body d-flex flex-column p-3 min-vh-100">
+  <div class="offcanvas-body d-flex flex-column p-3">
      <a href="{{ route('home') }}" class="d-flex align-items-center text-white text-decoration-none">
       <img src="{{ asset('images/logobyte.png') }}" class="img-fluid me-2" alt="ByteBooks" width="70" height="60">
       <span class="fs-4">ByteBooks</span>

@@ -36,7 +36,7 @@
     <script src="{{ asset('js/select2.js') }}"></script>
 
 
-
+    <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
 
     
 
@@ -67,7 +67,7 @@
         <i class="fa-solid fa-bars"></i>
     </button>
 
-   <div class="d-flex">
+   <div class="d-flex align-items-start">
         @include('sidebar')
 
         <div class="flex-grow-1" style="min-width: 0;">

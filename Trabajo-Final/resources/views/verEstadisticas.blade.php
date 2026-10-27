@@ -63,7 +63,7 @@
     <h5 class="mb-0">Libros y categorías más comprados</h5>
     <div class="btn-group btn-group-sm" id="grp-periodo">
         <button class="btn btn-outline-primary" data-v="dia">Hoy</button>
-        <button class="btn btn-outline-primary" data-v="semana">Semana</button>
+        <button class="btn btn-outline-primary" data-v="semana">Últimos 7 dias</button>
         <button class="btn btn-outline-primary active" data-v="mes">Mes</button>
         <button class="btn btn-outline-primary" data-v="anio">Año</button>
     </div>
