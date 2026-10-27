@@ -1,0 +1,7 @@
+#grp-ventas [data-v="semana"].active { background-color: #198754; border-color: #198754; color: #fff; }
+#grp-ventas [data-v="mes"].active    { background-color: #0d6efd; border-color: #0d6efd; color: #fff; }
+#grp-ventas [data-v="anio"].active   { background-color: #fd7e14; border-color: #fd7e14; color: #fff; }
+
+#grp-ventas [data-v="semana"]:not(.active) { border-color: #198754; color: #198754; }
+#grp-ventas [data-v="mes"]:not(.active)    { border-color: #0d6efd; color: #0d6efd; }
+#grp-ventas [data-v="anio"]:not(.active)   { border-color: #fd7e14; color: #fd7e14; }

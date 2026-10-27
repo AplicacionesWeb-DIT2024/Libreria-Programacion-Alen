@@ -8,6 +8,7 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\SubcategoriaController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\EstadisticasController;
 use App\Http\Controllers\FacturaController;
 
 
@@ -77,6 +78,16 @@ Route::middleware(['auth', 'role:admin,superadmin'])->group(function () {
         Route::patch('admin/subcategorias/{subcategoria}', 'activar')->name('subcategorias.activar')->middleware('auth');
 
     });
+
+    Route::controller(EstadisticasController::class) -> group(function() {
+        Route::get('admin/estadisticas', 'index')->name('estadisticas.index')->middleware('auth');
+        Route::get('admin/estadisticas/resumen', 'resumen')->name('estadisticas.resumen')->middleware('auth');
+        Route::get('admin/estadisticas/ventas', 'ventas')->name('estadisticas.ventas')->middleware('auth');
+        Route::get('admin/estadisticas/top-libros', 'topLibros')->name('estadisticas.topLibros')->middleware('auth');
+        Route::get('admin/estadisticas/categorias', 'categorias')->name('estadisticas.categorias')->middleware('auth');
+    });
+
+    
 
 
     //Autores

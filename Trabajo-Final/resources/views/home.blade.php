@@ -87,11 +87,11 @@
             </div>
 
             <div class="col-md-3">
-                <div onclick="location.href='{{ route('subcategorias.index') }}'"
+                <div onclick="location.href='{{ route('estadisticas.index') }}'"
                     class="card dashboard-card text-white text-center bg-reporte p-4 h-100">
                     <div class="dashboard-icon"><i class="fa-solid fa-chart-column"></i></div>
-                    <h5 class="fw-bold">Reportes</h5>
-                    <p class="small opacity-75"> Ver estadisticas y reportes</p>
+                    <h5 class="fw-bold">Estadisticas</h5>
+                    <p class="small opacity-75"> Ver estadisticas</p>
                 </div>
             </div>
         </div>

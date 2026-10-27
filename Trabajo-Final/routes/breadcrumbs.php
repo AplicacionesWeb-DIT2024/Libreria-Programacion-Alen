@@ -71,3 +71,9 @@ Breadcrumbs::for('pedidos.detalle', function (BreadcrumbTrail $trail, Factura $f
     $trail->parent('pedidos.index');
     $trail->push('Pedido #' . $factura->id);
 });
+
+
+Breadcrumbs::for('estadisticas.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('home');
+    $trail->push('Estadisticas', route('estadisticas.index'));
+});

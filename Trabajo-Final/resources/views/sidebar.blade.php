@@ -125,9 +125,9 @@
     </li>
 
       <li class="nav-item">
-        <a href="#" class="nav-link text-white">
+        <a href="{{ route('estadisticas.index') }}" class="nav-link text-white">
           <i class="fa-solid fa-chart-column"></i>
-          Reportes
+          Estadisticas
         </a>
       </li>
     </ul>
