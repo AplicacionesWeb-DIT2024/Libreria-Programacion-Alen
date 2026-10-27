@@ -33,11 +33,17 @@
 
     async function cargarVentas(periodo) {
         const d = await get(urls.ventas, {periodo});
+        const esCelular = window.innerWidth < 576;
+
+        const labels = (esCelular && periodo === 'mes')
+            ? d.labels.map(l => l.replace(/ (\d{2})(\d{2})$/, ' $2'))
+            : d.labels;
+
         chartVentas?.destroy();
         chartVentas = new Chart(document.getElementById('graficoVentas'), {
             type: 'bar',
             data: {
-                labels: d.labels,
+                labels: labels,
                 datasets: [{
                     label: ETIQUETAS_VENTAS[periodo],
                     data: d.ingresos,
@@ -47,10 +53,24 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                layout: {padding: {right: 12}},
                 plugins: {tooltip: {callbacks: {
                     label: c => peso(c.parsed.y) + ' · ' + d.pedidos[c.dataIndex] + ' pedidos'
                 }}},
-                scales: {y: {beginAtZero: true}}
+                scales: {
+                    x: {
+                        ticks: {
+                            autoSkip: false,             
+                            maxRotation: 90,
+                            minRotation: esCelular ? 90 : 0,
+                            font: {size: esCelular ? 10 : 12},
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {callback: v => '$' + Number(v).toLocaleString('es-AR')}
+                    }
+                }
             }
         });
     }
