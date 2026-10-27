@@ -5,3 +5,38 @@
 #grp-ventas [data-v="semana"]:not(.active) { border-color: #198754; color: #198754; }
 #grp-ventas [data-v="mes"]:not(.active)    { border-color: #0d6efd; color: #0d6efd; }
 #grp-ventas [data-v="anio"]:not(.active)   { border-color: #fd7e14; color: #fd7e14; }
+
+
+.chart-box {
+    position: relative;   
+    width: 100%;
+}
+.chart-ventas     { height: 320px; }
+.chart-categorias { height: 320px; max-width: 420px; margin: auto; }
+
+@media (max-width: 576px) {
+    .chart-ventas     { height: 380px; }
+    .chart-categorias { height: 360px; }
+}
+
+
+.top-item {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+.top-pos {
+    flex: 0 0 auto;
+    min-width: 1.5rem;
+    font-weight: 600;
+    color: #6c757d;
+}
+.top-nombre {
+    flex: 1 1 auto;
+    min-width: 0;            
+    overflow-wrap: anywhere;
+}
+.top-badge {
+    flex: 0 0 auto;
+    white-space: nowrap;     
+}

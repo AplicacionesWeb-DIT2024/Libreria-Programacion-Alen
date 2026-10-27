@@ -2,6 +2,12 @@
 @section('title', 'Listar Categorias')
 @section('js')
     <script src="{{ asset('js/modalEditar.js') }}"></script>
+     <script>
+        window.REABRIR_MODAL_AGREGAR_CATEGORIA = @json($errors->agregarCategoria->any());
+        window.REABRIR_MODAL_EDITAR_CATEGORIA  = @json($errors->editarCategoria->any());
+    </script>
+    <script src="{{ asset('js/modalAgregarCategoria.js') }}"></script>
+    <script src="{{ asset('js/modalEditarCategoria.js') }}"></script>
 @endsection
 @section('body')
 

@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         modal.addEventListener('show.bs.modal', function (event) {
             const button = event.relatedTarget;
+            if (!button) return;
             const form = modal.querySelector('form');
 
             if (button.dataset.action) {
@@ -69,6 +70,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (modalEditarLibro) {
         modalEditarLibro.addEventListener('show.bs.modal', function (event) {
             const button = event.relatedTarget;
+            if (!button) return;
 
             modalEditarLibro.querySelectorAll('[data-preview]').forEach(function (img) {
                 const url = button.dataset[img.dataset.preview];

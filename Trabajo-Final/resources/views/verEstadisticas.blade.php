@@ -53,7 +53,9 @@
                 <button class="btn btn-outline-primary" data-v="anio">Anual</button>
             </div>
         </div>
-        <canvas id="graficoVentas" height="90"></canvas>
+        <div class="chart-box chart-ventas">
+            <canvas id="graficoVentas"></canvas>
+        </div>
     </div>
 </div>
 
@@ -71,14 +73,16 @@
     <div class="col-lg-6">
         <div class="card h-100"><div class="card-body">
             <h6>Top 5 libros</h6>
-            <ol class="list-group list-group-numbered" id="listaTop"></ol>
+            <ol class="list-group" id="listaTop"></ol>
         </div></div>
     </div>
     <div class="col-lg-6">
         <div class="card h-100"><div class="card-body">
             <h6>Categorías</h6>
-            <div style="max-width:320px;margin:auto"><canvas id="graficoCategorias"></canvas></div>
-        </div></div>
+            <div class="chart-box chart-categorias">
+                <canvas id="graficoCategorias"></canvas>
+            </div>
+        </div>
     </div>
 </div>
 @endsection

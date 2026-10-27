@@ -45,6 +45,8 @@
                 }]
             },
             options: {
+                responsive: true,
+                maintainAspectRatio: false,
                 plugins: {tooltip: {callbacks: {
                     label: c => peso(c.parsed.y) + ' · ' + d.pedidos[c.dataIndex] + ' pedidos'
                 }}},
@@ -59,12 +61,16 @@
         const lista = document.getElementById('listaTop');
         lista.innerHTML = '';
         if (!top.length) lista.innerHTML = '<li class="list-group-item text-muted">Sin ventas en el período</li>';
-        top.forEach(l => {
+        top.forEach((l, i) => {
             const li = document.createElement('li');
-            li.className = 'list-group-item d-flex justify-content-between';
-            li.innerHTML = '<span></span><span class="badge bg-primary rounded-pill"></span>';
-            li.children[0].textContent = l.nombre;
-            li.children[1].textContent = l.total + ' unidades';
+            li.className = 'list-group-item top-item';
+            li.innerHTML =
+                '<span class="top-pos"></span>' +
+                '<span class="top-nombre"></span>' +
+                '<span class="badge bg-primary rounded-pill top-badge"></span>';
+            li.children[0].textContent = (i + 1) + '.';
+            li.children[1].textContent = l.nombre;
+            li.children[2].textContent = l.total + (Number(l.total) === 1 ? ' unidad' : ' unidades');
             lista.appendChild(li);
         });
 
@@ -74,6 +80,11 @@
             data: {
                 labels: cats.map(c => c.nombre),
                 datasets: [{data: cats.map(c => Number(c.total))}]
+            },
+             options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {legend: {position: 'bottom'}}
             }
         });
     }

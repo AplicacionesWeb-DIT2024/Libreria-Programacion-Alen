@@ -6,6 +6,7 @@ use App\Models\Categoria;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 
 class CategoriaController extends Controller
@@ -19,10 +20,15 @@ class CategoriaController extends Controller
     }
 
     public function store(Request $request) {
-        $request -> validate ([ 'nombre' => 'required|unique:categorias,nombre', ]);
+         $request->validateWithBag('agregarCategoria', 
+         ['nombre' => ['required', 'string', 'max:255', 'unique:categorias,nombre'],], [
+            'nombre.required' => 'El nombre de la categoría es obligatorio.',
+            'nombre.unique'   => 'Ya existe una categoría con ese nombre.',
+            'nombre.max'      => 'El nombre no puede superar los 255 caracteres.',
+        ]);
 
         $categoria = new Categoria(); 
-        $categoria->nombre = $request->nombre; 
+        $categoria->nombre = trim($request->nombre); 
         $categoria->activo = true;
         $categoria->usuario_creacion = Auth::id();
         $categoria->usuario_modificacion = Auth::id();
@@ -41,7 +47,15 @@ class CategoriaController extends Controller
     }
 
     public function update(Request $request, Categoria $categoria) {
-        $categoria -> nombre = $request -> nombre; 
+        $request->validateWithBag('editarCategoria', [
+        'nombre' => [
+            'required', 'string', 'max:255', Rule::unique('categorias', 'nombre')->ignore($categoria->id),
+        ],], [
+        'nombre.required' => 'El nombre de la categoría es obligatorio.',
+        'nombre.unique'   => 'Ya existe otra categoría con ese nombre.',
+        'nombre.max'      => 'El nombre no puede superar los 255 caracteres.',
+        ]);
+        $categoria -> nombre = trim($request -> nombre); 
         $categoria->usuario_modificacion = Auth::id();
 
         $categoria->save();
