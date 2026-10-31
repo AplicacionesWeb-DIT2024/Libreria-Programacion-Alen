@@ -6,6 +6,7 @@ use App\Models\Editorial;
 use App\Models\Pais;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 
 class EditorialController extends Controller
@@ -17,7 +18,6 @@ class EditorialController extends Controller
         $editoriales = Editorial::query()
         ->orderBy('id')
         ->get();
-;
        
 
         return view('listarEditoriales', compact('editoriales','paises'));
@@ -25,8 +25,28 @@ class EditorialController extends Controller
 
     public function store(Request $request) {
 
+        $paises = collect(config('countries'));
+
+         $request->validateWithBag('agregarEditorial', [
+        'nombre' =>[
+            'required', 'string', 'max:255',
+            function ($attribute, $value, $fail) {
+                $existe = Editorial::whereRaw('LOWER(nombre) = ?', [mb_strtolower(trim($value))])->exists();
+                if ($existe) {
+                        $fail('Ya existe una editorial con ese nombre.');
+                }
+            },
+        ],
+        'pais'   => ['required', Rule::in($paises->all())],
+        ], [
+            'nombre.required' => 'El nombre de la editorial es obligatorio.',
+            'nombre.max'      => 'El nombre no puede superar los 255 caracteres.',
+            'pais.required'   => 'Debe seleccionar un país.',
+            'pais.in'         => 'El país seleccionado no es válido.',
+        ]);
+
         $editorial = new Editorial(); 
-        $editorial->nombre = $request->nombre; 
+        $editorial->nombre = trim($request->nombre); 
         $editorial->pais = $request->pais;
         $editorial->activo = true; 
         $editorial->usuario_creacion = Auth::id();
@@ -49,14 +69,37 @@ class EditorialController extends Controller
     }
 
     public function update(Request $request, Editorial $editorial) {
-        $editorial->nombre = $request->nombre; 
+
+        $paises = collect(config('countries'));
+
+        $request->validateWithBag('editarEditorial', [
+        'nombre' => [
+            'required', 'string', 'max:255',
+            function ($attribute, $value, $fail) use ($editorial) {
+                $existe = Editorial::whereRaw('LOWER(nombre) = ?', [mb_strtolower(trim($value))])
+                            ->where('id', '!=', $editorial->id)
+                            ->exists();
+                if ($existe) {
+                    $fail('Ya existe otra editorial con ese nombre.');
+                }
+            },
+        ],
+        'pais' => ['required', Rule::in($paises->all())],
+        ], [
+            'nombre.required' => 'El nombre de la editorial es obligatorio.',
+            'nombre.max'      => 'El nombre no puede superar los 255 caracteres.',
+            'pais.required'   => 'Debe seleccionar un país.',
+            'pais.in'         => 'El país seleccionado no es válido.',
+        ]);
+
+        $editorial->nombre = trim($request->nombre); 
 
 
         $editorial->pais = $request->pais;
         $editorial->usuario_modificacion = Auth::id();
 
         $editorial->save();
-        return redirect() -> route('editoriales.index');
+        return redirect() -> back() -> with('success', 'Editorial modificada exitosamente');
 
     }
 

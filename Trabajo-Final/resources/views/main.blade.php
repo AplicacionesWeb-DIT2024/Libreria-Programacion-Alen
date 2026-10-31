@@ -34,6 +34,7 @@
     <script src="{{ asset('js/datatables.js') }}"></script>
     <script src="{{ asset('js/loading.js') }}"></script>
     <script src="{{ asset('js/select2.js') }}"></script>
+    <script src="{{ asset('js/esconderMensajeExito.js') }}"></script>
 
 
     <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
@@ -81,6 +82,13 @@
 
                     <span class="text-muted"> Fecha: {{ now()->format('d/m/Y') }}</span>
                 </div>
+                @if (session('success'))
+                    <div class="alert alert-success alert-dismissible fade show auto-dismiss" role="alert">
+                        <i class="fa-solid fa-circle-check me-1"></i>
+                        {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                    </div>
+                @endif
                 @yield('body')
                 @yield('js')
             </div>

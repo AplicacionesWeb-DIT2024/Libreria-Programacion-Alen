@@ -21,9 +21,16 @@ class CategoriaController extends Controller
 
     public function store(Request $request) {
          $request->validateWithBag('agregarCategoria', 
-         ['nombre' => ['required', 'string', 'max:255', 'unique:categorias,nombre'],], [
+         ['nombre' => 
+            ['required', 'string', 'max:255', 
+            function ($attribute, $value, $fail) {
+                $existe = Categoria::whereRaw('LOWER(nombre) = ?', [mb_strtolower(trim($value))])->exists();
+                if ($existe) {
+                    $fail('Ya existe una categoría con ese nombre.');
+                }
+            },
+            ],], [
             'nombre.required' => 'El nombre de la categoría es obligatorio.',
-            'nombre.unique'   => 'Ya existe una categoría con ese nombre.',
             'nombre.max'      => 'El nombre no puede superar los 255 caracteres.',
         ]);
 
@@ -49,17 +56,24 @@ class CategoriaController extends Controller
     public function update(Request $request, Categoria $categoria) {
         $request->validateWithBag('editarCategoria', [
         'nombre' => [
-            'required', 'string', 'max:255', Rule::unique('categorias', 'nombre')->ignore($categoria->id),
+            'required', 'string', 'max:255',
+            function ($attribute, $value, $fail) use ($categoria) {
+                $existe = Categoria::whereRaw('LOWER(nombre) = ?', [mb_strtolower(trim($value))])
+                    ->where('id', '!=', $categoria->id)
+                    ->exists();
+                if ($existe) {
+                    $fail('Ya existe otra categoría con ese nombre.');
+                }
+            },
         ],], [
         'nombre.required' => 'El nombre de la categoría es obligatorio.',
-        'nombre.unique'   => 'Ya existe otra categoría con ese nombre.',
         'nombre.max'      => 'El nombre no puede superar los 255 caracteres.',
         ]);
         $categoria -> nombre = trim($request -> nombre); 
         $categoria->usuario_modificacion = Auth::id();
 
         $categoria->save();
-        return redirect() -> route('categorias.index');
+        return redirect()->back() -> with('success', 'Categoria editada exitosamente');
 
     }
 

@@ -2,6 +2,14 @@
 @section('title', 'Listar editoriales')
 @section('js')
     <script src="{{ asset('js/modalEditar.js') }}"></script>
+    <script>
+        window.REABRIR_MODAL_AGREGAR_EDITORIAL = @json($errors->agregarEditorial->any());
+        window.REABRIR_MODAL_MODIFICAR_EDITORIAL = @json($errors->editarEditorial->any());
+
+    </script>
+    <script src="{{ asset('js/modalAgregarEditorial.js') }}"></script>
+    <script src="{{ asset('js/modalModificarEditorial.js') }}"></script>
+
 @endsection
 @section('body')
 
@@ -128,7 +136,7 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     Cerrar
                 </button>
-                <button type="submit" form="formAgregarEditorial" class="btn btn-primary">
+                <button type="submit" form="formAgregarEditorial" id="btnAgregarEditorial" class="btn btn-primary">
                     Agregar editorial
                 </button>
             </div>
@@ -154,6 +162,9 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     Cerrar
+                </button>
+                <button type="submit" form="formModificarEditorial" id="btnModificarEditorial" class="btn btn-primary">
+                    Modificar editorial
                 </button>
             </div>
 

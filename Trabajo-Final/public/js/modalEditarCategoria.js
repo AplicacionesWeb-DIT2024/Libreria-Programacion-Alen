@@ -4,14 +4,21 @@ document.addEventListener('DOMContentLoaded', function () {
     const input = document.getElementById('edit_nombre');
     const feedback = document.getElementById('edit_nombreFeedback');
     const idInput = document.getElementById('edit_categoria_id');
-    if (!modalEl || !form || !input) return;
+    const botonEditar = document.getElementById('btnEditarCategoria');
+    if (!modalEl || !form || !input || !botonEditar) return;
 
-    modalEl.addEventListener('show.bs.modal', function (e) {
-        const btn = e.relatedTarget;
-        if (!btn) return; 
-        idInput.value = btn.dataset.id;
-        input.classList.remove('is-invalid');
-        feedback.textContent = 'El nombre es obligatorio.';
+     const actualizarBoton = () => {
+        botonEditar.disabled = input.value.trim() === '';
+    };
+
+     modalEl.addEventListener('show.bs.modal', function (e) {
+        const origen = e.relatedTarget;
+        if (origen) {
+            idInput.value = origen.dataset.id;
+            input.classList.remove('is-invalid');
+            feedback.textContent = 'El nombre es obligatorio.';
+        }
+        setTimeout(actualizarBoton, 0);
     });
 
     form.addEventListener('submit', function (e) {
@@ -23,9 +30,13 @@ document.addEventListener('DOMContentLoaded', function () {
             input.focus();
         }
     });
+    
+    input.addEventListener('input', () => {
+        input.classList.remove('is-invalid');
+        actualizarBoton();
+    });
 
-    input.addEventListener('input', () => input.classList.remove('is-invalid'));
-
+    actualizarBoton();
     if (window.REABRIR_MODAL_EDITAR_CATEGORIA) {
         new bootstrap.Modal(modalEl).show();
     }

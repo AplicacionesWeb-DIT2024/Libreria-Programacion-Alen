@@ -20,18 +20,26 @@ class SubcategoriaController extends Controller
 
     public function store(Request $request) {
 
-        $request->validate([
-            'nombre' => [
-                'required',
-                Rule::unique('subcategorias')->where(function ($query) use ($request) {
-                    return $query->where('categoria', $request->categoria);
-                }),
-            ],
-            'categoria' => 'required|exists:categorias,id',
+        $request->validateWithBag('agregarSubcategoria', [
+        'nombre' => [
+            'required', 'string', 'max:255',
+            function ($attribute, $value, $fail) {
+                $existe = Subcategoria::whereRaw('LOWER(nombre) = ?', [mb_strtolower(trim($value))])->exists();
+                if ($existe) {
+                    $fail('Ya existe una subcategoría con ese nombre en la categoría seleccionada.');
+                }
+            },
+        ],
+        'categoria' => ['required', 'exists:categorias,id'],
+        ], [
+            'nombre.required'    => 'El nombre de la subcategoría es obligatorio.',
+            'nombre.max'         => 'El nombre no puede superar los 255 caracteres.',
+            'categoria.required' => 'Debe seleccionar una categoría.',
+            'categoria.exists'   => 'La categoría seleccionada no es válida.',
         ]);
 
         $subcategoria = new Subcategoria(); 
-        $subcategoria->nombre = $request->nombre; 
+        $subcategoria->nombre = trim($request->nombre); 
         $subcategoria->categoria = $request->categoria;
         $subcategoria->activo = true;
         $subcategoria->usuario_creacion = Auth::id();
@@ -52,23 +60,33 @@ class SubcategoriaController extends Controller
 
     public function update(Request $request, Subcategoria $subcategoria) {
 
-        $request->validate([
+       $request->validateWithBag('editarSubcategoria', [
         'nombre' => [
-            'required',
-            Rule::unique('subcategorias')
-                ->where(fn ($query) => $query->where('categoria', $request->categoria))
-                ->ignore($subcategoria->id),
+            'required', 'string', 'max:255',
+            function ($attribute, $value, $fail) use ($request, $subcategoria) {
+                $existe = Subcategoria::whereRaw('LOWER(nombre) = ?', [mb_strtolower(trim($value))])
+                    ->where('categoria', $request->categoria) 
+                    ->where('id', '!=', $subcategoria->id)
+                    ->exists();
+                if ($existe) {
+                    $fail('Ya existe otra subcategoría con ese nombre en la categoría seleccionada.');
+                }
+            },
         ],
-        'categoria' => 'required|exists:categorias,id',
+         'categoria' => ['required', 'exists:categorias,id'],
+        ],[
+            'nombre.required'    => 'El nombre de la subcategoría es obligatorio.',
+            'nombre.max'         => 'El nombre no puede superar los 255 caracteres.',
+            'categoria.required' => 'Debe seleccionar una categoría.',
+            'categoria.exists'   => 'La categoría seleccionada no es válida.',
         ]);
 
-        $subcategoria->nombre = $request->nombre;
+        $subcategoria->nombre = trim($request->nombre);
         $subcategoria->categoria = $request->categoria;
         $subcategoria->usuario_modificacion = Auth::id();
         $subcategoria->save();
 
-        $subcategoria->save();
-        return redirect() -> route('subcategorias.index');
+        return redirect()->back()->with('success', 'Subcategoría modificada exitosamente');;
 
     }
 

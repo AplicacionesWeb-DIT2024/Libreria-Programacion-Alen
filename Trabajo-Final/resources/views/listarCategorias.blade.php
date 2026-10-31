@@ -2,7 +2,7 @@
 @section('title', 'Listar Categorias')
 @section('js')
     <script src="{{ asset('js/modalEditar.js') }}"></script>
-     <script>
+    <script>
         window.REABRIR_MODAL_AGREGAR_CATEGORIA = @json($errors->agregarCategoria->any());
         window.REABRIR_MODAL_EDITAR_CATEGORIA  = @json($errors->editarCategoria->any());
     </script>
@@ -123,7 +123,7 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     Cerrar
                 </button>
-                <button type="submit" form="formAgregarCategoria" class="btn btn-primary">
+                <button type="submit" form="formAgregarCategoria" id="btnAgregarCategoria" class="btn btn-primary" disabled>
                     Agregar categoria
                 </button>
             </div>
@@ -145,7 +145,7 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     Cerrar
                 </button>
-                <button type="submit" form="formEditarCategoria" class="btn btn-primary">
+                <button type="submit" form="formEditarCategoria" id="btnEditarCategoria" class="btn btn-primary">
                     Editar categoria
                 </button>
             </div>

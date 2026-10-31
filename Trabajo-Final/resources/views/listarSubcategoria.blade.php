@@ -2,6 +2,13 @@
 @section('title', 'Listar Subcategorias')
 @section('js')
     <script src="{{ asset('js/modalEditar.js') }}"></script>
+    <script>
+        window.REABRIR_MODAL_AGREGAR_SUBCATEGORIA = @json($errors->agregarSubcategoria->any());
+        window.REABRIR_MODAL_EDITAR_SUBCATEGORIA = @json($errors->editarSubcategoria->any());
+    </script>
+    <script src="{{ asset('js/modalAgregarSubcategoria.js') }}"></script>
+    <script src="{{ asset('js/modalEditarSubcategoria.js') }}"></script>
+
 @endsection
 @section('body')
 
@@ -122,7 +129,7 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     Cerrar
                 </button>
-                <button type="submit" form="formAgregarSubcategoria" class="btn btn-primary">
+                <button type="submit" form="formAgregarSubcategoria" id="btnAgregarSubcategoria"  class="btn btn-primary">
                     Agregar subcategoria
                 </button>
             </div>
@@ -144,7 +151,7 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     Cerrar
                 </button>
-                <button type="submit" form="formEditarSubcategoria" class="btn btn-primary">
+                <button type="submit" form="formEditarSubcategoria" id="btnEditarSubcategoria" class="btn btn-primary">
                     Editar subcategoria
                 </button>
             </div>

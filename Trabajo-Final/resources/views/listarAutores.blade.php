@@ -2,6 +2,12 @@
 @section('title', 'Listar autores')
 @section('js')
     <script src="{{ asset('js/modalEditar.js') }}"></script>
+    <script>
+        window.REABRIR_MODAL_AGREGAR_AUTOR = @json($errors->agregarAutor->any());
+        window.REABRIR_MODAL_EDITAR_AUTOR = @json($errors->editarAutor->any());
+    </script>
+    <script src="{{ asset('js/modalAgregarAutor.js') }}"></script>
+    <script src="{{ asset('js/modalEditarAutor.js') }}"></script>
 @endsection
 @section('body')
 
@@ -129,7 +135,7 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     Cerrar
                 </button>
-                <button type="submit" form="formAgregarAutor" class="btn btn-primary">
+                <button type="submit" form="formAgregarAutor" id="btnAgregarAutor" class="btn btn-primary">
                     Agregar autor
                 </button>
             </div>
@@ -151,7 +157,7 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     Cerrar
                 </button>
-                 <button type="submit" form="formEditarAutor" class="btn btn-primary">
+                 <button type="submit" form="formEditarAutor" id="btnEditarAutor" class="btn btn-primary">
                     Editar autor
                 </button>
             </div>
