@@ -23,8 +23,10 @@ class SubcategoriaController extends Controller
         $request->validateWithBag('agregarSubcategoria', [
         'nombre' => [
             'required', 'string', 'max:255',
-            function ($attribute, $value, $fail) {
-                $existe = Subcategoria::whereRaw('LOWER(nombre) = ?', [mb_strtolower(trim($value))])->exists();
+            function ($attribute, $value, $fail) use ($request) {
+                $existe = Subcategoria::whereRaw('LOWER(nombre) = ?', [mb_strtolower(trim($value))])
+                    ->where('categoria', $request->categoria) 
+                    ->exists();
                 if ($existe) {
                     $fail('Ya existe una subcategoría con ese nombre en la categoría seleccionada.');
                 }
