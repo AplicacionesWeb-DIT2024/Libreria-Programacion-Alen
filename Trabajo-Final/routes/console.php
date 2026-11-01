@@ -9,6 +9,6 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote')->hourly();
 
 
-Schedule::command('pedidos:cancelar-vencidos')
+Schedule::command('app:cancelar-pedidos-vencidos')
     ->everyMinute()
     ->withoutOverlapping();
