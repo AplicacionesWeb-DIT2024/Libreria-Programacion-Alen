@@ -52,7 +52,7 @@ Route::get('cron/cancelar-pedidos', function (Request $request) {
         abort(401);
     }
 
-    Artisan::call('pedidos:cancelar-vencidos');
+    Artisan::call('pedidos:cancelar-pedidos-vencidos');
 
     return response()->json(['salida' => trim(Artisan::output())]);
 });
