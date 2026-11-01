@@ -57,3 +57,5 @@ Route::post('cron/cancelar-pedidos', function (Request $request) {
     return response()->json(['salida' => trim(Artisan::output())]);
 });
 
+
+Route::get('/ping-api', fn () => 'api ok');

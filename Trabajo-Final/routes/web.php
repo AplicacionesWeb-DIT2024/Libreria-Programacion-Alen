@@ -196,3 +196,6 @@ Route::middleware([
         return view('dashboard');
     })->name('dashboard');
 });
+
+
+Route::get('/ping-web', fn () => 'web ok');
