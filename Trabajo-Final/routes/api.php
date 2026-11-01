@@ -56,3 +56,12 @@ Route::get('cron/cancelar-pedidos', function (Request $request) {
 
     return response()->json(['salida' => trim(Artisan::output())]);
 });
+
+
+Route::get('/cron/prueba', function () {
+    return response()->json([
+        'mensaje' => 'Laravel funciona en producción',
+        'entorno' => app()->environment(),
+        'fecha' => now()->toDateTimeString()
+    ]);
+});
