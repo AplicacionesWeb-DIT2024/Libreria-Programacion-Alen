@@ -64,7 +64,7 @@
                 <div class="mb-2"> <b> Edición:</b> {{$edicion}} </div> 
                 <div class="mb-2"> <b> Año de publicación:</b> {{$anio_publicacion}} </div> 
                 <div class="mb-2"> <b> Stock disponible:</b> {{$stock}} </div> 
-                <div class="mb-2"> <b> Precio:</b> {{$precio}} </div> 
+                <div class="mb-2"> <b> Precio:</b> ${{ number_format($precio, 2, ',', '.') }} </div> 
                 <div class="mb-2"> <b> Fecha de creación:</b> {{$creado}} </div> 
                 <div class="mb-2"> <b> Fecha de modificación:</b> {{$actualizado}} </div> 
                 <div class="mb-2"> <b> Usuario de creación:</b> {{$usuario_creacion}} </div> 
