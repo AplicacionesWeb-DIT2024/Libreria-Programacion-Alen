@@ -198,4 +198,3 @@ Route::middleware([
 });
 
 
-Route::get('/ping-web', fn () => 'web ok');

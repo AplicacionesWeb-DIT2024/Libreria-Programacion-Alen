@@ -58,4 +58,3 @@ Route::post('cron/cancelar-pedidos', function (Request $request) {
 });
 
 
-Route::get('/ping-api', fn () => 'api ok');
