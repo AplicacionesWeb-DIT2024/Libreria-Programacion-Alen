@@ -45,14 +45,14 @@ Route::get('{cliente}/facturas', [UsuarioController::class, 'show_api_factura_cl
 
 
 
-Route::get('cron/cancelar-pedidos', function (Request $request) {
+Route::post('cron/cancelar-pedidos', function (Request $request) {
     $secret = config('services.cron.secret');
 
     if (! $secret || ! hash_equals("Bearer {$secret}", (string) $request->header('Authorization'))) {
         abort(401);
     }
 
-    Artisan::call('pedidos:cancelar-pedidos-vencidos');
+    Artisan::call('app:cancelar-pedidos-vencidos');
 
     return response()->json(['salida' => trim(Artisan::output())]);
 });
