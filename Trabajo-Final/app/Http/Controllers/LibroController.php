@@ -12,6 +12,7 @@ use App\Models\Pais;
 use App\Models\Subcategoria;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 
 class LibroController extends Controller
@@ -60,26 +61,67 @@ class LibroController extends Controller
 
     public function store(Request $request) {
 
+        $imagen = ['file', 'image', 'mimes:jpg,jpeg,png,webp', 'mimetypes:image/jpeg,image/png,image/webp', 'max:5120'];
+        $paises  = collect(config('countries'))->values()->all();
+        $idiomas = array_keys(config('languages'));
 
-
-        $request->validate([
-            'nombre' => 'required|string',
-            'anio_publicacion' => 'required|integer|min:1000|max:' . date('Y'),
-            'autor'  => 'required|not_in:""|different:autor2|different:autor3',
-            'autor2' => 'nullable|exists:autores,id|different:autor',
-            'autor3' => 'nullable|exists:autores,id|different:autor|different:autor2',
-            'idioma' => 'required|string',
-            'imagen_original' => 'required|image',
-            'imagen_referencia_2' => 'nullable|image',
-            'imagen_referencia_3' => 'nullable|image',
-            'stock' => 'required | integer | min:0',
-            'precio' => 'required | numeric | min:0',
-            'pais_origen'          => 'required|string',
-            'pais_impresion'       => 'required|string',
-            'edicion'              => 'required|integer|min:1',
-            'categoria'            => 'required|exists:categorias,id',
-            'subcategoria'         => 'required|exists:subcategorias,id',
-            'editorial'            => 'required|exists:editoriales,id',
+        $request->validateWithBag('agregarLibro', [
+            'nombre'           => [
+                'required', 'string', 'max:255', "regex:/^[\p{L}\p{N}¡¿][\p{L}\p{N}\s'’.,:;!?¡¿-]*$/u",
+                function ($attribute, $value, $fail) use ($request) {
+                    $existe = Libro::whereRaw('LOWER(nombre) = ?', [mb_strtolower(trim($value))])
+                        ->where('idioma', $request->idioma)
+                        ->where('categoria', $request->categoria)
+                        ->where('subcategoria', $request->subcategoria)
+                        ->where('editorial', $request->editorial)
+                        ->where('autor', $request->autor)
+                        ->where('autor2', $request->autor2 ?: null)
+                        ->where('autor3', $request->autor3 ?: null)
+                        ->where('pais_origen', $request->pais_origen)
+                        ->where('pais_impresion', $request->pais_impresion)
+                        ->where('edicion', $request->edicion)
+                        ->where('anio_publicacion', $request->anio_publicacion)
+                        ->exists();
+                    if ($existe) {
+                        $fail('Ya existe un libro con esos mismos datos.');
+                    }
+                },
+            ],
+            'categoria'        => ['required', 'exists:categorias,id'],
+            'subcategoria'     => ['required', 'exists:subcategorias,id'],
+            'editorial'        => ['required', 'exists:editoriales,id'],
+            'autor'            => ['required', 'exists:autores,id', 'different:autor2', 'different:autor3'],
+            'autor2'           => ['nullable', 'exists:autores,id', 'different:autor'],
+            'autor3'           => ['nullable', 'exists:autores,id', 'different:autor', 'different:autor2'],
+            'edicion'          => ['required', 'integer', 'min:1'],
+            'anio_publicacion' => ['required', 'integer', 'min:1000', 'max:' . date('Y')],
+            'stock'            => ['required', 'integer', 'min:0'],
+            'precio'           => ['required', 'numeric', 'min:0'],
+            'idioma'         => ['required', Rule::in($idiomas)],
+            'pais_origen'    => ['required', Rule::in($paises)],
+            'pais_impresion' => ['required', Rule::in($paises)],
+            'imagen_original'      => array_merge(['required'], $imagen),
+            'imagen_referencia_2'  => array_merge(['nullable'], $imagen),
+            'imagen_referencia_3'  => array_merge(['nullable'], $imagen),
+        ], [
+            'required'  => 'Este campo es obligatorio.',
+            'exists'    => 'La opción seleccionada no es válida.',
+            'integer'   => 'Debe ser un número entero.',
+            'numeric'   => 'Debe ser un número.',
+            'min'       => 'El valor mínimo permitido es :min.',
+            'anio_publicacion.max' => 'El año no puede ser mayor al actual.',
+            'autor.different'  => 'Los autores no pueden repetirse.',
+            'autor2.different' => 'Los autores no pueden repetirse.',
+            'autor3.different' => 'Los autores no pueden repetirse.',
+            'imagen_original.required' => 'Debe seleccionar una imagen principal.',
+            'idioma.in'         => 'El idioma seleccionado no es válido.',
+            'pais_origen.in'    => 'El país de origen seleccionado no es válido.',
+            'pais_impresion.in' => 'El país de impresión seleccionado no es válido.',
+            '*.image'     => 'El archivo debe ser una imagen.',
+            '*.mimes'     => 'Solo se permiten imágenes JPG, PNG o WEBP.',
+            '*.mimetypes' => 'Solo se permiten imágenes JPG, PNG o WEBP.',
+            '*.max'       => 'La imagen no puede superar los 5 MB.',
+            '*.uploaded'  => 'No se pudo subir la imagen (puede ser demasiado pesada).',
         ]);
 
         $libro = new Libro(); 
@@ -150,27 +192,69 @@ class LibroController extends Controller
 
     
     public function update(Request $request, Libro $libro) {
-        $request->validate([
-            'nombre' => 'required|string',
-            'anio_publicacion' => 'required|integer|min:1000|max:' . date('Y'),
-            'autor'  => 'required|not_in:""|different:autor2|different:autor3',
-            'autor2' => 'nullable|exists:autores,id|different:autor',
-            'autor3' => 'nullable|exists:autores,id|different:autor|different:autor2',
-            'idioma' => 'required|string',
-            'imagen_original' => 'nullable|image',
-            'imagen_referencia_2' => 'nullable|image',
-            'imagen_referencia_3' => 'nullable|image',
-            'stock' => 'required | integer | min:0',
-            'precio' => 'required | numeric | min:0',
-            'pais_origen'          => 'required|string',
-            'pais_impresion'       => 'required|string',
-            'edicion'              => 'required|integer|min:1',
-            'categoria'            => 'required|exists:categorias,id',
-            'subcategoria'         => 'required|exists:subcategorias,id',
-            'editorial'            => 'required|exists:editoriales,id',
-            'eliminar_imagen_referencia_2' => 'nullable|boolean',
-            'eliminar_imagen_referencia_3' => 'nullable|boolean',
+        $imagen = ['file', 'image', 'mimes:jpg,jpeg,png,webp', 'mimetypes:image/jpeg,image/png,image/webp', 'max:5120'];
+        $paises  = collect(config('countries'))->values()->all();
+        $idiomas = array_keys(config('languages'));
+
+        $request->validateWithBag('editarLibro', [
+            'nombre'           => [
+                'required', 'string', 'max:255', "regex:/^[\p{L}\p{N}¡¿][\p{L}\p{N}\s'’.,:;!?¡¿-]*$/u",
+                function ($attribute, $value, $fail) use ($request, $libro) {
+                    $existe = Libro::whereRaw('LOWER(nombre) = ?', [mb_strtolower(trim($value))])
+                        ->where('idioma', $request->idioma)
+                        ->where('categoria', $request->categoria)
+                        ->where('subcategoria', $request->subcategoria)
+                        ->where('editorial', $request->editorial)
+                        ->where('autor', $request->autor)
+                        ->where('autor2', $request->autor2 ?: null)
+                        ->where('autor3', $request->autor3 ?: null)
+                        ->where('pais_origen', $request->pais_origen)
+                        ->where('pais_impresion', $request->pais_impresion)
+                        ->where('edicion', $request->edicion)
+                        ->where('anio_publicacion', $request->anio_publicacion)
+                        ->where('id', '!=', $libro->id)
+                        ->exists();
+                    if ($existe) {
+                        $fail('Ya existe un libro con esos mismos datos.');
+                    }
+                },
+            ],
+            'categoria'        => ['required', 'exists:categorias,id'],
+            'subcategoria'     => ['required', 'exists:subcategorias,id'],
+            'editorial'        => ['required', 'exists:editoriales,id'],
+            'autor'            => ['required', 'exists:autores,id', 'different:autor2', 'different:autor3'],
+            'autor2'           => ['nullable', 'exists:autores,id', 'different:autor'],
+            'autor3'           => ['nullable', 'exists:autores,id', 'different:autor', 'different:autor2'],
+            'edicion'          => ['required', 'integer', 'min:1'],
+            'anio_publicacion' => ['required', 'integer', 'min:1000', 'max:' . date('Y')],
+            'stock'            => ['required', 'integer', 'min:0'],
+            'precio'           => ['required', 'numeric', 'min:0'],
+            'idioma'         => ['required', Rule::in($idiomas)],
+            'pais_origen'    => ['required', Rule::in($paises)],
+            'pais_impresion' => ['required', Rule::in($paises)],
+            'imagen_original'      => array_merge(['nullable'], $imagen),
+            'imagen_referencia_2'  => array_merge(['nullable'], $imagen),
+            'imagen_referencia_3'  => array_merge(['nullable'], $imagen),
+        ], [
+            'required'  => 'Este campo es obligatorio.',
+            'exists'    => 'La opción seleccionada no es válida.',
+            'integer'   => 'Debe ser un número entero.',
+            'numeric'   => 'Debe ser un número.',
+            'min'       => 'El valor mínimo permitido es :min.',
+            'anio_publicacion.max' => 'El año no puede ser mayor al actual.',
+            'autor.different'  => 'Los autores no pueden repetirse.',
+            'autor2.different' => 'Los autores no pueden repetirse.',
+            'autor3.different' => 'Los autores no pueden repetirse.',
+            'idioma.in'         => 'El idioma seleccionado no es válido.',
+            'pais_origen.in'    => 'El país de origen seleccionado no es válido.',
+            'pais_impresion.in' => 'El país de impresión seleccionado no es válido.',
+            '*.image'     => 'El archivo debe ser una imagen.',
+            '*.mimes'     => 'Solo se permiten imágenes JPG, PNG o WEBP.',
+            '*.mimetypes' => 'Solo se permiten imágenes JPG, PNG o WEBP.',
+            '*.max'       => 'La imagen no puede superar los 5 MB.',
+            '*.uploaded'  => 'No se pudo subir la imagen (puede ser demasiado pesada).',
         ]);
+
         $libro->nombre = $request->nombre; 
         $libro->stock = $request->stock;
         $libro->autor = $request->autor;
@@ -187,15 +271,15 @@ class LibroController extends Controller
         $libro->categoria = $request->categoria; 
         $libro->subcategoria = $request->subcategoria;
         $libro->usuario_modificacion = Auth::id();
-        $libro->activo = true;
 
         if ($request->hasFile('imagen_original')) {
-            if ($libro->imagen_original_public_id) {
-                Cloudinary::destroy($libro->imagen_original_public_id);
+            $viejo = $libro->imagen_original_public_id;
+            $subida = $request->file('imagen_original')->storeOnCloudinary('libros');
+            $libro->imagen_original = $subida->getSecurePath();
+            $libro->imagen_original_public_id = $subida->getPublicId();
+            if ($viejo) {
+                Cloudinary::destroy($viejo);
             }
-            $cloudinaryImagen = $request->file('imagen_original')->storeOnCloudinary('libros');
-            $libro->imagen_original = $cloudinaryImagen->getSecurePath();
-            $libro->imagen_original_public_id = $cloudinaryImagen->getPublicId();
         }
 
         foreach ([2, 3] as $n) {

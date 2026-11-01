@@ -6,6 +6,7 @@ use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\AuthApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -40,3 +41,18 @@ Route::get('facturas/', [FacturaController::class, 'index_api']);
 Route::get('facturas/{id}', [FacturaController::class, 'show_api']);
 
 Route::get('{cliente}/facturas', [UsuarioController::class, 'show_api_factura_cliente']);
+
+
+
+
+Route::get('cron/cancelar-pedidos', function (Request $request) {
+    $secret = config('services.cron.secret');
+
+    if (! $secret || ! hash_equals("Bearer {$secret}", (string) $request->header('Authorization'))) {
+        abort(401);
+    }
+
+    Artisan::call('pedidos:cancelar-vencidos');
+
+    return response()->json(['salida' => trim(Artisan::output())]);
+});

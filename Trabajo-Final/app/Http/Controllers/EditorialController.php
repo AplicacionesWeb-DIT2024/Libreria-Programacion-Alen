@@ -29,7 +29,7 @@ class EditorialController extends Controller
 
          $request->validateWithBag('agregarEditorial', [
         'nombre' =>[
-            'required', 'string', 'max:255',
+            'required', 'string', 'max:255',"regex:/^[\p{L}\p{N}][\p{L}\p{N}\s'’-]*$/u",
             function ($attribute, $value, $fail) {
                 $existe = Editorial::whereRaw('LOWER(nombre) = ?', [mb_strtolower(trim($value))])->exists();
                 if ($existe) {
@@ -41,6 +41,7 @@ class EditorialController extends Controller
         ], [
             'nombre.required' => 'El nombre de la editorial es obligatorio.',
             'nombre.max'      => 'El nombre no puede superar los 255 caracteres.',
+            'nombre.regex' => 'El nombre no puede contener caracteres especiales',
             'pais.required'   => 'Debe seleccionar un país.',
             'pais.in'         => 'El país seleccionado no es válido.',
         ]);
@@ -74,7 +75,7 @@ class EditorialController extends Controller
 
         $request->validateWithBag('editarEditorial', [
         'nombre' => [
-            'required', 'string', 'max:255',
+            'required', 'string', 'max:255', "regex:/^[\p{L}\p{N}][\p{L}\p{N}\s'’-]*$/u",
             function ($attribute, $value, $fail) use ($editorial) {
                 $existe = Editorial::whereRaw('LOWER(nombre) = ?', [mb_strtolower(trim($value))])
                             ->where('id', '!=', $editorial->id)
@@ -88,6 +89,7 @@ class EditorialController extends Controller
         ], [
             'nombre.required' => 'El nombre de la editorial es obligatorio.',
             'nombre.max'      => 'El nombre no puede superar los 255 caracteres.',
+            'nombre.regex' => 'El nombre no puede contener caracteres especiales',
             'pais.required'   => 'Debe seleccionar un país.',
             'pais.in'         => 'El país seleccionado no es válido.',
         ]);

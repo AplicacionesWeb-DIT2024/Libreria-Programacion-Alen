@@ -7,8 +7,17 @@ document.addEventListener('DOMContentLoaded', function () {
     const botonEditar = document.getElementById('btnEditarCategoria');
     if (!modalEl || !form || !input || !botonEditar) return;
 
-     const actualizarBoton = () => {
-        botonEditar.disabled = input.value.trim() === '';
+    const CARACTERES_NO_PERMITIDOS = /[^\p{L}\p{N}\s'’-]/gu;
+
+
+    const completo = () => input.value.trim() !== '';
+
+    const actualizarBoton = () => { 
+        
+        const bloqueado = !completo();
+        botonEditar.classList.toggle('btn-bloqueado', bloqueado);
+        botonEditar.setAttribute('aria-disabled', bloqueado ? 'true' : 'false');
+    
     };
 
      modalEl.addEventListener('show.bs.modal', function (e) {
@@ -32,6 +41,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     
     input.addEventListener('input', () => {
+        input.value = input.value.replace(CARACTERES_NO_PERMITIDOS, '');
         input.classList.remove('is-invalid');
         actualizarBoton();
     });

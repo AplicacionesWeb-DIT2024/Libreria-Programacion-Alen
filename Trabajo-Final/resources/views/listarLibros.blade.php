@@ -4,10 +4,15 @@
     <script src="{{ asset('js/modalEditar.js') }}"></script>
     <script>
         const subcategoriasPorCategoria = @json($subcategorias->groupBy('categoria'));
+        window.REABRIR_MODAL_AGREGAR_LIBRO = @json($errors->agregarLibro->any());
+        window.OLD_SUBCATEGORIA = @json(old('subcategoria'));
+        window.REABRIR_MODAL_EDITAR_LIBRO = @json($errors->editarLibro->any());
     </script>
     <script src="{{ asset('js/validarLibro.js') }}"></script>
     <script src="{{ asset('js/categoriaSubcategoria.js') }}"></script>
     <script src="{{ asset('js/modalAgregar.js') }}"></script>
+    <script src="{{ asset('js/modalAgregarLibro.js') }}"></script>
+    <script src="{{ asset('js/modalEditarLibro.js') }}"></script>
 
 @endsection
 @section('css')
@@ -177,7 +182,7 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     Cerrar
                 </button>
-                <button type="submit" form="formAgregarLibro" class="btn btn-primary">
+                <button type="submit" form="formAgregarLibro" id="btnAgregarLibro" class="btn btn-primary">
                     Agregar libro
                 </button>
             </div>
@@ -199,7 +204,7 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     Cerrar
                 </button>
-                <button type="submit" form="formEditarLibro" class="btn btn-primary">
+                <button type="submit" form="formEditarLibro" id="btnEditarLibro" class="btn btn-primary">
                     Editar libro
                 </button>
             </div>

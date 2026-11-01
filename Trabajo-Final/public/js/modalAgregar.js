@@ -26,5 +26,8 @@ $('#modalAgregarLibro').on('hidden.bs.modal', function () {
         $(this).removeData('objectUrl').removeAttr('src').hide();
     });
 
+    this.querySelectorAll('input:not([type="hidden"]):not([type="file"])').forEach(i => i.value = '');
+    $modal.find('select').val('').trigger('change');
+
     $modal.find('select').trigger('change');
 });

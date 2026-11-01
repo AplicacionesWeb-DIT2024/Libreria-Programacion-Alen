@@ -1,0 +1,1 @@
+<div class="invalid-feedback d-block" data-fb="{{ $campo }}">@error($campo, $bag ?? 'agregarLibro')  {{ $message }} @enderror</div>

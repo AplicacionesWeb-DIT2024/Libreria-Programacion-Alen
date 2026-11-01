@@ -7,8 +7,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (!form || !input || !modalEl || !boton) return;
 
-    const actualizarBoton = () => {
-        boton.disabled = input.value.trim() === '';
+    const CARACTERES_NO_PERMITIDOS = /[^\p{L}\p{N}\s'’-]/gu;
+
+
+    const completo = () => input.value.trim() !== '';
+
+    const actualizarBoton = () => { 
+        
+        const bloqueado = !completo();
+        boton.classList.toggle('btn-bloqueado', bloqueado);
+        boton.setAttribute('aria-disabled', bloqueado ? 'true' : 'false');
+    
     };
 
     form.addEventListener('submit', function (e) {
@@ -22,6 +31,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     input.addEventListener('input', () => {
+        input.value = input.value.replace(CARACTERES_NO_PERMITIDOS, '');
         input.classList.remove('is-invalid');
         actualizarBoton();
     });

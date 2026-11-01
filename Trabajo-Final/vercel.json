@@ -5,6 +5,9 @@
     "functions": {
         "api/index.php": { "runtime": "vercel-php@0.9.0" }
     },
+    "crons": [
+        { "path": "/api/cron/cancelar-pedidos", "schedule": "*/5 * * * *" }
+    ],
     "routes": [
         { "src": "/(.*\\.php)$", "dest": "/api/index.php" },
         { "src": "/$", "dest": "/api/index.php" },
@@ -25,4 +28,6 @@
         "LOG_CHANNEL": "stderr",
         "SESSION_DRIVER": "cookie"
     }
+    
+    
 }

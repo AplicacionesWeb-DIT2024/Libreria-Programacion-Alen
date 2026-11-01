@@ -123,7 +123,7 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     Cerrar
                 </button>
-                <button type="submit" form="formAgregarCategoria" id="btnAgregarCategoria" class="btn btn-primary" disabled>
+                <button type="submit" form="formAgregarCategoria" id="btnAgregarCategoria" class="btn btn-primary">
                     Agregar categoria
                 </button>
             </div>

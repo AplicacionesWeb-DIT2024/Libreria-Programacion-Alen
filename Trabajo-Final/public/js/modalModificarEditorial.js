@@ -9,11 +9,20 @@ document.addEventListener('DOMContentLoaded', function () {
     const boton = document.getElementById('btnModificarEditorial');
     if (!modalEl || !form || !nombre || !pais || !boton) return;
 
-    const actualizarBoton = () => {
-        boton.disabled = !(nombre.value.trim() !== '' && pais.value !== '');
+    const CARACTERES_NO_PERMITIDOS = /[^\p{L}\p{N}\s'’-]/gu;
+
+    const completo = () => nombre.value.trim() !== '' && pais.value !== '';
+
+    const actualizarBoton = () => { 
+        
+        const bloqueado = !completo();
+        boton.classList.toggle('btn-bloqueado', bloqueado);
+        boton.setAttribute('aria-disabled', bloqueado ? 'true' : 'false');
+    
     };
 
     nombre.addEventListener('input', () => {
+        nombre.value = nombre.value.replace(CARACTERES_NO_PERMITIDOS, '');
         nombre.classList.remove('is-invalid');
         actualizarBoton();
     });
@@ -35,7 +44,15 @@ document.addEventListener('DOMContentLoaded', function () {
             paisFb.textContent = 'Debe seleccionar un país.';
             ok = false;
         }
-        if (!ok) e.preventDefault();
+        if (!ok) {
+            e.preventDefault();
+            const primero = form.querySelector('.is-invalid');
+            if (primero) {
+                primero.focus();
+            } else if (pais.value === '') {
+                 $(pais).select2('open'); 
+            }      
+        }
     });
 
     modalEl.addEventListener('show.bs.modal', function (e) {

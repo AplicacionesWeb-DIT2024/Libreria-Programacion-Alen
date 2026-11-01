@@ -15,17 +15,47 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const fechaValida = () => fecha.value !== '' && fecha.value <= fecha.max && fecha.value >= fecha.min;
 
+
+     const ajustarFecha = () => {
+         if (fecha.value === '') return;
+        const anio = parseInt(fecha.value.slice(0, 4), 10);
+        if (anio < 1000) return;                 
+        if (fecha.max && fecha.value > fecha.max) {
+            fecha.value = fecha.max;
+        }
+    };
+
+    const SOLO_LETRAS = /[^\p{L}\s'’.-]/gu;
+
+    [nombre, apellido].forEach(el => {
+        el.addEventListener('input', () => {
+            el.value = el.value.replace(SOLO_LETRAS, '');
+        });
+    });
+
     const completo = () =>
         nombre.value.trim() !== '' &&
         apellido.value.trim() !== '' &&
         fechaValida() &&
         pais.value !== '';
 
-    const actualizarBoton = () => { boton.disabled = !completo(); };
+    const actualizarBoton = () => { 
+        const bloqueado = !completo();
+        boton.classList.toggle('btn-bloqueado', bloqueado);
+        boton.setAttribute('aria-disabled', bloqueado ? 'true' : 'false');
+    
+    };
 
     nombre.addEventListener('input', () => { nombre.classList.remove('is-invalid'); actualizarBoton(); });
     apellido.addEventListener('input', () => { apellido.classList.remove('is-invalid'); actualizarBoton(); });
     fecha.addEventListener('input', () => { fecha.classList.remove('is-invalid'); actualizarBoton(); });
+    
+    fecha.addEventListener('blur', () => {
+        ajustarFecha();
+        actualizarBoton();
+    });
+    
+    
     $(pais).on('change', () => { paisFb.textContent = ''; actualizarBoton(); });
 
     form.addEventListener('submit', function (e) {
@@ -57,7 +87,16 @@ document.addEventListener('DOMContentLoaded', function () {
             ok = false;
         }
 
-        if (!ok) e.preventDefault();
+        if (!ok) {
+            e.preventDefault();
+            const primero = form.querySelector('.is-invalid');
+            if (primero) {
+                primero.focus();
+            } else if (pais.value === '') {
+                 $(pais).select2('open'); 
+            }
+                
+        }
     });
 
     modalEl.addEventListener('show.bs.modal', function (e) {

@@ -23,6 +23,7 @@ class CategoriaController extends Controller
          $request->validateWithBag('agregarCategoria', 
          ['nombre' => 
             ['required', 'string', 'max:255', 
+            "regex:/^[\p{L}\p{N}][\p{L}\p{N}\s'’-]*$/u",
             function ($attribute, $value, $fail) {
                 $existe = Categoria::whereRaw('LOWER(nombre) = ?', [mb_strtolower(trim($value))])->exists();
                 if ($existe) {
@@ -30,8 +31,9 @@ class CategoriaController extends Controller
                 }
             },
             ],], [
-            'nombre.required' => 'El nombre de la categoría es obligatorio.',
-            'nombre.max'      => 'El nombre no puede superar los 255 caracteres.',
+                'nombre.required' => 'El nombre de la categoría es obligatorio.',
+                'nombre.max'      => 'El nombre no puede superar los 255 caracteres.',
+                'nombre.regex' => 'El nombre no puede contener caracteres especiales',
         ]);
 
         $categoria = new Categoria(); 
@@ -57,6 +59,7 @@ class CategoriaController extends Controller
         $request->validateWithBag('editarCategoria', [
         'nombre' => [
             'required', 'string', 'max:255',
+            "regex:/^[\p{L}\p{N}][\p{L}\p{N}\s'’-]*$/u",
             function ($attribute, $value, $fail) use ($categoria) {
                 $existe = Categoria::whereRaw('LOWER(nombre) = ?', [mb_strtolower(trim($value))])
                     ->where('id', '!=', $categoria->id)
@@ -66,8 +69,9 @@ class CategoriaController extends Controller
                 }
             },
         ],], [
-        'nombre.required' => 'El nombre de la categoría es obligatorio.',
-        'nombre.max'      => 'El nombre no puede superar los 255 caracteres.',
+            'nombre.required' => 'El nombre de la categoría es obligatorio.',
+            'nombre.max'      => 'El nombre no puede superar los 255 caracteres.',
+            'nombre.regex' => 'El nombre no puede contener caracteres especiales',
         ]);
         $categoria -> nombre = trim($request -> nombre); 
         $categoria->usuario_modificacion = Auth::id();

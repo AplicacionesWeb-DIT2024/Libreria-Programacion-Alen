@@ -1,0 +1,4 @@
+.btn-bloqueado {
+    opacity: .65;
+    cursor: not-allowed;
+}

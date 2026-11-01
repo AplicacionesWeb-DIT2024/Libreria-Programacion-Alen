@@ -27,8 +27,8 @@ class AutorController extends Controller
         $paises = collect(config('countries'));
 
         $request->validateWithBag('agregarAutor', [
-            'nombre'   => ['required', 'string', 'max:255'],
-            'apellido' => ['required', 'string', 'max:255'],
+            'nombre'   => ['required', 'string', 'max:255', "regex:/^[\p{L}][\p{L}\s'’.-]*$/u"],
+            'apellido' => ['required', 'string', 'max:255', "regex:/^[\p{L}][\p{L}\s'’.-]*$/u"],
             'pais'     => ['required', Rule::in($paises->all())],
             'fechaNac' => [
                 'required', 'date',
@@ -42,13 +42,15 @@ class AutorController extends Controller
                         ->exists();
 
                     if ($existe) {
-                        $fail('Ya existe un autor con el mismo nombre, apellido, país y fecha de nacimiento.');
+                        $fail('Ya existe un autor con los mismos datos.');
                     }
                 },
             ],
         ], [
             'nombre.required'   => 'El nombre es obligatorio.',
             'apellido.required' => 'El apellido es obligatorio.',
+            'nombre.regex'   => 'El nombre no puede contener numeros ni caracteres especiales.',
+            'apellido.regex' => 'El apellido no puede contener numeros ni caracteres especiales.',
             'pais.required'     => 'Debe seleccionar un país.',
             'pais.in'           => 'El país seleccionado no es válido.',
             'fechaNac.required' => 'La fecha de nacimiento es obligatoria.',
@@ -89,8 +91,8 @@ class AutorController extends Controller
         $paises = collect(config('countries'));
 
         $request->validateWithBag('editarAutor', [
-            'nombre'   => ['required', 'string', 'max:255'],
-            'apellido' => ['required', 'string', 'max:255'],
+            'nombre'   => ['required', 'string', 'max:255', "regex:/^[\p{L}][\p{L}\s'’.-]*$/u"],
+            'apellido' => ['required', 'string', 'max:255', "regex:/^[\p{L}][\p{L}\s'’.-]*$/u"],
             'pais'     => ['required', Rule::in($paises->all())],
             'fechaNac' => [
                 'required', 'date',
@@ -104,7 +106,7 @@ class AutorController extends Controller
                         ->where('id', '!=', $autor->id)
                         ->exists();
                     if ($existe) {
-                        $fail('Ya existe otro autor con el mismo nombre, apellido, país y fecha de nacimiento.');
+                        $fail('Ya existe otro autor con los mismos datos.');
                     }
                 },
             ],
@@ -112,6 +114,8 @@ class AutorController extends Controller
         [
             'nombre.required'   => 'El nombre es obligatorio.',
             'apellido.required' => 'El apellido es obligatorio.',
+            'nombre.regex'   => 'El nombre no puede contener números ni caracteres especiales.',
+            'apellido.regex' => 'El apellido no puede contener números ni caracteres especiales',
             'pais.required'     => 'Debe seleccionar un país.',
             'pais.in'           => 'El país seleccionado no es válido.',
             'fechaNac.required' => 'La fecha de nacimiento es obligatoria.',

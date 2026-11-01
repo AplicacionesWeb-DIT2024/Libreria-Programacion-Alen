@@ -22,7 +22,7 @@ class SubcategoriaController extends Controller
 
         $request->validateWithBag('agregarSubcategoria', [
         'nombre' => [
-            'required', 'string', 'max:255',
+            'required', 'string', 'max:255', "regex:/^[\p{L}\p{N}][\p{L}\p{N}\s'’-]*$/u",
             function ($attribute, $value, $fail) use ($request) {
                 $existe = Subcategoria::whereRaw('LOWER(nombre) = ?', [mb_strtolower(trim($value))])
                     ->where('categoria', $request->categoria) 
@@ -36,6 +36,7 @@ class SubcategoriaController extends Controller
         ], [
             'nombre.required'    => 'El nombre de la subcategoría es obligatorio.',
             'nombre.max'         => 'El nombre no puede superar los 255 caracteres.',
+            'nombre.regex' => 'El nombre no puede contener caracteres especiales',
             'categoria.required' => 'Debe seleccionar una categoría.',
             'categoria.exists'   => 'La categoría seleccionada no es válida.',
         ]);
@@ -64,7 +65,7 @@ class SubcategoriaController extends Controller
 
        $request->validateWithBag('editarSubcategoria', [
         'nombre' => [
-            'required', 'string', 'max:255',
+            'required', 'string', 'max:255',"regex:/^[\p{L}\p{N}][\p{L}\p{N}\s'’-]*$/u",
             function ($attribute, $value, $fail) use ($request, $subcategoria) {
                 $existe = Subcategoria::whereRaw('LOWER(nombre) = ?', [mb_strtolower(trim($value))])
                     ->where('categoria', $request->categoria) 
@@ -79,6 +80,7 @@ class SubcategoriaController extends Controller
         ],[
             'nombre.required'    => 'El nombre de la subcategoría es obligatorio.',
             'nombre.max'         => 'El nombre no puede superar los 255 caracteres.',
+            'nombre.regex' => 'El nombre no puede contener caracteres especiales',
             'categoria.required' => 'Debe seleccionar una categoría.',
             'categoria.exists'   => 'La categoría seleccionada no es válida.',
         ]);
