@@ -63,7 +63,7 @@
                         @endforeach
                     </td>
                     <td> {{$libro -> stock}} </td> 
-                    <td> {{$libro -> precio}} </td>
+                    <td> ${{ number_format($libro->precio, 2, ',', '.') }} </td>
                     <td>
                         <span class="d-none">{{ $libro->activo ? 'Activo' : 'Inactivo' }}</span>
                         @if ($libro->activo)
