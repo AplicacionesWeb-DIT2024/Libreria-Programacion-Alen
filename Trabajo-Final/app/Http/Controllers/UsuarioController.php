@@ -166,19 +166,53 @@ class UsuarioController extends Controller
         $usuario = $request->user();
 
         $data = $request->validate([
-            'nombre'   => ['required', 'string', 'max:255'],
-            'apellido' => ['required', 'string', 'max:255'],
-            'username' => ['required', 'string', 'max:255', Rule::unique('users', 'username')->ignore($usuario->id)],
-            'email'    => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($usuario->id)],
-            'current_password' => ['required_with:password', 'nullable', 'current_password'],
-            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+        'nombre'   => ['required', 'string', 'max:255', "regex:/^[\p{L}][\p{L}\s'’.-]*$/u"],
+        'apellido' => ['required', 'string', 'max:255', "regex:/^[\p{L}][\p{L}\s'’.-]*$/u"],
+        'username' => [
+            'required', 'string', 'min:4', 'max:50',
+            'regex:/^[A-Za-z0-9._-]+$/',
+            function ($attribute, $value, $fail) use ($usuario) {
+                $existe = User::whereRaw('LOWER(username) = ?', [mb_strtolower(trim($value))])
+                    ->where('id', '!=', $usuario->id)
+                    ->exists();
+                if ($existe) {
+                    $fail('Ya existe una persona con ese nombre de usuario.');
+                }
+            },
+        ],
+        'email' => [
+            'required', 'email:rfc', 'max:255',
+            'regex:/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/',
+            function ($attribute, $value, $fail) use ($usuario) {
+                $existe = User::whereRaw('LOWER(email) = ?', [mb_strtolower(trim($value))])
+                    ->where('id', '!=', $usuario->id)
+                    ->exists();
+                if ($existe) {
+                    $fail('Ya existe un usuario con ese email.');
+                }
+            },
+        ],
+        'current_password' => ['required_with:password', 'nullable', 'current_password'],
+        'password'         => ['nullable', 'string', 'min:8', 'confirmed'],
+        ], [
+            'required'         => 'Este campo es obligatorio.',
+            'max'              => 'No puede superar los :max caracteres.',
+            'nombre.regex'     => 'El nombre solo puede contener letras, espacios, apóstrofes y guiones.',
+            'apellido.regex'   => 'El apellido solo puede contener letras, espacios, apóstrofes y guiones.',
+            'username.min'     => 'El usuario debe tener al menos :min caracteres.',
+            'username.regex'   => 'El usuario solo puede contener letras, números, puntos, guiones y guiones bajos.',
+            'email.email'      => 'El email no es válido.',
+            'email.regex'      => 'El email no es válido.',
+            'current_password.required_with' => 'Debe ingresar su contraseña actual para cambiarla.',
+            'current_password.current_password' => 'La contraseña actual no es correcta.',
+            'password.min'     => 'La nueva contraseña debe tener al menos :min caracteres.',
+            'password.confirmed' => 'La confirmación de la contraseña no coincide.',
         ]);
 
-
-        $usuario->name = $data['nombre'];
-        $usuario->apellido = $data['apellido'];
-        $usuario->username = $data['username'];
-        $usuario->email = $data['email'];
+        $usuario->name = trim($data['nombre']);
+        $usuario->apellido = trim($data['apellido']);
+        $usuario->username = trim($data['username']);
+        $usuario->email = mb_strtolower(trim($data['email']));
 
 
         if (!empty($data['password'])) {
