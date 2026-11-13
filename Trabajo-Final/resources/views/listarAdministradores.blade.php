@@ -1,5 +1,11 @@
 @extends('main')
 @section('title', 'Listar administradores')
+@section('js')
+<script>
+    window.REABRIR_MODAL_AGREGAR_ADMINISTRADOR = @json($errors->agregarAdministrador->any());
+</script>
+<script src="{{ asset('js/modalAgregarAdministrador.js') }}"></script>
+@endsection
 @section('body')
 
 @php $esSuper = auth()->user()->isSuperAdmin(); @endphp
@@ -11,7 +17,7 @@
         <button class="btn btn-success"
                 title="Agregar administrador"
                 data-bs-toggle="modal"
-                data-bs-target="#modalAgregarUsuario">
+                data-bs-target="#modalAgregarAdministrador">
             <i class="fas fa-plus"></i>
         </button>
     @endif
@@ -141,7 +147,7 @@
 
     @if ($esSuper)
 
-        <div class="modal fade" id="modalAgregarUsuario" tabindex="-1">
+        <div class="modal fade" id="modalAgregarAdministrador" tabindex="-1">
             <div class="modal-dialog modal-xl">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -155,20 +161,12 @@
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                             Cerrar
                         </button>
-                        <button type="submit" form="formAgregarAdministrador" class="btn btn-primary">
+                        <button type="submit" form="formAgregarAdministrador" id="btnAgregarAdministrador" class="btn btn-primary">
                             Agregar administrador
                         </button>
                     </div>
                 </div>
             </div>
         </div>
-
-         @if ($errors->any() || session('error'))
-            <script>
-                document.addEventListener('DOMContentLoaded', function () {
-                    new bootstrap.Modal(document.getElementById('modalAgregarUsuario')).show();
-                });
-            </script>
-        @endif
     @endif
 @endsection

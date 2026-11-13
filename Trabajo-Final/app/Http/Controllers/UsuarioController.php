@@ -63,12 +63,40 @@ class UsuarioController extends Controller
 
     public function store(Request $request) {
 
-        $data = $request->validate([
-            'nombre'   => ['required', 'string', 'max:255'],
-            'apellido' => ['required', 'string', 'max:255'],
-            'username' => ['required', 'string', 'max:255', 'unique:users,username'],
-            'email'    => ['required', 'email', 'max:255', 'unique:users,email'],
+        $request->validateWithBag('agregarAdministrador', [
+            'nombre' => ['required', 'string', 'max:255', "regex:/^[\p{L}][\p{L}\s'’.-]*$/u"],
+            'apellido' => ['required', 'string', 'max:255', "regex:/^[\p{L}][\p{L}\s'’.-]*$/u"],
+            'username' => [
+                'required', 'string', 'min:4', 'max:50',
+                'regex:/^[A-Za-z0-9._-]+$/',
+                function ($attribute, $value, $fail) {
+                    if (User::whereRaw('LOWER(username) = ?', [mb_strtolower(trim($value))])->exists()) {
+                        $fail('Ya existe un usuario con ese nombre de usuario.');
+                    }
+                },
+            ],
+            'email' => [
+                'required', 'email:rfc', 'max:255','regex:/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/',
+                function ($attribute, $value, $fail) {
+                    if (User::whereRaw('LOWER(email) = ?', [mb_strtolower(trim($value))])->exists()) {
+                        $fail('Ya existe un usuario con ese email.');
+                    }
+                },
+            ],
+        ], [
+            'required'       => 'Este campo es obligatorio.',
+            'max'            => 'No puede superar los :max caracteres.',
+            'username.min'   => 'El usuario debe tener al menos :min caracteres.',
+            'nombre.regex'   => 'El nombre solo puede contener letras, espacios, apóstrofes y guiones.',
+            'apellido.regex' => 'El apellido solo puede contener letras, espacios, apóstrofes y guiones.',
+            'username.regex' => 'El usuario solo puede contener letras, números, puntos, guiones y guiones bajos.',
+            'email.email'    => 'El email no es válido.',
+            'email.regex'    => 'El email no es válido.'
         ]);
+
+        $data = $request->only(['nombre', 'apellido', 'username', 'email']);
+        $data['email'] = mb_strtolower(trim($data['email']));
+        $data['username'] = trim($data['username']);
         $passwordTemporal = Str::password(12);
 
         try {
