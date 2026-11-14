@@ -68,6 +68,7 @@ document.addEventListener('DOMContentLoaded', function () {
         boton.classList.toggle('btn-bloqueado', bloqueado);
     };
 
+    actualizarBoton(); 
 
     campos.forEach(el => el.addEventListener('input', () => {
         mostrar(el, ''); 

@@ -24,28 +24,28 @@
             <div class="form-group mt-3 mb-3">
                 <label for="nombre"><i class="fa-solid fa-person"></i> Nombre</label>
                 <input type="text" class="form-control @error('nombre') is-invalid @enderror" required id="nombre" name="nombre"
-                       value="{{ old('nombre', $usuario->name) }}" required maxlength="255">
+                       value="{{ old('nombre', $usuario->name) }}" maxlength="255">
                 @include('_campoError', ['campo' => 'nombre', 'bag' => 'default'])
             </div>
 
             <div class="form-group mt-3 mb-3">
                 <label for="apellido"><i class="fa-solid fa-person"></i> Apellido</label>
                 <input type="text" class="form-control @error('apellido') is-invalid @enderror" required id="apellido" name="apellido"
-                       value="{{ old('apellido', $usuario->apellido) }}" required maxlength="255">
+                       value="{{ old('apellido', $usuario->apellido) }}" maxlength="255">
                 @include('_campoError', ['campo' => 'apellido', 'bag' => 'default'])
             </div>
 
             <div class="form-group mt-3 mb-3">
                 <label for="username"><i class="fa-solid fa-user"></i> Nombre de usuario</label>
                 <input type="text" class="form-control @error('username') is-invalid @enderror" required id="username" name="username"
-                       value="{{ old('username', $usuario->username) }}" required minlength="4" maxlength="50">
+                       value="{{ old('username', $usuario->username) }}" minlength="4" maxlength="50">
                 @include('_campoError', ['campo' => 'username', 'bag' => 'default'])
             </div>
 
             <div class="form-group mt-3 mb-3">
                 <label for="email">Email</label>
                 <input type="email" class="form-control @error('email') is-invalid @enderror" required id="email" name="email"
-                       value="{{ old('email', $usuario->email) }}" required maxlength="255">
+                       value="{{ old('email', $usuario->email) }}" maxlength="255">
                 @include('_campoError', ['campo' => 'email', 'bag' => 'default'])
             </div>
 
