@@ -27,7 +27,6 @@ Route::controller(LoginController::class) -> group(function() {
     Route::post('admin/login', 'loguear');
     Route::get('admin/login', 'show') -> name('login');
     Route::post('admin/logout', 'desloguear')->name('logout');
-    Route::get('admin/logout', 'desloguear');
 });
 
 

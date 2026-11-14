@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Database\Console\Migrations\StatusCommand;
 use Illuminate\Http\Request;
@@ -192,8 +193,15 @@ class UsuarioController extends Controller
                 }
             },
         ],
-        'current_password' => ['required_with:password', 'nullable', 'current_password'],
-        'password'         => ['nullable', 'string', 'min:8', 'confirmed'],
+        'current_password' => [
+            Rule::requiredIf(fn () => $usuario->debe_cambiar_password || $request->filled('password')),
+            'nullable', 'current_password',
+        ],
+        'password' => [
+            Rule::requiredIf(fn () => $usuario->debe_cambiar_password),
+            'nullable', 'string', 'min:8', 'confirmed',
+            'different:current_password',
+        ],
         ], [
             'required'         => 'Este campo es obligatorio.',
             'max'              => 'No puede superar los :max caracteres.',
@@ -203,11 +211,15 @@ class UsuarioController extends Controller
             'username.regex'   => 'El usuario solo puede contener letras, números, puntos, guiones y guiones bajos.',
             'email.email'      => 'El email no es válido.',
             'email.regex'      => 'El email no es válido.',
-            'current_password.required_with' => 'Debe ingresar su contraseña actual para cambiarla.',
+            'current_password.required'         => 'Debe ingresar su contraseña actual (la temporal) para cambiarla.',
             'current_password.current_password' => 'La contraseña actual no es correcta.',
-            'password.min'     => 'La nueva contraseña debe tener al menos :min caracteres.',
-            'password.confirmed' => 'La confirmación de la contraseña no coincide.',
+            'password.required'                 => 'Debe establecer una nueva contraseña.',
+            'password.min'                      => 'La nueva contraseña debe tener al menos :min caracteres.',
+            'password.confirmed'                => 'La confirmación de la contraseña no coincide.',
+            'password.different'                => 'La nueva contraseña debe ser distinta de la actual.',
         ]);
+
+        $cambioPassword = !empty($data['password']);
 
         $usuario->name = trim($data['nombre']);
         $usuario->apellido = trim($data['apellido']);
@@ -215,12 +227,17 @@ class UsuarioController extends Controller
         $usuario->email = mb_strtolower(trim($data['email']));
 
 
-        if (!empty($data['password'])) {
+        if ($cambioPassword) {
             $usuario->password = $data['password']; 
             $usuario->debe_cambiar_password = false;
         }
 
         $usuario->save();
+
+        if ($cambioPassword) {
+            Auth::logoutOtherDevices($data['password']);
+            $request->session()->regenerate();
+        }
         return redirect() -> route('usuario.perfil') -> with('success', 'Perfil actualizado correctamente.');
 
     }

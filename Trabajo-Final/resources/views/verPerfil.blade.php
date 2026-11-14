@@ -8,17 +8,12 @@
 @section('body')
     <div class = "container mt-5 perfil-form" >
         <h1> Ver perfil </h1>
-        @if (session('success'))
-        <div class = "alert alert-success">
-            {{ session('success') }}
-        </div>
-        @endif
         @if (session('aviso'))
             <div class="alert alert-warning">
                 {{ session('aviso') }}
             </div>
         @endif
-        <form action = "{{route('usuario.perfil.update',$usuario) }}" id="formPerfil" method = "POST" novalidate>
+        <form action = "{{route('usuario.perfil.update',$usuario) }}" id="formPerfil" method = "POST" data-obligatorio="{{ $usuario->debe_cambiar_password ? '1' : '0' }}" novalidate>
             @csrf
             @method('PUT')
             <div class="form-group mt-3 mb-3">
@@ -68,6 +63,7 @@
                            autocomplete="new-password">
                     <i class="fa-solid fa-eye" data-toggle-password="password"></i>
                 </div>
+                <small id="password-help" class="form-text text-muted" aria-live="polite" hidden> </small>
                 @include('_campoError', ['campo' => 'password', 'bag' => 'default'])
             </div>
 

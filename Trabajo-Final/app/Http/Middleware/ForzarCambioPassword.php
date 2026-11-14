@@ -15,7 +15,7 @@ class ForzarCambioPassword
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (auth()->check() && auth()->user()->debe_cambiar_password && !$request->routeIs('usuario.perfil', 'usuarios.update', 'logout')) {
+        if (auth()->check() && auth()->user()->debe_cambiar_password && !$request->routeIs('usuario.perfil', 'usuario.perfil.update', 'logout')) {
             return redirect()->route('usuario.perfil')
                 ->with('aviso', 'Debe cambiar su contraseña temporal para continuar');
         }

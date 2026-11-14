@@ -33,10 +33,13 @@
           </a>
         </li>
         <li class="nav-item">
-          <a href="{{ route('logout') }}" class="nav-link text-white d-flex align-items-center gap-2">
-            <i class="fa-solid fa-arrow-right-from-bracket fa-fw"></i>
-            Cerrar Sesion
-          </a>
+          <form action="{{ route('logout') }}" method="POST">
+            @csrf
+            <button type="submit" class="nav-link text-white d-flex align-items-center gap-2 w-100 bg-transparent border-0">
+              <i class="fa-solid fa-arrow-right-from-bracket fa-fw"></i>
+                Cerrar Sesion
+            </button>
+          </form>
         </li>
       </ul>
     </div>

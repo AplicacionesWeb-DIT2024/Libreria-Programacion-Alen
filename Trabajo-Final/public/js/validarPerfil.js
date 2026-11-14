@@ -10,6 +10,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const nueva = form.querySelector('#password');
     const confirmacion = form.querySelector('#password_confirmation');
     const boton = form.querySelector('button[type="submit"]');
+    const obligatorio = form.dataset.obligatorio === '1';
+    const ayudaPassword = form.querySelector('#password-help');
+
 
     const SOLO_LETRAS = /[^\p{L}\s'’.-]/gu;
     const SOLO_USUARIO = /[^A-Za-z0-9._-]/g;
@@ -45,20 +48,48 @@ document.addEventListener('DOMContentLoaded', function () {
             return '';
         }
 
+        if (el === actual) {
+            if ((obligatorio || nueva.value !== '') && actual.value === '') return 'Debe ingresar su contraseña actual para cambiarla.';
+            return '';
+        }
         if (el === nueva) {
+            if (obligatorio && nueva.value === '') return 'Debe establecer una nueva contraseña.';
             if (nueva.value !== '' && nueva.value.length < 8) return 'La nueva contraseña debe tener al menos 8 caracteres.';
             return '';
         }
-        if (el === actual) {
-            if (nueva.value !== '' && actual.value === '') return 'Debe ingresar su contraseña actual para cambiarla.';
-            return '';
-        }
         if (el === confirmacion) {
-            if (nueva.value !== '' && confirmacion.value !== nueva.value) return 'La confirmación no coincide.';
+            if ((obligatorio || nueva.value !== '') && confirmacion.value !== nueva.value) return 'La confirmación no coincide.';
             return '';
         }
         return '';
     }
+
+    nueva.addEventListener('focus', () => {
+        actualizarAyudaPassword();
+    });
+
+    nueva.addEventListener('blur', () => {
+        if (nueva.value === '' && !obligatorio) {
+            ayudaPassword.hidden = true;
+        }
+    });
+
+
+    function actualizarAyudaPassword() {
+        const longitud = nueva.value.length;
+
+        ayudaPassword.hidden = false;
+
+        if (longitud < 8) {
+            ayudaPassword.textContent = 'La contraseña debe tener al menos 8 caracteres.';
+            ayudaPassword.className = 'form-text text-danger';
+        } else {
+            ayudaPassword.textContent = 'Longitud correcta.';
+            ayudaPassword.className = 'form-text text-success';
+        }
+    }
+
+  
 
     const completo = () => campos.every(el => errorCampo(el) === '');
 
@@ -74,6 +105,9 @@ document.addEventListener('DOMContentLoaded', function () {
         mostrar(el, ''); 
         actualizarBoton();
         if (el === nueva) { mostrar(actual, ''); mostrar(confirmacion, '');  }
+        if (el === nueva && !ayudaPassword.hidden) {
+            actualizarAyudaPassword();
+        }
     }));
 
     
