@@ -22,24 +22,25 @@ class EstadisticasController extends Controller
             ->groupBy('estado')
             ->pluck('total', 'estado');
 
-        $aceptada = EstadoFactura::Aceptada;
-
-        $ingresosMes = Factura::where('estado', $aceptada)
+        $ingresosMes = Factura::whereIn('estado', EstadoFactura::pagados())
             ->whereBetween('fecha', [now()->startOfMonth()->toDateString(), now()->endOfMonth()->toDateString()])
             ->sum('precioTotal');
 
-        $ingresosAnio = Factura::where('estado', $aceptada)
+        $ingresosAnio = Factura::whereIn('estado', EstadoFactura::pagados())
             ->whereBetween('fecha', [now()->startOfYear()->toDateString(), now()->endOfYear()->toDateString()])
             ->sum('precioTotal');
 
+        $n = fn (EstadoFactura $e) => $porEstado[$e->value] ?? 0;
+
         return response()->json([
-            'total'      => $porEstado->sum(),
-            'aceptadas'  => $porEstado[EstadoFactura::Aceptada->value] ?? 0,
-            'pendientes' => $porEstado[EstadoFactura::Pendiente->value] ?? 0,
-            'canceladas' => $porEstado[EstadoFactura::Cancelada->value] ?? 0,
-            'rechazadas' => $porEstado[EstadoFactura::Rechazada->value] ?? 0,
-            'ingresos_mes'  => (float) $ingresosMes,
-            'ingresos_anio' => (float) $ingresosAnio,
+            'total'          => $porEstado->sum(),
+            'aceptadas'      => $n(EstadoFactura::Aceptada) + $n(EstadoFactura::EnPreparacion)
+             + $n(EstadoFactura::EnDistribucion) + $n(EstadoFactura::RecibidoDomicilio),
+            'pendientes'     => $n(EstadoFactura::Pendiente),
+            'canceladas'     => $n(EstadoFactura::Cancelada),
+            'rechazadas'     => $n(EstadoFactura::Rechazada),
+            'ingresos_mes'   => (float) $ingresosMes,
+            'ingresos_anio'  => (float) $ingresosAnio,
         ]);
     }
 
@@ -53,7 +54,7 @@ class EstadisticasController extends Controller
             'anio'   => now()->startOfYear()->subYears(4),
         };
 
-        $facturas = Factura::where('estado', EstadoFactura::Aceptada)
+        $facturas = Factura::where('estado', EstadoFactura::pagados())
             ->where('fecha', '>=', $desde->toDateString())
             ->get(['fecha', 'precioTotal']);
 
@@ -128,7 +129,7 @@ class EstadisticasController extends Controller
     {
         return DB::table('detalle_facturas as d')
             ->join('facturas as f', 'f.id', '=', 'd.factura')
-            ->where('f.estado', EstadoFactura::Aceptada->value)
+            ->where('f.estado', EstadoFactura::pagados())
             ->whereBetween('f.fecha', [$desde->toDateString(), $hasta->toDateString()]);
     }
 

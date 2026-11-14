@@ -169,7 +169,11 @@ Route::middleware(['auth', 'role:admin,superadmin'])->group(function () {
     Route::get('admin/pedidos', [FacturaController::class, 'index'])->name('pedidos.index');
 
     Route::get('admin/pedidos/{factura}', [FacturaController::class, 'showPedidos'])->name('pedidos.detalle');
+
+    Route::patch('admin/pedidos/{factura}/avanzar', [FacturaController::class, 'avanzarEstado'])->name('pedidos.avanzar');
+
 });
+
 
 
 //Superadmins

@@ -84,6 +84,27 @@ class FacturaController extends Controller
 
 
 
+    public function avanzarEstado(Factura $factura)
+    {
+        $actual = $factura->estado;
+        $siguiente = $actual->siguiente();
+
+        if ($siguiente === null) {
+            return back()->with('error', 'Este pedido no puede avanzar de estado.');
+        }
+
+        $cambiadas = Factura::where('id', $factura->id)
+            ->where('estado', $actual)
+            ->update(['estado' => $siguiente]);
+
+        if ($cambiadas === 0) {
+            return back()->with('error', 'El pedido ya fue modificado. Actualice la página');
+        }
+
+        return back()->with('success', "Pedido #{$factura->id} - Estado {$siguiente->label()}.");
+    }
+
+
     
    
     public function store (Request $request) {

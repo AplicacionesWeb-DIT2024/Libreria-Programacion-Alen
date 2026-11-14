@@ -18,9 +18,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const SOLO_USUARIO = /[^A-Za-z0-9._-]/g;
     const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
-    [nombre, apellido].forEach(el => el.addEventListener('input', () => { el.value = el.value.replace(SOLO_LETRAS, ''); }));
-    username.addEventListener('input', () => { username.value = username.value.replace(SOLO_USUARIO, ''); });
-    email.addEventListener('input', () => { email.value = email.value.replace(/\s/g, ''); });
 
     const campos = [nombre, apellido, username, email, actual, nueva, confirmacion];
     const feedback = el => form.querySelector(`[data-fb="${el.name}"]`);
@@ -74,6 +71,46 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+
+    function filtrarConAviso(el, regex, mensaje) {
+        const ayuda = form.querySelector(`#${el.id}-help`);
+        let timer;
+
+        el.addEventListener('input', () => {
+            const limpio = el.value.replace(regex, '');
+            if (limpio === el.value) return;
+
+            let pos = null;
+            try { pos = el.selectionStart; } catch (e) {}
+
+            el.value = limpio;
+
+            if (pos !== null) {
+                const nueva = pos - 1 < 0 ? 0 : pos - 1;
+                try { el.setSelectionRange(nueva, nueva); } catch (e) {}
+            }
+
+            if (!ayuda) return;
+            ayuda.textContent = mensaje;
+            ayuda.hidden = false;
+            clearTimeout(timer);
+            timer = setTimeout(() => { ayuda.hidden = true; }, 3000);
+        });
+    }
+
+
+    filtrarConAviso(nombre, SOLO_LETRAS, 'El nombre solo admite letras, espacios, apóstrofes, puntos y guiones.');
+    filtrarConAviso(apellido, SOLO_LETRAS, 'El apellido solo admite letras, espacios, apóstrofes, puntos y guiones.');
+    filtrarConAviso(username, SOLO_USUARIO, 'El usuario solo admite letras, números, puntos, guiones y guiones bajos.');
+    filtrarConAviso(email, /\s/g, 'El email no puede contener espacios.');
+
+
+
+
+    email.addEventListener('blur', () => {
+        const v = email.value.trim();
+        if (v !== '' && !EMAIL.test(v)) mostrar(email, 'El email no es válido.');
+    });
 
     function actualizarAyudaPassword() {
         const longitud = nueva.value.length;
