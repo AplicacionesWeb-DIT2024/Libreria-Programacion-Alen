@@ -7,31 +7,62 @@ document.addEventListener('DOMContentLoaded', function () {
     const apellidoFb = document.getElementById('edit_aut_apellidoFeedback');
     const fecha = document.getElementById('edit_aut_fechaNac');
     const fechaFb = document.getElementById('edit_aut_fechaNacFeedback');
+    const fechaAyuda = document.getElementById('edit_aut_fechaNac-help');
     const pais = document.getElementById('edit_pais_autor');
     const paisFb = document.getElementById('edit_aut_paisFeedback');
     const idInput = document.getElementById('edit_autor_id');
     const boton = document.getElementById('btnEditarAutor');
     if (!modalEl || !form || !nombre || !apellido || !fecha || !pais || !boton) return;
 
+    const SOLO_LETRAS = /[^\p{L}\s'’.-]/gu;
+    const formatear = iso => iso.split('-').reverse().join('/');
+
     const fechaValida = () => fecha.value !== '' && fecha.value <= fecha.max && fecha.value >= fecha.min;
 
+    const textoRango = () =>
+        `Debe estar entre el ${formatear(fecha.min)} y el ${formatear(fecha.max)} (mínimo 18 años).`;
 
-     const ajustarFecha = () => {
-         if (fecha.value === '') return;
-        const anio = parseInt(fecha.value.slice(0, 4), 10);
-        if (anio < 1000) return;                 
-        if (fecha.max && fecha.value > fecha.max) {
-            fecha.value = fecha.max;
-        }
+    const restaurarAyudaFecha = () => {
+        if (!fechaAyuda) return;
+        fechaAyuda.textContent = textoRango();
+        fechaAyuda.className = 'form-text text-muted';
     };
 
-    const SOLO_LETRAS = /[^\p{L}\s'’.-]/gu;
+    restaurarAyudaFecha();
 
-    [nombre, apellido].forEach(el => {
+    const ajustarFecha = () => {
+        if (fecha.value === '') return;
+        const anio = parseInt(fecha.value.slice(0, 4), 10);
+        if (anio < 1000) return;
+        if (fecha.max && fecha.value > fecha.max) fecha.value = fecha.max;
+    };
+
+    function filtrarConAviso(el, regex, mensaje) {
+        const ayuda = form.querySelector(`#${el.id}-help`);
+        let timer;
+
         el.addEventListener('input', () => {
-            el.value = el.value.replace(SOLO_LETRAS, '');
+            const limpio = el.value.replace(regex, '');
+            if (limpio === el.value) return;
+
+            let pos = null;
+            try { pos = el.selectionStart; } catch (e) {}
+            el.value = limpio;
+            if (pos !== null) {
+                const nueva = Math.max(0, pos - 1);
+                try { el.setSelectionRange(nueva, nueva); } catch (e) {}
+            }
+
+            if (!ayuda) return;
+            ayuda.textContent = mensaje;
+            ayuda.hidden = false;
+            clearTimeout(timer);
+            timer = setTimeout(() => { ayuda.hidden = true; }, 3000);
         });
-    });
+    }
+
+    filtrarConAviso(nombre, SOLO_LETRAS, 'El nombre solo admite letras, espacios, apóstrofes, puntos y guiones.');
+    filtrarConAviso(apellido, SOLO_LETRAS, 'El apellido solo admite letras, espacios, apóstrofes, puntos y guiones.');
 
     const completo = () =>
         nombre.value.trim() !== '' &&
@@ -39,23 +70,46 @@ document.addEventListener('DOMContentLoaded', function () {
         fechaValida() &&
         pais.value !== '';
 
-    const actualizarBoton = () => { 
+    const actualizarBoton = () => {
         const bloqueado = !completo();
         boton.classList.toggle('btn-bloqueado', bloqueado);
         boton.setAttribute('aria-disabled', bloqueado ? 'true' : 'false');
-    
     };
 
     nombre.addEventListener('input', () => { nombre.classList.remove('is-invalid'); actualizarBoton(); });
     apellido.addEventListener('input', () => { apellido.classList.remove('is-invalid'); actualizarBoton(); });
-    fecha.addEventListener('input', () => { fecha.classList.remove('is-invalid'); actualizarBoton(); });
-    
-    fecha.addEventListener('blur', () => {
-        ajustarFecha();
+
+    fecha.addEventListener('input', () => {
+        clearTimeout(timerFecha);
+        fecha.classList.remove('is-invalid');
+        restaurarAyudaFecha();
         actualizarBoton();
     });
-    
-    
+
+
+    let timerFecha;
+
+    fecha.addEventListener('blur', () => {
+        const caeFuera = fecha.value !== '' && (fecha.value > fecha.max || fecha.value < fecha.min);
+        ajustarFecha();
+
+        if (fechaAyuda) {
+            clearTimeout(timerFecha);
+
+            if (caeFuera && fechaValida()) {
+                fechaAyuda.textContent = `La fecha se ajustó al máximo permitido (${formatear(fecha.max)}).`;
+                fechaAyuda.className = 'form-text text-warning';
+                timerFecha = setTimeout(restaurarAyudaFecha, 3000);
+            } else if (caeFuera) {
+                // Sigue fuera de rango: queda en rojo hasta que el usuario lo corrija
+                fechaAyuda.className = 'form-text text-danger';
+            } else {
+                restaurarAyudaFecha();
+            }
+        }
+        actualizarBoton();
+    });
+
     $(pais).on('change', () => { paisFb.textContent = ''; actualizarBoton(); });
 
     form.addEventListener('submit', function (e) {
@@ -90,12 +144,8 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!ok) {
             e.preventDefault();
             const primero = form.querySelector('.is-invalid');
-            if (primero) {
-                primero.focus();
-            } else if (pais.value === '') {
-                 $(pais).select2('open'); 
-            }
-                
+            if (primero) primero.focus();
+            else if (pais.value === '') $(pais).select2('open');
         }
     });
 
@@ -107,6 +157,8 @@ document.addEventListener('DOMContentLoaded', function () {
             apellidoFb.textContent = 'El apellido es obligatorio.';
             fechaFb.textContent = 'La fecha de nacimiento es obligatoria.';
             paisFb.textContent = '';
+            clearTimeout(timerFecha);
+            restaurarAyudaFecha();
         }
         setTimeout(actualizarBoton, 0);
     });

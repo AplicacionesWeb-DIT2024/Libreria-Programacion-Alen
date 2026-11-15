@@ -7,6 +7,7 @@
                 <label for="edit_nombre_edi">Nombre de la editorial </label>
                 <input type="text" class="form-control @error('nombre', 'editarEditorial') is-invalid @enderror"
                         data-field="nombre" id="edit_nombre_edi" name="nombre" maxlength="255" value="{{ old('nombre') }}" required>
+                <small id="nombre-edicion-help" class="form-text text-danger" aria-live="polite" hidden></small>
                 <div class="invalid-feedback" id="edit_nombre_ediFeedback">
                     @error('nombre', 'editarEditorial') {{ $message }} @else El nombre es obligatorio. @enderror
                 </div>

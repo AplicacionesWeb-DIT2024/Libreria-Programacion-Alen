@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('formModificarEditorial');
     const nombre = document.getElementById('edit_nombre_edi');
     const nombreFb = document.getElementById('edit_nombre_ediFeedback');
+    const ayuda = document.getElementById('nombre-edicion-help');
     const pais = document.getElementById('edit_pais');
     const paisFb = document.getElementById('edit_paisFeedback');
     const idInput = document.getElementById('edit_editorial_id');
@@ -11,24 +12,67 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const CARACTERES_NO_PERMITIDOS = /[^\p{L}\p{N}\s'’-]/gu;
 
+    let timer;
+
     const completo = () => nombre.value.trim() !== '' && pais.value !== '';
 
-    const actualizarBoton = () => { 
-        
+
+    function mostrar(el, msg) {
+        if (el === nombre) {
+            nombreFb.textContent = msg;
+        }
+
+        el.classList.toggle('is-invalid', msg !== '');
+    }
+
+    function actualizarBoton() {
         const bloqueado = !completo();
+
         boton.classList.toggle('btn-bloqueado', bloqueado);
         boton.setAttribute('aria-disabled', bloqueado ? 'true' : 'false');
-    
-    };
+    }
+
+    function filtrarConAviso() {
+        nombre.addEventListener('input', () => {
+            const limpio = nombre.value.replace(CARACTERES_NO_PERMITIDOS, '');
+
+            if (limpio === nombre.value) return;
+
+            let pos = null;
+
+            try {
+                pos = nombre.selectionStart;
+            } catch (e) {}
+
+            nombre.value = limpio;
+
+            if (pos !== null) {
+                const nuevaPosicion = Math.max(0, pos - 1);
+
+                try {
+                    nombre.setSelectionRange(nuevaPosicion, nuevaPosicion);
+                } catch (e) {}
+            }
+
+            ayuda.textContent = 'El nombre solo admite letras, números, espacios, apóstrofes, puntos y guiones.';
+            ayuda.hidden = false;
+
+            clearTimeout(timer);
+
+            timer = setTimeout(() => {
+                ayuda.hidden = true;
+            }, 3000);
+        });
+    }
 
     nombre.addEventListener('input', () => {
-        nombre.value = nombre.value.replace(CARACTERES_NO_PERMITIDOS, '');
-        nombre.classList.remove('is-invalid');
+        mostrar(nombre, '');
         actualizarBoton();
     });
 
     $(pais).on('change', () => {
         paisFb.textContent = '';
+        pais.classList.remove('is-invalid');
         actualizarBoton();
     });
 
@@ -36,12 +80,12 @@ document.addEventListener('DOMContentLoaded', function () {
         nombre.value = nombre.value.trim();
         let ok = true;
         if (nombre.value === '') {
-            nombreFb.textContent = 'El nombre es obligatorio.';
-            nombre.classList.add('is-invalid');
+            mostrar(nombre, 'El nombre es obligatorio.');
             ok = false;
         }
         if (pais.value === '') {
             paisFb.textContent = 'Debe seleccionar un país.';
+            pais.classList.add('is-invalid');
             ok = false;
         }
         if (!ok) {
@@ -56,15 +100,20 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     modalEl.addEventListener('show.bs.modal', function (e) {
-        if (e.relatedTarget) {
-            idInput.value = e.relatedTarget.dataset.id;
-            nombre.classList.remove('is-invalid');
+        const origen = e.relatedTarget;
+        if (origen) {
+            idInput.value = origen.dataset.id;
+            mostrar(nombre, '');
             nombreFb.textContent = 'El nombre es obligatorio.';
+            ayuda.hidden = true;
+            clearTimeout(timer);
+            pais.classList.remove('is-invalid');
             paisFb.textContent = '';
         }
         setTimeout(actualizarBoton, 0); 
     });
 
+    filtrarConAviso();
     actualizarBoton();
 
     if (window.REABRIR_MODAL_MODIFICAR_EDITORIAL) {
