@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (caeFuera && fechaValida()) {
                 fechaAyuda.textContent = `La fecha se ajustó al máximo permitido (${formatear(fecha.max)}).`;
-                fechaAyuda.className = 'form-text text-warning';
+                fechaAyuda.className = 'form-text text-danger';
                 timerFecha = setTimeout(restaurarAyudaFecha, 3000);
             } else if (caeFuera) {
                 fechaAyuda.className = 'form-text text-danger';
@@ -64,31 +64,55 @@ document.addEventListener('DOMContentLoaded', function () {
     
 
 
-   function filtrarConAviso(el, regex, mensaje) {
+   
+    function filtrarConAviso(el, regex, mensaje) {
         const ayuda = form.querySelector(`#${el.id}-help`);
         let timer;
 
         el.addEventListener('input', () => {
-            const limpio = el.value.replace(regex, '');
+            let limpio = el.value.replace(regex, '');
+            let aviso = mensaje;
+
+            const sinSimbolosInicio = limpio.replace(/^[\s'’.-]+/, '');
+            const inicioInvalido = sinSimbolosInicio !== limpio;
+
+            if (inicioInvalido) {
+                limpio = sinSimbolosInicio;
+                aviso = 'El texto debe empezar con una letra.';
+            }
+
             if (limpio === el.value) return;
 
             let pos = null;
-            try { pos = el.selectionStart; } catch (e) {}
 
+            try {
+                pos = el.selectionStart;
+            } catch (e) {}
+
+            const quitados = el.value.length - limpio.length;
             el.value = limpio;
 
             if (pos !== null) {
-                const nueva = Math.max(0, pos - 1);
-                try { el.setSelectionRange(nueva, nueva); } catch (e) {}
+                const nuevaPosicion = Math.max(0, pos - quitados);
+
+                try {
+                    el.setSelectionRange(nuevaPosicion, nuevaPosicion);
+                } catch (e) {}
             }
 
             if (!ayuda) return;
-            ayuda.textContent = mensaje;
+
+            ayuda.textContent = aviso;
             ayuda.hidden = false;
+
             clearTimeout(timer);
-            timer = setTimeout(() => { ayuda.hidden = true; }, 3000);
+
+            timer = setTimeout(() => {
+                ayuda.hidden = true;
+            }, 3000);
         });
     }
+
 
     filtrarConAviso(nombre, SOLO_LETRAS, 'El nombre solo admite letras, espacios, apóstrofes, puntos y guiones.');
     filtrarConAviso(apellido, SOLO_LETRAS, 'El apellido solo admite letras, espacios, apóstrofes, puntos y guiones.');

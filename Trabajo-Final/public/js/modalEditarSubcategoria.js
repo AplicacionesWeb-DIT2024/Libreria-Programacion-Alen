@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('formEditarSubcategoria');
     const nombre = document.getElementById('edit_nombre_sub');
     const nombreFb = document.getElementById('edit_nombre_subFeedback');
+    const ayuda = document.getElementById('edit_nombre_sub-help');
     const categoria = document.getElementById('edit_categoria_sub');
     const categoriaFb = document.getElementById('edit_categoria_subFeedback');
     const idInput = document.getElementById('edit_subcategoria_id');
@@ -11,21 +12,69 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const CARACTERES_NO_PERMITIDOS = /[^\p{L}\p{N}\s'’-]/gu;
 
+    let timer;
 
-    const completo = () =>
-        nombre.value.trim() !== '' && categoria.value !== '';
+    const completo = () => nombre.value.trim() !== '' && categoria.value !== '';
 
-    const actualizarBoton = () => { 
-        
+    function mostrar(el, msg) {
+        if (el === nombre) {
+            nombreFb.textContent = msg;
+        }
+
+        el.classList.toggle('is-invalid', msg !== '');
+    }
+
+    function actualizarBoton() {
         const bloqueado = !completo();
+
         boton.classList.toggle('btn-bloqueado', bloqueado);
         boton.setAttribute('aria-disabled', bloqueado ? 'true' : 'false');
-    
-    };
+    }
+
+
+    function filtrarConAviso() {
+        nombre.addEventListener('input', () => {
+            let limpio = nombre.value.replace(CARACTERES_NO_PERMITIDOS, '');
+            let mensaje = 'El nombre solo admite letras, números, espacios, apóstrofes y guiones.';
+
+            const sinSimbolosInicio = limpio.replace(/^[\s'’-]+/, '');
+            const inicioInvalido = sinSimbolosInicio !== limpio;
+            if (inicioInvalido) {
+                limpio = sinSimbolosInicio;
+                mensaje = 'El nombre debe empezar con una letra o un número.';
+            }
+
+            if (limpio === nombre.value) return;
+
+            let pos = null;
+
+            try {
+                pos = nombre.selectionStart;
+            } catch (e) {}
+
+            const quitados = nombre.value.length - limpio.length;
+            nombre.value = limpio;
+
+            if (pos !== null) {
+                const nuevaPosicion = Math.max(0, pos - quitados);
+                try {
+                    nombre.setSelectionRange(nuevaPosicion, nuevaPosicion);
+                } catch (e) {}
+            }
+
+            ayuda.textContent = mensaje;
+            ayuda.hidden = false;
+
+            clearTimeout(timer);
+
+            timer = setTimeout(() => {
+                ayuda.hidden = true;
+            }, 3000);
+        });
+    }
 
     nombre.addEventListener('input', () => {
-        nombre.value = nombre.value.replace(CARACTERES_NO_PERMITIDOS, '');
-        nombre.classList.remove('is-invalid');
+        mostrar(nombre, '');
         actualizarBoton();
     });
 
@@ -38,8 +87,7 @@ document.addEventListener('DOMContentLoaded', function () {
         nombre.value = nombre.value.trim();
         let ok = true;
         if (nombre.value === '') {
-            nombreFb.textContent = 'El nombre es obligatorio.';
-            nombre.classList.add('is-invalid');
+            mostrar(nombre, 'El nombre es obligatorio.');
             ok = false;
         }
         if (categoria.value === '') {
@@ -58,15 +106,20 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     modalEl.addEventListener('show.bs.modal', function (e) {
-        if (e.relatedTarget) {
-            idInput.value = e.relatedTarget.dataset.id;
-            nombre.classList.remove('is-invalid');
+        const origen = e.relatedTarget;
+        if (origen) {
+            idInput.value = origen.dataset.id;
+            mostrar(nombre, '');
             nombreFb.textContent = 'El nombre es obligatorio.';
+            ayuda.hidden = true;
+            clearTimeout(timer);
+            categoria.classList.remove('is-invalid');
             categoriaFb.textContent = '';
         }
         setTimeout(actualizarBoton, 0);
     });
 
+    filtrarConAviso();
     actualizarBoton();
 
     if (window.REABRIR_MODAL_EDITAR_SUBCATEGORIA) {

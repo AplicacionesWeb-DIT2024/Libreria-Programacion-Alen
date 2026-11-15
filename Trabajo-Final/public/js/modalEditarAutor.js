@@ -42,22 +42,46 @@ document.addEventListener('DOMContentLoaded', function () {
         let timer;
 
         el.addEventListener('input', () => {
-            const limpio = el.value.replace(regex, '');
+            let limpio = el.value.replace(regex, '');
+            let aviso = mensaje;
+
+            const sinSimbolosInicio = limpio.replace(/^[\s'’.-]+/, '');
+            const inicioInvalido = sinSimbolosInicio !== limpio;
+
+            if (inicioInvalido) {
+                limpio = sinSimbolosInicio;
+                aviso = 'El texto debe empezar con una letra.';
+            }
+
             if (limpio === el.value) return;
 
             let pos = null;
-            try { pos = el.selectionStart; } catch (e) {}
+
+            try {
+                pos = el.selectionStart;
+            } catch (e) {}
+
+            const quitados = el.value.length - limpio.length;
             el.value = limpio;
+
             if (pos !== null) {
-                const nueva = Math.max(0, pos - 1);
-                try { el.setSelectionRange(nueva, nueva); } catch (e) {}
+                const nuevaPosicion = Math.max(0, pos - quitados);
+
+                try {
+                    el.setSelectionRange(nuevaPosicion, nuevaPosicion);
+                } catch (e) {}
             }
 
             if (!ayuda) return;
-            ayuda.textContent = mensaje;
+
+            ayuda.textContent = aviso;
             ayuda.hidden = false;
+
             clearTimeout(timer);
-            timer = setTimeout(() => { ayuda.hidden = true; }, 3000);
+
+            timer = setTimeout(() => {
+                ayuda.hidden = true;
+            }, 3000);
         });
     }
 
@@ -98,10 +122,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (caeFuera && fechaValida()) {
                 fechaAyuda.textContent = `La fecha se ajustó al máximo permitido (${formatear(fecha.max)}).`;
-                fechaAyuda.className = 'form-text text-warning';
+                fechaAyuda.className = 'form-text text-danger';
                 timerFecha = setTimeout(restaurarAyudaFecha, 3000);
             } else if (caeFuera) {
-                // Sigue fuera de rango: queda en rojo hasta que el usuario lo corrija
                 fechaAyuda.className = 'form-text text-danger';
             } else {
                 restaurarAyudaFecha();

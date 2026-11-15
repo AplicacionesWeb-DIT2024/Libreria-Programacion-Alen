@@ -48,7 +48,7 @@
                                     <form action="{{ route('pedidos.avanzar', $factura) }}" method="POST">
                                         @csrf
                                         @method('PATCH')
-                                        <button type="submit" class="btn btn-primary btn-sm text-nowrap">
+                                        <button type="submit" class="btn btn-primary btn-sm text-nowrap" title="Pasar a estado {{ $factura->estado->siguiente()?->label() }}">
                                             <i class="fas fa-forward"></i> {{ $factura->estado->textoAccion() }}
                                         </button>
                                     </form>

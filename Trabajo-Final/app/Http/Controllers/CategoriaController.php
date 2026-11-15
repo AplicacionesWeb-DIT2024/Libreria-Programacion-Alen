@@ -71,7 +71,7 @@ class CategoriaController extends Controller
         ],], [
             'nombre.required' => 'El nombre de la categoría es obligatorio.',
             'nombre.max'      => 'El nombre no puede superar los 255 caracteres.',
-            'nombre.regex' => 'El nombre no puede contener caracteres especiales',
+            'nombre.regex' => 'El nombre no puede contener caracteres especiales y debe empezar con una letra o un número',
         ]);
         $categoria -> nombre = trim($request -> nombre); 
         $categoria->usuario_modificacion = Auth::id();

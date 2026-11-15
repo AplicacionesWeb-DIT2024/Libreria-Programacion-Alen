@@ -6,6 +6,7 @@
                 <label for="edit_nombre_sub">Nombre de la subcategoria </label>
                 <input type="text" class="form-control @error('nombre', 'editarSubcategoria') is-invalid @enderror"  data-field="nombre" id="edit_nombre_sub" name="nombre" maxlength="255"
                 value="{{ old('nombre') }}" required>
+                <small id="edit_nombre_sub-help" class="form-text text-danger" aria-live="polite" hidden></small>
                 <div class="invalid-feedback" id="edit_nombre_subFeedback">
                     @error('nombre', 'editarSubcategoria') {{ $message }} @else El nombre es obligatorio. @enderror
                 </div>

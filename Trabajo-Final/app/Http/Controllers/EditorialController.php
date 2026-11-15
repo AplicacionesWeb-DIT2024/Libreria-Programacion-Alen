@@ -41,7 +41,7 @@ class EditorialController extends Controller
         ], [
             'nombre.required' => 'El nombre de la editorial es obligatorio.',
             'nombre.max'      => 'El nombre no puede superar los 255 caracteres.',
-            'nombre.regex' => 'El nombre no puede contener caracteres especiales',
+            'nombre.regex' => 'El nombre no puede contener caracteres especiales y debe empezar con una letra o un número',
             'pais.required'   => 'Debe seleccionar un país.',
             'pais.in'         => 'El país seleccionado no es válido.',
         ]);
@@ -89,7 +89,7 @@ class EditorialController extends Controller
         ], [
             'nombre.required' => 'El nombre de la editorial es obligatorio.',
             'nombre.max'      => 'El nombre no puede superar los 255 caracteres.',
-            'nombre.regex' => 'El nombre no puede contener caracteres especiales',
+            'nombre.regex' => 'El nombre no puede contener caracteres especiales y debe empezar con una letra o un número',
             'pais.required'   => 'Debe seleccionar un país.',
             'pais.in'         => 'El país seleccionado no es válido.',
         ]);

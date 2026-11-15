@@ -36,7 +36,7 @@ class SubcategoriaController extends Controller
         ], [
             'nombre.required'    => 'El nombre de la subcategoría es obligatorio.',
             'nombre.max'         => 'El nombre no puede superar los 255 caracteres.',
-            'nombre.regex' => 'El nombre no puede contener caracteres especiales',
+            'nombre.regex' => 'El nombre no puede contener caracteres especiales y debe empezar con una letra o un número',
             'categoria.required' => 'Debe seleccionar una categoría.',
             'categoria.exists'   => 'La categoría seleccionada no es válida.',
         ]);
@@ -80,7 +80,7 @@ class SubcategoriaController extends Controller
         ],[
             'nombre.required'    => 'El nombre de la subcategoría es obligatorio.',
             'nombre.max'         => 'El nombre no puede superar los 255 caracteres.',
-            'nombre.regex' => 'El nombre no puede contener caracteres especiales',
+            'nombre.regex' => 'El nombre no puede contener caracteres especiales y debe empezar con una letra o un número',
             'categoria.required' => 'Debe seleccionar una categoría.',
             'categoria.exists'   => 'La categoría seleccionada no es válida.',
         ]);

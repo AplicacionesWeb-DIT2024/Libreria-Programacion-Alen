@@ -36,7 +36,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function filtrarConAviso() {
         nombre.addEventListener('input', () => {
-            const limpio = nombre.value.replace(CARACTERES_NO_PERMITIDOS, '');
+            let limpio = nombre.value.replace(CARACTERES_NO_PERMITIDOS, '');
+            let mensaje = 'El nombre solo admite letras, números, espacios, apóstrofes y guiones.';
+
+            const sinSimbolosInicio = limpio.replace(/^[\s'’-]+/, '');
+            const inicioInvalido = sinSimbolosInicio !== limpio;
+            if (inicioInvalido) {
+                limpio = sinSimbolosInicio;
+                mensaje = 'El nombre debe empezar con una letra o un número.';
+            }
 
             if (limpio === nombre.value) return;
 
@@ -46,18 +54,20 @@ document.addEventListener('DOMContentLoaded', function () {
                 pos = nombre.selectionStart;
             } catch (e) {}
 
+            const quitados = nombre.value.length - limpio.length;
             nombre.value = limpio;
 
             if (pos !== null) {
-                const nuevaPosicion = Math.max(0, pos - 1);
+                const nuevaPosicion = Math.max(0, pos - quitados);
 
                 try {
                     nombre.setSelectionRange(nuevaPosicion, nuevaPosicion);
                 } catch (e) {}
             }
 
-            ayuda.textContent = 'El nombre solo admite letras, números, espacios, apóstrofes, puntos y guiones.';
+            ayuda.textContent = mensaje;
             ayuda.hidden = false;
+
 
             clearTimeout(timer);
 
@@ -105,11 +115,9 @@ document.addEventListener('DOMContentLoaded', function () {
     modalEl.addEventListener('show.bs.modal', function (e) {
         if (e.relatedTarget) {
             nombre.value = '';
-
             mostrar(nombre, '');
             ayuda.hidden = true;
             clearTimeout(timer);
-
             $(pais).val('').trigger('change');
             pais.classList.remove('is-invalid');
             paisFb.textContent = '';

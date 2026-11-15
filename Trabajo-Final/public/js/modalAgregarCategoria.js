@@ -32,7 +32,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function filtrarConAviso() {
         input.addEventListener('input', () => {
-            const limpio = input.value.replace(CARACTERES_NO_PERMITIDOS, '');
+            let limpio = input.value.replace(CARACTERES_NO_PERMITIDOS, '');
+            let mensaje = 'El nombre solo admite letras, números, espacios, apóstrofes y guiones.';
+
+            const sinSimbolosInicio = limpio.replace(/^[\s'’-]+/, '');
+            const inicioInvalido = sinSimbolosInicio !== limpio;
+            if (inicioInvalido) {
+                limpio = sinSimbolosInicio;
+                mensaje = 'El nombre debe empezar con una letra o un número.';
+            }
 
             if (limpio === input.value) return;
 
@@ -42,17 +50,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 pos = input.selectionStart;
             } catch (e) {}
 
+            const quitados = input.value.length - limpio.length;
             input.value = limpio;
 
             if (pos !== null) {
-                const nuevaPosicion = Math.max(0, pos - 1);
+                const nuevaPosicion = Math.max(0, pos - quitados);
 
                 try {
                     input.setSelectionRange(nuevaPosicion, nuevaPosicion);
                 } catch (e) {}
             }
 
-            ayuda.textContent = 'El nombre solo admite letras, números, espacios, apóstrofes, puntos y guiones.';
+            ayuda.textContent = mensaje;
             ayuda.hidden = false;
 
             clearTimeout(timer);
