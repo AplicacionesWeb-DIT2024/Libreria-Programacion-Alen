@@ -13,15 +13,11 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button"
-                        class="btn btn-danger"
-                        data-bs-dismiss="modal">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
                     No
                 </button>
 
-                <button type="submit"
-                        class="btn btn-primary"
-                        form="deleteForm{{ $id }}">
+                <button type="submit" class="btn btn-primary" form="deleteForm{{ $id }}">
                     Sí
                 </button>
             </div>

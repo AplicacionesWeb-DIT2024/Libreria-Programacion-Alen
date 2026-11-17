@@ -13,6 +13,7 @@
                 <div class="form-group">
                     <label for="editar_nombre"><i class="fa-solid fa-book"></i> Nombre del libro</label>
                     <input type="text" class="form-control" data-field="nombre" id="editar_nombre" name="nombre" maxlength="255" value="{{ old('nombre') }}" required>
+                    <small id="editar_nombre-help" class="form-text text-muted" aria-live="polite"> Debe empezar con letras, números, signos de exclamación o interrogación.</small>
                     @include('_campoError', ['campo' => 'nombre', 'bag' => 'editarLibro'])
                 </div>
 
@@ -139,12 +140,14 @@
                 <div class="form-group mt-3 mb-3">
                     <label for="editar_edicion"><i class="fas fa-layer-group"></i> Edición</label>
                     <input type="number" class="form-control" id="editar_edicion" data-field="edicion" name="edicion" min="1" value="{{ old('edicion') }}" required>
+                    <small id="editar_edicion-help" class="form-text text-muted">Debe ser un número entero. El valor mínimo es el 1</small>
                     @include('_campoError', ['campo' => 'edicion', 'bag' => 'editarLibro'])
                 </div>
 
                 <div class="form-group mt-3 mb-3">
                     <label for="editar_anio_publicacion"><i class="fas fa-calendar-alt"></i> Año de publicación</label>
                     <input type="number" class="form-control" id="editar_anio_publicacion" data-field="anio_publicacion" name="anio_publicacion" min="1000" max="{{ date('Y') }}" value="{{ old('anio_publicacion') }}" required>
+                    <small id="editar_anio_publicacion-help" class="form-text text-muted">El valor debe estar entre el año 1000 y {{ date('Y') }}.</small>
                     @include('_campoError', ['campo' => 'anio_publicacion', 'bag' => 'editarLibro'])
                 </div>
 
@@ -156,12 +159,14 @@
                 <div class="form-group mt-3 mb-3">
                     <label for="editar_stock"><i class="fas fa-cubes"></i> Stock disponible</label>
                     <input type="number" class="form-control" id="editar_stock" data-field="stock" name="stock" min="0" value="{{ old('stock') }}" required>
+                    <small id="editar_stock-help" class="form-text text-muted">Debe ser un número entero. El valor mínimo es 0.</small>
                     @include('_campoError', ['campo' => 'stock', 'bag' => 'editarLibro'])
                 </div>
 
                 <div class="form-group mt-3 mb-3">
                     <label for="editar_precio"><i class="fas fa-dollar-sign"></i> Precio</label>
                     <input type="number" class="form-control" id="editar_precio" data-field="precio" name="precio" min="0" step="0.01" value="{{ old('precio') }}" required>
+                    <small id="editar_precio-help" class="form-text text-muted">Debe ser un número entero con dos decimales.</small>
                     @include('_campoError', ['campo' => 'precio', 'bag' => 'editarLibro'])
                 </div>
 
@@ -174,7 +179,7 @@
                     <label for="editar_imagen_original">Imagen principal</label>
                     <img data-preview="imagen_original" class="img-thumbnail d-block mb-2" style="display:none; max-height:120px;">
                     <input type="file" class="form-control" id="editar_imagen_original" data-field = "imagen_original" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" name="imagen_original">
-                    <small class="text-muted">Dejar vacío para conservar la imagen actual.</small>
+                    <small id="editar_imagen_original-help" class="form-text text-muted">Dejar vacío para conservar la imagen actual. Formatos permitidos: JPG, PNG o WEBP. Máximo 5 MB.</small>
                     @include('_campoError', ['campo' => 'imagen_original', 'bag' => 'editarLibro'])
                 </div>
 
@@ -188,6 +193,7 @@
                         </label>
                     </div>
                     <input type="file" class="form-control" id="editar_imagen_referencia_2" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"  data-field = "imagen_referencia_2" name="imagen_referencia_2">
+                    <small id="editar_imagen_referencia_2-help" class="form-text text-muted">Formatos permitidos: JPG, PNG o WEBP. Máximo 5 MB.</small>
                     @include('_campoError', ['campo' => 'imagen_referencia_2', 'bag' => 'editarLibro'])
                 </div>
 
@@ -203,6 +209,7 @@
                         </label>
                     </div>
                     <input type="file" class="form-control" id="editar_imagen_referencia_3" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" data-field = "imagen_referencia_3" name="imagen_referencia_3">
+                    <small id="editar_imagen_referencia_3-help" class="form-text text-muted">Formatos permitidos: JPG, PNG o WEBP. Máximo 5 MB.</small>
                     @include('_campoError', ['campo' => 'imagen_referencia_3', 'bag' => 'editarLibro'])
                 </div>
             </div>

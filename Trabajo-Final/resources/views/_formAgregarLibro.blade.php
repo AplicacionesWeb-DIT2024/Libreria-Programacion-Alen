@@ -11,6 +11,7 @@
                 <div class="form-group">
                     <label for="nombre"><i class="fa-solid fa-book"></i> Nombre del libro</label>
                     <input type="text" class="form-control" id="nombre" name="nombre" maxlength="255" value="{{ old('nombre') }}" required>
+                    <small id="nombre-help" class="form-text text-muted" aria-live="polite"> Debe empezar con letras, números, signos de exclamación o interrogación.</small>
                     @include('_campoError', ['campo' => 'nombre'])
                 </div>
 
@@ -128,12 +129,14 @@
                 <div class="form-group mt-3 mb-3">
                     <label for="edicion"><i class="fas fa-layer-group"></i> Edición</label>
                     <input type="number" class="form-control" id="edicion" name="edicion" min="1" value="{{ old('edicion') }}" required>
+                    <small id="edicion-help" class="form-text text-muted">Debe ser un número entero. El valor mínimo es el 1</small>
                     @include('_campoError', ['campo' => 'edicion'])
                 </div>
 
                 <div class="form-group mt-3 mb-3">
                     <label for="anio_publicacion"><i class="fas fa-calendar-alt"></i> Año de publicación</label>
                     <input type="number" class="form-control" id="anio_publicacion" name="anio_publicacion" min="1000" max="{{ date('Y') }}" value="{{ old('anio_publicacion') }}" required>
+                    <small id="anio_publicacion-help" class="form-text text-muted">El valor debe estar entre el año 1000 y {{ date('Y') }}.</small>
                     @include('_campoError', ['campo' => 'anio_publicacion'])
                 </div>
 
@@ -145,12 +148,14 @@
                 <div class="form-group mt-3 mb-3">
                     <label for="stock"><i class="fas fa-cubes"></i> Stock disponible</label>
                     <input type="number" class="form-control" id="stock" name="stock" min="0" value="{{ old('stock') }}" required>
+                    <small id="stock-help" class="form-text text-muted">Debe ser un número entero. El valor mínimo es 0.</small>
                     @include('_campoError', ['campo' => 'stock'])
                 </div>
 
                 <div class="form-group mt-3 mb-3">
                     <label for="precio"><i class="fas fa-dollar-sign"></i> Precio</label>
                     <input type="number" class="form-control" id="precio" name="precio" min="0" step="0.01" value="{{ old('precio') }}" required>
+                    <small id="precio-help" class="form-text text-muted">Debe ser un número entero con dos decimales.</small>
                     @include('_campoError', ['campo' => 'precio'])
                 </div>
 
@@ -164,6 +169,7 @@
                     <img class="preview-nueva img-thumbnail mb-2" style="display:none; max-height:120px;" alt="Vista previa">
                     <input type="file" class="form-control" id="imagen_original" name="imagen_original"
                            accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" required>
+                    <small id="imagen_original-help" class="form-text text-muted">Formatos permitidos: JPG, PNG o WEBP. Máximo 5 MB.</small>
                     @include('_campoError', ['campo' => 'imagen_original'])
                 </div>
 
@@ -172,6 +178,7 @@
                     <img class="preview-nueva img-thumbnail mb-2" style="display:none; max-height:120px;" alt="Vista previa">
                     <input type="file" class="form-control" id="imagen_referencia_2" name="imagen_referencia_2"
                            accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+                <small id="imagen_referencia_2-help" class="form-text text-muted">Formatos permitidos: JPG, PNG o WEBP. Máximo 5 MB.</small>
                     @include('_campoError', ['campo' => 'imagen_referencia_2'])
                 </div>
 
@@ -180,6 +187,7 @@
                     <img class="preview-nueva img-thumbnail mb-2" style="display:none; max-height:120px;" alt="Vista previa">
                     <input type="file" class="form-control" id="imagen_referencia_3" name="imagen_referencia_3"
                            accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+                    <small id="imagen_referencia_3-help" class="form-text text-muted">Formatos permitidos: JPG, PNG o WEBP. Máximo 5 MB.</small>
                     @include('_campoError', ['campo' => 'imagen_referencia_3'])
                 </div>
             </div>
