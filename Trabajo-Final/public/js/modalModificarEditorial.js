@@ -13,6 +13,24 @@ document.addEventListener('DOMContentLoaded', function () {
     const CARACTERES_NO_PERMITIDOS = /[^\p{L}\p{N}\s'’-]/gu;
 
     let timer;
+    const guiaTexto = ayuda.textContent.trim();
+    const guiaClase = ayuda.className;
+
+    function avisar(mensaje) {
+        ayuda.textContent = mensaje;
+        ayuda.className = 'form-text text-danger';
+        ayuda.hidden = false;
+
+        clearTimeout(timer);
+        timer = setTimeout(restaurarGuia, 3000);
+    }
+
+    function restaurarGuia() {
+        clearTimeout(timer);
+        ayuda.textContent = guiaTexto;
+        ayuda.className = guiaClase;
+        ayuda.hidden = false;
+    }
 
     const completo = () => nombre.value.trim() !== '' && pais.value !== '';
 
@@ -20,6 +38,12 @@ document.addEventListener('DOMContentLoaded', function () {
     function mostrar(el, msg) {
         if (el === nombre) {
             nombreFb.textContent = msg;
+            if (msg !== '') {
+                    clearTimeout(timer);
+                    ayuda.hidden = true;        
+                } else {
+                    restaurarGuia();            
+            }
         }
 
         el.classList.toggle('is-invalid', msg !== '');
@@ -65,20 +89,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 } catch (e) {}
             }
 
-            ayuda.textContent = mensaje;
-            ayuda.hidden = false;
-
-
-            clearTimeout(timer);
-
-            timer = setTimeout(() => {
-                ayuda.hidden = true;
-            }, 3000);
+            avisar(mensaje);
         });
     }
 
     nombre.addEventListener('input', () => {
-        mostrar(nombre, '');
+        nombreFb.textContent = '';
+        nombre.classList.remove('is-invalid');
+        if (ayuda.className === guiaClase) 
+            ayuda.hidden = false;   
         actualizarBoton();
     });
 
@@ -117,8 +136,7 @@ document.addEventListener('DOMContentLoaded', function () {
             idInput.value = origen.dataset.id;
             mostrar(nombre, '');
             nombreFb.textContent = 'El nombre es obligatorio.';
-            ayuda.hidden = true;
-            clearTimeout(timer);
+            restaurarGuia();
             pais.classList.remove('is-invalid');
             paisFb.textContent = '';
         }
@@ -126,6 +144,9 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     filtrarConAviso();
+    if (nombreFb.textContent.trim() !== '' && nombre.classList.contains('is-invalid')) {
+        ayuda.hidden = true;
+    }
     actualizarBoton();
 
     if (window.REABRIR_MODAL_MODIFICAR_EDITORIAL) {

@@ -4,7 +4,7 @@
                 <label for="sub_nombre">Nombre de la subcategoria (*) </label>
                 <input type="text" class="form-control @error('nombre', 'agregarSubcategoria') is-invalid @enderror"
                     id="sub_nombre" name="nombre" maxlength="255" value="{{ old('nombre') }}" required>
-                <small id="sub_nombre-help" class="form-text text-danger" aria-live="polite" hidden></small>
+                <small id="sub_nombre-help" class="form-text text-muted" aria-live="polite">Se permiten letras, números, espacios, apostrofes y guiones. Debe empezar con una letra o un número.</small>
                 <div class="invalid-feedback" id="sub_nombreFeedback">
                     @error('nombre', 'agregarSubcategoria') {{ $message }} @else El nombre es obligatorio. @enderror
                 </div>

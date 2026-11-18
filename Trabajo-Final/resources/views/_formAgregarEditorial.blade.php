@@ -4,7 +4,7 @@
                 <label for="nombre_edi">Nombre de la editorial (*) </label>
                 <input type="text" class="form-control @error('nombre', 'agregarEditorial') is-invalid @enderror"
                     id="nombre_edi" name="nombre" maxlength="255" value="{{ old('nombre') }}" required>
-                <small id="nombre-help" class="form-text text-danger" aria-live="polite" hidden></small>
+                <small id="nombre-help" class="form-text text-muted" aria-live="polite">Se permiten letras, números, espacios, apostrofes y guiones. Debe empezar con una letra o un número.</small>
                 <div class="invalid-feedback" id="edi_nombreFeedback">
                     @error('nombre', 'agregarEditorial') {{ $message }} @else El nombre es obligatorio. @enderror
                 </div>

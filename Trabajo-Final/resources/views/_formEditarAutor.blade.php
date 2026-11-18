@@ -8,7 +8,7 @@
                 <input type="text" class="form-control @error('nombre', 'editarAutor') is-invalid @enderror"
                     data-field="nombre" id="edit_aut_nombre" name="nombre" maxlength="255"
                     value="{{ old('nombre') }}" required>
-                <small id="edit_aut_nombre-help" class="form-text text-danger" aria-live="polite" hidden></small>
+                <small id="edit_aut_nombre-help" class="form-text text-muted" aria-live="polite">El nombre solo admite letras, espacios, apóstrofes, puntos y guiones. Debe empezar con una letra.</small>
                 <div class="invalid-feedback" id="edit_aut_nombreFeedback">
                     @error('nombre', 'editarAutor') {{ $message }} @else El nombre es obligatorio. @enderror
                 </div>
@@ -17,7 +17,7 @@
                 <label for="edit_aut_apellido">Apellido del autor </label>
                 <input type="text" class="form-control @error('apellido', 'editarAutor') is-invalid @enderror"
                     data-field="apellido" id="edit_aut_apellido" name="apellido" maxlength="255" value="{{ old('apellido') }}" required>
-                <small id="edit_aut_apellido-help" class="form-text text-danger" aria-live="polite" hidden></small>
+                <small id="edit_aut_apellido-help" class="form-text text-muted" aria-live="polite">El apellido solo admite letras, espacios, apóstrofes, puntos y guiones. Debe empezar con una letra.</small>
                 <div class="invalid-feedback" id="edit_aut_apellidoFeedback">
                      @error('apellido', 'editarAutor') {{ $message }} @else El apellido es obligatorio. @enderror
                 </div>

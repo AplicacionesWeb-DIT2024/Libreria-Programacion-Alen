@@ -3,7 +3,7 @@
             <div class="form-group mt-3 mb-3">
                 <label for="aut_nombre">Nombre del autor (*) </label>
                 <input type="text" class="form-control @error('nombre', 'agregarAutor') is-invalid @enderror" id="aut_nombre" name="nombre" maxlength="255" value="{{ old('nombre') }}" required>
-                <small id="aut_nombre-help" class="form-text text-danger" aria-live="polite" hidden></small>
+                <small id="aut_nombre-help" class="form-text text-muted" aria-live="polite">El nombre solo admite letras, espacios, apóstrofes, puntos y guiones. Debe empezar con una letra.</small>
                 <div class="invalid-feedback" id="aut_nombreFeedback">
                     @error('nombre', 'agregarAutor') {{ $message }} @else El nombre es obligatorio. @enderror
                 </div>
@@ -11,7 +11,7 @@
             <div class="form-group mt-3 mb-3">
                 <label for="aut_apellido">Apellido del autor (*) </label>
                 <input type="text" class="form-control @error('apellido', 'agregarAutor') is-invalid @enderror" id="aut_apellido" name="apellido" maxlength="255" value="{{ old('apellido') }}" required>
-                <small id="aut_apellido-help" class="form-text text-danger" aria-live="polite" hidden></small>
+                <small id="aut_apellido-help" class="form-text text-muted" aria-live="polite">El apellido solo admite letras, espacios, apóstrofes, puntos y guiones. Debe empezar con una letra.</small>
                 <div class="invalid-feedback" id="aut_apellidoFeedback">
                     @error('apellido', 'agregarAutor') {{ $message }} @else El apellido es obligatorio. @enderror
                 </div>

@@ -10,16 +10,39 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const CARACTERES_NO_PERMITIDOS = /[^\p{L}\p{N}\s'’-]/gu;
 
-
     let timer;
+    const guiaTexto = ayuda.textContent.trim();
+    const guiaClase = ayuda.className;
+
+    function avisar(mensaje) {
+        ayuda.textContent = mensaje;
+        ayuda.className = 'form-text text-danger';
+        ayuda.hidden = false;
+
+        clearTimeout(timer);
+        timer = setTimeout(restaurarGuia, 3000);
+    }
+
+    function restaurarGuia() {
+        clearTimeout(timer);
+        ayuda.textContent = guiaTexto;
+        ayuda.className = guiaClase;
+        ayuda.hidden = false;
+    }
 
     const completo = () => input.value.trim() !== '';
 
 
-    function mostrar(el, msg) {
-        if (el === input) {
-            feedback.textContent = msg;
-        }
+     function mostrar(el, msg) {
+            if (el === input) {
+                feedback.textContent = msg;
+                if (msg !== '') {
+                    clearTimeout(timer);
+                    ayuda.hidden = true;        
+                } else {
+                    restaurarGuia();            
+                }
+            }
 
         el.classList.toggle('is-invalid', msg !== '');
     }
@@ -37,8 +60,8 @@ document.addEventListener('DOMContentLoaded', function () {
             idInput.value = origen.dataset.id;
             input.classList.remove('is-invalid');
             feedback.textContent = 'El nombre es obligatorio.';
-            ayuda.hidden = true;
-            clearTimeout(timer);
+            restaurarGuia();
+
         }
         setTimeout(actualizarBoton, 0);
     });
@@ -75,14 +98,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 } catch (e) {}
             }
 
-            ayuda.textContent = mensaje;
-            ayuda.hidden = false;
-
-            clearTimeout(timer);
-
-            timer = setTimeout(() => {
-                ayuda.hidden = true;
-            }, 3000);
+            avisar(mensaje);
         });
     }
 
@@ -97,11 +113,18 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     
     input.addEventListener('input', () => {
-        mostrar(input, '');
+        feedback.textContent = '';
+        input.classList.remove('is-invalid');
+        if (ayuda.className === guiaClase) 
+            ayuda.hidden = false;   
         actualizarBoton();
     });
 
     filtrarConAviso();
+
+    if (feedback.textContent.trim() !== '' && input.classList.contains('is-invalid')) {
+        ayuda.hidden = true;
+    }
 
 
     actualizarBoton();

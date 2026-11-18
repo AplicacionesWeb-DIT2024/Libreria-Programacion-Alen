@@ -8,6 +8,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const fecha = document.getElementById('edit_aut_fechaNac');
     const fechaFb = document.getElementById('edit_aut_fechaNacFeedback');
     const fechaAyuda = document.getElementById('edit_aut_fechaNac-help');
+    const nombreAyuda = form.querySelector('#edit_aut_nombre-help');
+    const apellidoAyuda = form.querySelector('#edit_aut_apellido-help');
     const pais = document.getElementById('edit_pais_autor');
     const paisFb = document.getElementById('edit_aut_paisFeedback');
     const idInput = document.getElementById('edit_autor_id');
@@ -16,6 +18,47 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const SOLO_LETRAS = /[^\p{L}\s'’.-]/gu;
     const formatear = iso => iso.split('-').reverse().join('/');
+
+    const ayudas = [
+        { el: nombre, ayuda: nombreAyuda },
+        { el: apellido, ayuda: apellidoAyuda }
+    ];
+
+    const timers = new Map();
+
+    ayudas.forEach(({ el, ayuda }) => {
+        if (!ayuda) return;
+
+        ayuda.dataset.textoOriginal = ayuda.textContent.trim();
+        ayuda.dataset.claseOriginal = ayuda.className;
+    });
+
+    function restaurarGuia(ayuda) {
+        if (!ayuda) return;
+
+        clearTimeout(timers.get(ayuda));
+
+        ayuda.textContent = ayuda.dataset.textoOriginal;
+        ayuda.className = ayuda.dataset.claseOriginal;
+        ayuda.hidden = false;
+    }
+
+    function avisar(ayuda, mensaje) {
+        if (!ayuda) return;
+
+        ayuda.textContent = mensaje;
+        ayuda.className = 'form-text text-danger';
+        ayuda.hidden = false;
+
+        clearTimeout(timers.get(ayuda));
+
+        const timer = setTimeout(() => {
+            restaurarGuia(ayuda);
+        }, 3000);
+
+        timers.set(ayuda, timer);
+    }
+
 
     const fechaValida = () => fecha.value !== '' && fecha.value <= fecha.max && fecha.value >= fecha.min;
 
@@ -72,16 +115,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 } catch (e) {}
             }
 
-            if (!ayuda) return;
-
-            ayuda.textContent = aviso;
-            ayuda.hidden = false;
-
-            clearTimeout(timer);
-
-            timer = setTimeout(() => {
-                ayuda.hidden = true;
-            }, 3000);
+            avisar(ayuda, aviso);
         });
     }
 
@@ -100,9 +134,25 @@ document.addEventListener('DOMContentLoaded', function () {
         boton.setAttribute('aria-disabled', bloqueado ? 'true' : 'false');
     };
 
-    nombre.addEventListener('input', () => { nombre.classList.remove('is-invalid'); actualizarBoton(); });
-    apellido.addEventListener('input', () => { apellido.classList.remove('is-invalid'); actualizarBoton(); });
+    nombre.addEventListener('input', () => {
+        nombreFb.textContent = '';
+        nombre.classList.remove('is-invalid');
+        if (nombreAyuda.hidden) {
+            restaurarGuia(nombreAyuda);
+        }
+        actualizarBoton();
+    });
 
+    apellido.addEventListener('input', () => {
+        apellidoFb.textContent = '';
+        apellido.classList.remove('is-invalid');
+        if (apellidoAyuda.hidden) {
+            restaurarGuia(apellidoAyuda);
+        }
+        actualizarBoton();
+    });
+
+    let timerFecha;
     fecha.addEventListener('input', () => {
         clearTimeout(timerFecha);
         fecha.classList.remove('is-invalid');
@@ -111,7 +161,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
 
-    let timerFecha;
 
     fecha.addEventListener('blur', () => {
         const caeFuera = fecha.value !== '' && (fecha.value > fecha.max || fecha.value < fecha.min);
@@ -133,7 +182,11 @@ document.addEventListener('DOMContentLoaded', function () {
         actualizarBoton();
     });
 
-    $(pais).on('change', () => { paisFb.textContent = ''; actualizarBoton(); });
+    $(pais).on('change', () =>  {
+        paisFb.textContent = '';
+        pais.classList.remove('is-invalid');
+        actualizarBoton();
+    });
 
     form.addEventListener('submit', function (e) {
         nombre.value = nombre.value.trim();
@@ -176,15 +229,29 @@ document.addEventListener('DOMContentLoaded', function () {
         if (e.relatedTarget) {
             idInput.value = e.relatedTarget.dataset.id;
             [nombre, apellido, fecha].forEach(el => el.classList.remove('is-invalid'));
-            nombreFb.textContent = 'El nombre es obligatorio.';
-            apellidoFb.textContent = 'El apellido es obligatorio.';
-            fechaFb.textContent = 'La fecha de nacimiento es obligatoria.';
+            nombreFb.textContent = '';
+            apellidoFb.textContent = '';
+            fechaFb.textContent = '';
             paisFb.textContent = '';
+            pais.classList.remove('is-invalid');
+            ayudas.forEach(({ ayuda }) => {
+                if (!ayuda) return;
+                restaurarGuia(ayuda);
+            });
             clearTimeout(timerFecha);
             restaurarAyudaFecha();
         }
         setTimeout(actualizarBoton, 0);
     });
+
+    if (nombreFb.textContent.trim() !== '' && nombre.classList.contains('is-invalid')) {
+        nombreAyuda.hidden = true;
+    }
+
+    if (apellidoFb.textContent.trim() !== '' && apellido.classList.contains('is-invalid')) {
+        apellidoAyuda.hidden = true;
+    }
+
 
     actualizarBoton();
 

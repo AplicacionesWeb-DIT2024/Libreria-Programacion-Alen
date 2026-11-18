@@ -27,15 +27,16 @@ class AutorController extends Controller
         $paises = collect(config('countries'));
 
         $request->validateWithBag('agregarAutor', [
-            'nombre'   => ['required', 'string', 'max:255', "regex:/^[\p{L}][\p{L}\s'’.-]*$/u"],
-            'apellido' => ['required', 'string', 'max:255', "regex:/^[\p{L}][\p{L}\s'’.-]*$/u"],
-            'pais'     => ['required', Rule::in($paises->all())],
-            'fechaNac' => [
-                'required', 'date',
-                'before_or_equal:' . now()->subYears(18)->toDateString(),
-                'after_or_equal:1900-01-01',
+            'nombre'   => [
+                'required', 
+                'string', 
+                'max:255', 
+                "regex:/^[\p{L}][\p{L}\s'’.-]*$/u",
                 function ($attribute, $value, $fail) use ($request) {
-                    $existe = Autor::whereRaw('LOWER(nombre) = ?', [mb_strtolower(trim($request->nombre))])
+                    if (!$request->filled('apellido') || !$request->filled('pais') || !$request->filled('fechaNac')){
+                        return;
+                    }
+                    $existe = Autor::whereRaw('LOWER(nombre) = ?', [mb_strtolower(trim($value))])
                         ->whereRaw('LOWER(apellido) = ?', [mb_strtolower(trim($request->apellido))])
                         ->where('pais_origen', $request->pais)
                         ->whereDate('fecha_nacimiento', $request->fechaNac)
@@ -44,7 +45,13 @@ class AutorController extends Controller
                     if ($existe) {
                         $fail('Ya existe un autor con los mismos datos.');
                     }
-                },
+                },],
+            'apellido' => ['required', 'string', 'max:255', "regex:/^[\p{L}][\p{L}\s'’.-]*$/u"],
+            'pais'     => ['required', Rule::in($paises->all())],
+            'fechaNac' => [
+                'required', 'date',
+                'before_or_equal:' . now()->subYears(18)->toDateString(),
+                'after_or_equal:1900-01-01'
             ],
         ], [
             'nombre.required'   => 'El nombre es obligatorio.',
@@ -91,24 +98,31 @@ class AutorController extends Controller
         $paises = collect(config('countries'));
 
         $request->validateWithBag('editarAutor', [
-            'nombre'   => ['required', 'string', 'max:255', "regex:/^[\p{L}][\p{L}\s'’.-]*$/u"],
-            'apellido' => ['required', 'string', 'max:255', "regex:/^[\p{L}][\p{L}\s'’.-]*$/u"],
-            'pais'     => ['required', Rule::in($paises->all())],
-            'fechaNac' => [
-                'required', 'date',
-                'before_or_equal:' . now()->subYears(18)->toDateString(),
-                'after_or_equal:1900-01-01',
+            'nombre'   => [
+                'required', 
+                'string', 
+                'max:255', 
+                "regex:/^[\p{L}][\p{L}\s'’.-]*$/u",
                 function ($attribute, $value, $fail) use ($request, $autor) {
-                    $existe = Autor::whereRaw('LOWER(nombre) = ?', [mb_strtolower(trim($request->nombre))])
+                    if (!$request->filled('apellido') || !$request->filled('pais') || !$request->filled('fechaNac')){
+                        return;
+                    }
+                    $existe = Autor::whereRaw('LOWER(nombre) = ?', [mb_strtolower(trim($value))])
                         ->whereRaw('LOWER(apellido) = ?', [mb_strtolower(trim($request->apellido))])
                         ->where('pais_origen', $request->pais)
-                        ->whereDate('fecha_nacimiento', $value)
+                        ->whereDate('fecha_nacimiento', $request->fechaNac)
                         ->where('id', '!=', $autor->id)
                         ->exists();
                     if ($existe) {
                         $fail('Ya existe otro autor con los mismos datos.');
                     }
-                },
+                },],
+            'apellido' => ['required', 'string', 'max:255', "regex:/^[\p{L}][\p{L}\s'’.-]*$/u"],
+            'pais'     => ['required', Rule::in($paises->all())],
+            'fechaNac' => [
+                'required', 'date',
+                'before_or_equal:' . now()->subYears(18)->toDateString(),
+                'after_or_equal:1900-01-01'
             ],
         ], 
         [

@@ -4,7 +4,7 @@
                 <label for="nombre">Nombre de la categoria (*) </label>
                 <input type="text" class="form-control @error('nombre', 'agregarCategoria') is-invalid @enderror"
                     id="nombre" name="nombre" maxlength="255" value="{{ old('nombre') }}" required>
-                <small id="nombre-help" class="form-text text-danger" aria-live="polite" hidden></small>
+                <small id="nombre-help" class="form-text text-muted" aria-live="polite">Se permiten letras, números, espacios, apostrofes y guiones. Debe empezar con una letra o un número.</small>
                 <div class="invalid-feedback" id="nombreFeedback">
                     @error('nombre', 'agregarCategoria') {{ $message }} @else El nombre es obligatorio. @enderror
                 </div>

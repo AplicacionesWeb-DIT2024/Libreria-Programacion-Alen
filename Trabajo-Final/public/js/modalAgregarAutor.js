@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const apellidoFb = document.getElementById('aut_apellidoFeedback');
     const fecha = document.getElementById('aut_fechaNac');
     const fechaAyuda = form.querySelector('#aut_fechaNac-help');
+    const nombreAyuda = form.querySelector('#aut_nombre-help');
+    const apellidoAyuda = form.querySelector('#aut_apellido-help');
     const fechaFb = document.getElementById('aut_fechaNacFeedback');
     const pais = document.getElementById('aut_pais');
     const paisFb = document.getElementById('aut_paisFeedback');
@@ -17,10 +19,51 @@ document.addEventListener('DOMContentLoaded', function () {
     const SOLO_LETRAS = /[^\p{L}\s'’.-]/gu;
     const formatear = iso => iso.split('-').reverse().join('/');
 
+    const ayudas = [
+        { el: nombre, ayuda: nombreAyuda },
+        { el: apellido, ayuda: apellidoAyuda }
+    ];
+
+    const timers = new Map();
+
+    ayudas.forEach(({ el, ayuda }) => {
+        if (!ayuda) return;
+
+        ayuda.dataset.textoOriginal = ayuda.textContent.trim();
+        ayuda.dataset.claseOriginal = ayuda.className;
+    });
+
+    function restaurarGuia(ayuda) {
+        if (!ayuda) return;
+
+        clearTimeout(timers.get(ayuda));
+
+        ayuda.textContent = ayuda.dataset.textoOriginal;
+        ayuda.className = ayuda.dataset.claseOriginal;
+        ayuda.hidden = false;
+    }
+
+    function avisar(ayuda, mensaje) {
+        if (!ayuda) return;
+
+        ayuda.textContent = mensaje;
+        ayuda.className = 'form-text text-danger';
+        ayuda.hidden = false;
+
+        clearTimeout(timers.get(ayuda));
+
+        const timer = setTimeout(() => {
+            restaurarGuia(ayuda);
+        }, 3000);
+
+        timers.set(ayuda, timer);
+    }
+
+
 
     const fechaValida = () => fecha.value !== '' && fecha.value <= fecha.max && fecha.value >= fecha.min;
 
-   let timerFecha;
+    let timerFecha;
 
     const textoRango = () => `Debe estar entre el ${formatear(fecha.min)} y el ${formatear(fecha.max)} (mínimo 18 años).`;
 
@@ -67,7 +110,6 @@ document.addEventListener('DOMContentLoaded', function () {
    
     function filtrarConAviso(el, regex, mensaje) {
         const ayuda = form.querySelector(`#${el.id}-help`);
-        let timer;
 
         el.addEventListener('input', () => {
             let limpio = el.value.replace(regex, '');
@@ -100,16 +142,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 } catch (e) {}
             }
 
-            if (!ayuda) return;
-
-            ayuda.textContent = aviso;
-            ayuda.hidden = false;
-
-            clearTimeout(timer);
-
-            timer = setTimeout(() => {
-                ayuda.hidden = true;
-            }, 3000);
+            avisar(ayuda, aviso);
         });
     }
 
@@ -132,8 +165,23 @@ document.addEventListener('DOMContentLoaded', function () {
     
     };
 
-    nombre.addEventListener('input', () => { nombre.classList.remove('is-invalid'); actualizarBoton(); });
-    apellido.addEventListener('input', () => { apellido.classList.remove('is-invalid'); actualizarBoton(); });
+    nombre.addEventListener('input', () => {
+        nombreFb.textContent = '';
+        nombre.classList.remove('is-invalid');
+        if (nombreAyuda.hidden) {
+            restaurarGuia(nombreAyuda);
+        }
+        actualizarBoton();
+    });
+
+    apellido.addEventListener('input', () => {
+        apellidoFb.textContent = '';
+        apellido.classList.remove('is-invalid');
+        if (apellidoAyuda.hidden) {
+            restaurarGuia(apellidoAyuda);
+        }
+        actualizarBoton();
+    });
 
     fecha.addEventListener('input', () => {
         clearTimeout(timerFecha);
@@ -193,11 +241,23 @@ document.addEventListener('DOMContentLoaded', function () {
             $(pais).val('').trigger('change');
             [nombre, apellido, fecha].forEach(el => el.classList.remove('is-invalid'));
             paisFb.textContent = '';
+            ayudas.forEach(({ ayuda }) => {
+                if (!ayuda) return;
+                restaurarGuia(ayuda);
+            });
             clearTimeout(timerFecha);
             restaurarAyudaFecha();
         }
         setTimeout(actualizarBoton, 0);
     });
+
+    if (nombreFb.textContent.trim() !== '' && nombre.classList.contains('is-invalid')) {
+        nombreAyuda.hidden = true;
+    }
+
+    if (apellidoFb.textContent.trim() !== '' && apellido.classList.contains('is-invalid')) {
+        apellidoAyuda.hidden = true;
+    }
 
     actualizarBoton();
 

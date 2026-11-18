@@ -10,7 +10,7 @@
                class="form-control @error('nombre', 'editarCategoria') is-invalid @enderror"
                data-field="nombre" id="edit_nombre" name="nombre" maxlength="255"
                value="{{ old('nombre') }}" required>
-        <small id="nombre-edicion-help" class="form-text text-danger" aria-live="polite" hidden></small>
+        <small id="nombre-edicion-help" class="form-text text-muted" aria-live="polite"> Se permiten letras, números, espacios, apostrofes y guiones. Debe empezar con una letra o un número.</small>
         <div class="invalid-feedback" id="edit_nombreFeedback">
             @error('nombre', 'editarCategoria') {{ $message }} @else El nombre es obligatorio. @enderror
         </div>
