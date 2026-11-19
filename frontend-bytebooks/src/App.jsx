@@ -13,7 +13,7 @@ function App() {
 	const [cartProducts, setCartProducts] = useState([]);
 
 	useEffect(() => {
-    	fetch(`${import.meta.env.VITE_API_URL}/api/libros`)
+    	fetch(`${import.meta.env.VITE_API_URL}/api/api/libros`)
             .then(res => res.json())
             .then(data => {
                 const productsWithQuantity = data.map(product => ({
