@@ -13,7 +13,7 @@ function App() {
 	const [cartProducts, setCartProducts] = useState([]);
 
 	useEffect(() => {
-        fetch('http://127.0.0.1:8000/api/libros')
+        fetch('${import.meta.env.VITE_API_URL}/api/api/libros')
             .then(res => res.json())
             .then(data => {
                 const productsWithQuantity = data.map(product => ({
