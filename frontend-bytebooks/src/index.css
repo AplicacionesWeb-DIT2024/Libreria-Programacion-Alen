@@ -220,6 +220,8 @@ header {
 .carousel {
 	position: relative;
 	width: 100%;
+	touch-action: pan-y; 
+	outline: none;
 }
 
 .carousel img {
