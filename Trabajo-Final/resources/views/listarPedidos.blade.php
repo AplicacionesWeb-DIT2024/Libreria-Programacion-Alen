@@ -43,15 +43,9 @@
                                     <i class="fas fa-list"></i>
                                 </a>
                                 @if ($factura->estado->siguiente())
-                                    <button type="button" class="btn btn-primary btn-sm text-nowrap" data-bs-toggle="modal" data-bs-target="#cambioEstado{{ $factura->id }} " title="Pasar a estado {{ $factura->estado->siguiente()?->label() }}">
+                                    <button type="button" class="btn btn-primary btn-sm text-nowrap" data-bs-toggle="modal" data-bs-target="#cambioEstado{{ $factura->id }}" title="Pasar a estado {{ $factura->estado->siguiente()?->label() }}">
                                         <i class="fas fa-forward"></i>  {{ $factura->estado->textoAccion() }}
                                     </button>
-
-                                    <form id="cambioEstadoForm{{ $factura->id }}" action="{{ route('pedidos.avanzar', $factura) }}" method="POST" class="d-none">
-                                        @csrf
-                                        @method('PATCH')
-                                    </form>
-                                    @include('cambioEstado', ['id' => $factura->id, 'estado' => $factura->estado->siguiente()->label()])
                                 @endif
                             </div>
                         </td>
@@ -60,4 +54,14 @@
             </tbody>
     </table>
 </div>
+
+@foreach ($facturas as $factura)
+    @if ($factura->estado->siguiente())
+        <form id="cambioEstadoForm{{ $factura->id }}" action="{{ route('pedidos.avanzar', $factura) }}" method="POST" class="d-none">
+            @csrf
+            @method('PATCH')
+        </form>
+        @include('cambioEstado', ['id' => $factura->id, 'estado' => $factura->estado->siguiente()->label()])
+    @endif
+@endforeach
 @endsection
