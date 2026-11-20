@@ -1,4 +1,5 @@
 import React from 'react';
+import { ImageCarousel } from './ImageCarousel';
 export const ProductList = ({
 	allProducts,
 	setAllProducts,
@@ -30,7 +31,14 @@ export const ProductList = ({
 			{allProducts.map((product) => (
 				<div className='item' key={product.id}>
 					<figure>
-						<img src={`${product.imagen_referencia}`} alt={product.nombre} />
+						<ImageCarousel
+							alt={product.nombre}
+							images={[
+								product.imagen_original,
+								product.imagen_referencia_2,
+								product.imagen_referencia_3,
+							].filter(Boolean)}
+						/>
 					</figure>
 					<div className='info-product'>
 						<h2>{product.nombre}</h2>

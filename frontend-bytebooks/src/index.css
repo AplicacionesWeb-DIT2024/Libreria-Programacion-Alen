@@ -215,3 +215,61 @@ header {
   transform: scale(1.03);
   border-radius: 0;
 }
+
+
+.carousel {
+	position: relative;
+	width: 100%;
+}
+
+.carousel img {
+	width: 100%;
+	display: block;
+	object-fit: cover;
+}
+
+.carousel-btn {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	background: rgba(0, 0, 0, 0.5);
+	color: #fff;
+	border: none;
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+}
+
+.carousel-btn:hover {
+	background: rgba(0, 0, 0, 0.8);
+}
+
+.carousel-prev { left: 8px; }
+.carousel-next { right: 8px; }
+
+.carousel-dots {
+	position: absolute;
+	bottom: 8px;
+	left: 0;
+	right: 0;
+	display: flex;
+	justify-content: center;
+	gap: 6px;
+}
+
+.dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.6);
+	cursor: pointer;
+}
+
+.dot.active {
+	background: #000;
+}
