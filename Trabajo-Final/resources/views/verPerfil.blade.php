@@ -20,7 +20,7 @@
                 <label for="nombre"><i class="fa-solid fa-person"></i> Nombre</label>
                 <input type="text" class="form-control @error('nombre') is-invalid @enderror" required id="nombre" name="nombre"
                        value="{{ old('nombre', $usuario->name) }}" maxlength="255">
-                <small id="nombre-help" class="form-text text-danger" aria-live="polite" hidden></small>
+                <small id="nombre-help" class="form-text text-muted" aria-live="polite">Solo letras, espacios, apóstrofes, puntos y guiones. Debe empezar con una letra.</small>
                 @include('_campoError', ['campo' => 'nombre', 'bag' => 'default'])
             </div>
 
@@ -28,7 +28,7 @@
                 <label for="apellido"><i class="fa-solid fa-person"></i> Apellido</label>
                 <input type="text" class="form-control @error('apellido') is-invalid @enderror" required id="apellido" name="apellido"
                        value="{{ old('apellido', $usuario->apellido) }}" maxlength="255">
-                <small id="apellido-help" class="form-text text-danger" aria-live="polite" hidden></small>
+                <small id="apellido-help" class="form-text text-muted" aria-live="polite">Solo letras, espacios, apóstrofes, puntos y guiones. Debe empezar con una letra.</small>
                 @include('_campoError', ['campo' => 'apellido', 'bag' => 'default'])
             </div>
 
@@ -36,7 +36,7 @@
                 <label for="username"><i class="fa-solid fa-user"></i> Nombre de usuario</label>
                 <input type="text" class="form-control @error('username') is-invalid @enderror" required id="username" name="username"
                        value="{{ old('username', $usuario->username) }}" minlength="4" maxlength="50">
-                <small id="username-help" class="form-text text-danger" aria-live="polite" hidden></small>
+                <small id="username-help" class="form-text text-muted" aria-live="polite">De 4 a 50 caracteres: letras, números, puntos, guiones y guiones bajos, sin espacios.</small>
                 @include('_campoError', ['campo' => 'username', 'bag' => 'default'])
             </div>
 
@@ -44,7 +44,7 @@
                 <label for="email">Email</label>
                 <input type="email" class="form-control @error('email') is-invalid @enderror" required id="email" name="email"
                        value="{{ old('email', $usuario->email) }}" maxlength="255">
-                <small id="email-help" class="form-text text-danger" aria-live="polite" hidden></small>
+                <small id="email-help" class="form-text text-muted" aria-live="polite">Sin espacios, con formato usuario@dominio.com.</small>
                 @include('_campoError', ['campo' => 'email', 'bag' => 'default'])
             </div>
 

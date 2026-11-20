@@ -18,14 +18,44 @@ document.addEventListener('DOMContentLoaded', function () {
     const SOLO_USUARIO = /[^A-Za-z0-9._-]/g;
     const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
+    const ayudaDe = el => form.querySelector(`#${el.id}-help`);
+    const guias = new Map();
+    const timers = new Map();
+
+    [nombre, apellido, username, email].forEach(el => {
+        const a = ayudaDe(el);
+        if (a) guias.set(el, { texto: a.textContent.trim(), clase: a.className });
+    });
+
 
     const campos = [nombre, apellido, username, email, actual, nueva, confirmacion];
     const feedback = el => form.querySelector(`[data-fb="${el.name}"]`);
 
+    [nombre, apellido, username, email].forEach(el => {
+        const fb = feedback(el);
+        if (fb && fb.textContent.trim() !== '') {
+            const a = ayudaDe(el);
+            if (a) a.hidden = true;
+        }
+    });
+
     function mostrar(el, msg) {
         const fb = feedback(el);
-        if (fb) fb.textContent = msg;
+        if (fb) 
+            fb.textContent = msg;
         el.classList.toggle('is-invalid', msg !== '');
+
+        if (el === nueva) ayudaPassword.hidden = msg !== '';
+
+        const g = guias.get(el);
+        const a = ayudaDe(el);
+        if (!g || !a) return;
+        if (msg !== '') {
+            clearTimeout(timers.get(el));
+            a.hidden = true;
+        } else if (a.className === g.clase) {
+            a.hidden = false;
+        }
     }
 
     function errorCampo(el) {
@@ -72,38 +102,52 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
 
-    function filtrarConAviso(el, regex, mensaje) {
-        const ayuda = form.querySelector(`#${el.id}-help`);
-        let timer;
+   function restaurarGuia(el) {
+        const a = ayudaDe(el), g = guias.get(el);
+        if (!a || !g) return;
+        clearTimeout(timers.get(el));
+        a.textContent = g.texto;
+        a.className = g.clase;
+        a.hidden = false;
+    }
 
+    function avisar(el, mensaje) {
+        const a = ayudaDe(el);
+        if (!a) return;
+        a.textContent = mensaje;
+        a.className = 'form-text text-danger';
+        a.hidden = false;
+        clearTimeout(timers.get(el));
+        timers.set(el, setTimeout(() => restaurarGuia(el), 3000));
+    }
+
+    function filtrarConAviso(el, regex, mensaje, inicioRegex, mensajeInicio) {
         el.addEventListener('input', () => {
-            const limpio = el.value.replace(regex, '');
+            let limpio = el.value.replace(regex, '');
+            let msg = mensaje;
+
+            if (inicioRegex) {
+                const sinInicio = limpio.replace(inicioRegex, '');
+                if (sinInicio !== limpio) { limpio = sinInicio; msg = mensajeInicio; }
+            }
             if (limpio === el.value) return;
 
             let pos = null;
             try { pos = el.selectionStart; } catch (e) {}
-
+            const quitados = el.value.length - limpio.length;
             el.value = limpio;
-
             if (pos !== null) {
-                const nueva = pos - 1 < 0 ? 0 : pos - 1;
-                try { el.setSelectionRange(nueva, nueva); } catch (e) {}
+                const n = Math.max(0, pos - quitados);
+                try { el.setSelectionRange(n, n); } catch (e) {}
             }
-
-            if (!ayuda) return;
-            ayuda.textContent = mensaje;
-            ayuda.hidden = false;
-            clearTimeout(timer);
-            timer = setTimeout(() => { ayuda.hidden = true; }, 3000);
+            avisar(el, msg);
         });
     }
 
-
-    filtrarConAviso(nombre, SOLO_LETRAS, 'El nombre solo admite letras, espacios, apóstrofes, puntos y guiones.');
-    filtrarConAviso(apellido, SOLO_LETRAS, 'El apellido solo admite letras, espacios, apóstrofes, puntos y guiones.');
-    filtrarConAviso(username, SOLO_USUARIO, 'El usuario solo admite letras, números, puntos, guiones y guiones bajos.');
+    filtrarConAviso(nombre, SOLO_LETRAS, 'El nombre solo admite letras, espacios, apóstrofes, puntos y guiones.',/^[\s'’.-]+/, 'El nombre debe empezar con una letra.');
+    filtrarConAviso(apellido, SOLO_LETRAS, 'El apellido solo admite letras, espacios, apóstrofes, puntos y guiones.',/^[\s'’.-]+/, 'El apellido debe empezar con una letra.');
+    filtrarConAviso(username, SOLO_USUARIO, 'El usuario solo admite letras, números, puntos, guiones y guiones bajos, sin espacios.');
     filtrarConAviso(email, /\s/g, 'El email no puede contener espacios.');
-
 
 
 
@@ -117,7 +161,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
         ayudaPassword.hidden = false;
 
-        if (longitud < 8) {
+         if (longitud === 0 && !obligatorio) {
+            ayudaPassword.textContent = 'Opcional. Si la cambiás, debe tener al menos 8 caracteres.';
+            ayudaPassword.className = 'form-text text-muted';
+        } else if (longitud < 8) {
             ayudaPassword.textContent = 'La contraseña debe tener al menos 8 caracteres.';
             ayudaPassword.className = 'form-text text-danger';
         } else {
