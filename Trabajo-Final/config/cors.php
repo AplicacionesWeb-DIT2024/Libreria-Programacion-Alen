@@ -21,7 +21,7 @@ return [
 
     'allowed_origins' => [
         'http://localhost:5173',
-        'https://trabajo-final-3je85pprw-alen-morillo-meneses-projects.vercel.app',
+        'https://libreria-programacion-alen.vercel.app',
     ],
 
     'allowed_origins_patterns' => [],
