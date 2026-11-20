@@ -21,10 +21,13 @@ return [
 
     'allowed_origins' => [
         'http://localhost:5173',
-        'https://libreria-programacion-alen.vercel.app',
+        'https://libreria-programacion-alen-b06amxnru.vercel.app',
+        'https://libreria-programacion-alen.vercel.app',  
     ],
 
-    'allowed_origins_patterns' => [],
+    'allowed_origins_patterns' => [
+        '#^https://libreria-programacion-alen-[a-z0-9]+(-alen-morillo-meneses-projects)?\.vercel\.app$#',
+    ],
 
     'allowed_headers' => ['*'],
 
