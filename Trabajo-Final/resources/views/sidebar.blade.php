@@ -5,9 +5,12 @@
   </div>
 
   <div class="offcanvas-body d-flex flex-column p-3">
-     <a href="{{ route('home') }}" class="d-flex align-items-center text-white text-decoration-none">
-      <img src="{{ asset('images/logobyte.png') }}" class="img-fluid me-2" alt="ByteBooks" width="70" height="60">
-      <span class="fs-4">ByteBooks</span>
+     <a href="{{ route('home') }}" class="sidebar-brand d-flex align-items-center text-white text-decoration-none">
+      <img src="{{ asset('images/logo.png') }}" class="sidebar-logo" alt="ByteBooks" width="56" height="56">
+      <span class="sidebar-title">
+        <small>Panel de</small>
+        administración
+      </span>
     </a>
     <hr class="d-none d-md-block mt-0">
     @auth

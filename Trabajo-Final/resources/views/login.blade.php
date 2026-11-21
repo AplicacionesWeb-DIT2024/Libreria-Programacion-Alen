@@ -20,7 +20,7 @@
     <form method = "POST" action="{{ url('admin/login') }}">
         @csrf
         <div class = "form-image">
-            <img class="mb-3 img-center" src="{{ asset('images/logobyte.png') }}" alt="50" width="150" height="140">
+            <img class="mb-3 logo-login" src="{{ asset('images/logo.png') }}" alt="logo" width="150" height="150">
         </div>
         <div class="form-group">
             <label for="username"><i class="fa-solid fa-user"></i> Usuario</label>

@@ -29,7 +29,7 @@ export const Header = ({
 	return (
 		<header>
 			<div className = "logo-container">
-				<img src = "/logobyte.png" alt = "Logo de la Libreria Bytebooks" className="logo"></img>
+				<img src = "/logo.png" alt = "Logo de la Libreria Bytebooks" className="logo"></img>
 				<h1>Libreria Bytebooks </h1>
 			</div>
 

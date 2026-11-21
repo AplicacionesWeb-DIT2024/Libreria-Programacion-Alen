@@ -58,3 +58,21 @@ body {
 }
 
 
+
+.logo-login {
+  width: 150px;
+  height: 150px;
+  object-fit: contain;      
+  border-radius: 50%;
+  box-shadow:
+    0 6px 18px rgba(0, 0, 0, 0.25),
+    0 0 0 5px rgba(32, 178, 170, 0.25);  
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.logo-login:hover {
+  transform: scale(1.04);
+  box-shadow:
+    0 8px 22px rgba(0, 0, 0, 0.3),
+    0 0 0 6px rgba(32, 178, 170, 0.45);
+}
