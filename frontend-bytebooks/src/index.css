@@ -862,30 +862,3 @@ a {
 	}
 }
 
-
-.welcome {
-	display: flex;
-	align-items: center;
-	gap: 10px;
-	max-width: var(--max);
-	margin: 16px auto 0;
-	padding: 12px 14px;
-	width: calc(100% - 40px);
-	border-radius: var(--radius-sm);
-	background: var(--brand-50);
-	border: 1px solid color-mix(in srgb, var(--brand) 40%, transparent);
-	color: var(--brand-700);
-}
-
-.welcome span {
-	flex: 1;
-}
-
-.welcome button {
-	border: none;
-	background: none;
-	color: inherit;
-	cursor: pointer;
-	display: grid;
-	place-items: center;
-}

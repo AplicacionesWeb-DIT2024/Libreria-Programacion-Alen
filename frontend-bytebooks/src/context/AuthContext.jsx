@@ -47,9 +47,16 @@ export const AuthProvider = ({ children }) => {
 
 	const logout = async () => {
 		const token = sesion?.token;
+
+		const minimo = new Promise((r) => setTimeout(r, 600));
+
+		const avisarServidor = token
+			? Promise.race([logoutApi(token).catch(() => {}), new Promise((r) => setTimeout(r, 5000))])
+			: null;
+
+		await Promise.all([minimo, avisarServidor]);
 		guardarSesion(null);
 		setSesion(null);
-		if (token) logoutApi(token).catch(() => {});
 	};
 
 	return (

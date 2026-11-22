@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { Header } from './components/Header';
 import { Tienda } from './pages/Tienda';
 import { Login } from './pages/Login';
@@ -14,11 +14,20 @@ const SoloInvitados = ({ children }) => {
 	return yaLogueado ? <Navigate to='/' replace /> : children;
 };
 
+const ScrollArriba = () => {
+	const { pathname } = useLocation();
+	useEffect(() => {
+		window.scrollTo(0, 0);
+	}, [pathname]);
+	return null;
+};
+
 function App() {
 	const carrito = useCarrito();
 
 	return (
 		<>
+			<ScrollArriba />
 			<Header carrito={carrito} />
 
 			<Routes>

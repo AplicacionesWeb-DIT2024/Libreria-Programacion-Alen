@@ -3,7 +3,9 @@ import { Icon } from './Icon';
 import { Link } from 'react-router-dom';
 import { CartDropdown } from './CartDropdown';
 import { useAuth } from '../context/AuthContext';
+import { createPortal } from 'react-dom';
 import './Header.css';
+
 
 const useCerrarAlSalir = (abierto, cerrar) => {
 	const ref = useRef(null);
@@ -32,8 +34,24 @@ export const Header = ({ carrito }) => {
 	const { usuario, logout } = useAuth();
 	const [carritoAbierto, setCarritoAbierto] = useState(false);
 	const [menuUsuario, setMenuUsuario] = useState(false);
+	const [cerrando, setCerrando] = useState(false);
+	const [aviso, setAviso] = useState('');
 	const refCarrito = useCerrarAlSalir(carritoAbierto, () => setCarritoAbierto(false));
-	const refUsuario = useCerrarAlSalir(menuUsuario, () => setMenuUsuario(false));
+	const refUsuario = useCerrarAlSalir(menuUsuario && !cerrando, () => setMenuUsuario(false));
+
+	const cerrarSesion = async () => {
+		setCerrando(true);
+		await logout();
+		setCerrando(false);
+		setMenuUsuario(false);
+		setAviso('Cerraste sesión. ¡Hasta pronto!');
+	};
+
+	useEffect(() => {
+		if (!aviso) return;
+		const t = setTimeout(() => setAviso(''), 3000);
+		return () => clearTimeout(t);
+	}, [aviso]);
 
 	return (
 		<header className='site-header'>
@@ -61,7 +79,7 @@ export const Header = ({ carrito }) => {
 					</div>
 
 					{usuario ? (
-						<div className='user-wrapper' ref={refUsuario}>
+						<div className={`user-wrapper ${cerrando ? 'is-leaving' : ''}`} ref={refUsuario}>
 							<button
 								type='button'
 								className='user-btn'
@@ -80,12 +98,20 @@ export const Header = ({ carrito }) => {
 									</div>
 									<button
 										type='button'
-										onClick={() => {
-											setMenuUsuario(false);
-											logout();
-										}}
+										className='logout-btn'
+										onClick={cerrarSesion}
+										disabled={cerrando}
+										aria-busy={cerrando}
 									>
-										<Icon name='logout' size={18} /> Cerrar sesión
+										{cerrando ? (
+											<>
+												<span className='spinner' aria-hidden='true' /> Cerrando sesión…
+											</>
+										) : (
+											<>
+												<Icon name='logout' size={18} /> Cerrar sesión
+											</>
+										)}
 									</button>
 								</div>
 							)}
@@ -103,6 +129,14 @@ export const Header = ({ carrito }) => {
 					)}
 				</div>
 			</div>
+			{aviso &&
+				createPortal(
+					<div className='toast' role='status'>
+						<Icon name='check' size={18} strokeWidth={2.4} />
+						{aviso}
+					</div>,
+					document.body,
+				)}
 		</header>
 	);
 };

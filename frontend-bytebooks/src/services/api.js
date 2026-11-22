@@ -5,7 +5,7 @@ export const RUTAS = {
 	libros: '/libros',
 	login: '/loginApi',
 	registro: '/registro',
-	logout: '/logout',
+	logout: '/logoutApi',
 };
 
 export class ApiError extends Error {

@@ -45,6 +45,12 @@ export const Tienda = ({ carrito }) => {
 	};
 
 	useEffect(() => {
+			if (!bienvenida) return;
+			const t = setTimeout(() => setBienvenida(false), 4000);
+			return () => clearTimeout(t);
+	}, [bienvenida]);
+
+	useEffect(() => {
 		document.body.style.overflow = filtrosAbiertos ? 'hidden' : '';
 		return () => {
 			document.body.style.overflow = '';
@@ -58,14 +64,9 @@ export const Tienda = ({ carrito }) => {
 	return (
 		<>
 			{bienvenida && usuario && (
-				<div className='welcome' role='status'>
-					<Icon name='check' size={20} strokeWidth={2.4} />
-					<span>
-						¡Bienvenido/a, <strong>{usuario.nombre}</strong>! Tu cuenta ya está creada.
-					</span>
-					<button type='button' onClick={() => setBienvenida(false)} aria-label='Cerrar aviso'>
-						<Icon name='close' size={18} />
-					</button>
+				<div className='toast' role='status'>
+					<Icon name='check' size={18} strokeWidth={2.4} />
+					<span>¡Bienvenido/a, {usuario.nombre}! Tu cuenta ha sido creada.</span>h
 				</div>
 			)}
 
