@@ -1,106 +1,49 @@
-import { useDeferredValue, useEffect, useMemo, useState } from 'react';
+import { useState } from 'react';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import { Header } from './components/Header';
-import { Hero } from './components/Hero';
-import { Filtros } from './components/Filtros';
-import { Toolbar } from './components/Toolbar';
-import { ProductList } from './components/ProductList';
-import { useLibros } from './hooks/useLibros';
+import { Tienda } from './pages/Tienda';
+import { Login } from './pages/Login';
+import { Registro } from './pages/Registro';
 import { useCarrito } from './hooks/useCarrito';
-import { FILTROS_INICIALES, filtrarLibros, obtenerOpciones, ordenarLibros } from './utils/libros';
+import { useAuth } from './context/AuthContext';
 
-const leerUsuario = () => {
-	try {
-		return JSON.parse(localStorage.getItem('usuario'));
-	} catch {
-		return null;
-	}
+
+const SoloInvitados = ({ children }) => {
+	const { usuario } = useAuth();
+	const [yaLogueado] = useState(Boolean(usuario));
+	return yaLogueado ? <Navigate to='/' replace /> : children;
 };
 
 function App() {
-	const { libros, cargando, error, reintentar } = useLibros();
 	const carrito = useCarrito();
-	const [usuario, setUsuario] = useState(leerUsuario);
-
-	const [busqueda, setBusqueda] = useState('');
-	const [filtros, setFiltros] = useState(FILTROS_INICIALES);
-	const [orden, setOrden] = useState('relevancia');
-	const [filtrosAbiertos, setFiltrosAbiertos] = useState(false);
-
-	const busquedaDiferida = useDeferredValue(busqueda);
-
-	const opciones = useMemo(() => obtenerOpciones(libros, filtros.categoria), [libros, filtros.categoria]);
-
-	const resultado = useMemo(
-		() => ordenarLibros(filtrarLibros(libros, busquedaDiferida, filtros), orden),
-		[libros, busquedaDiferida, filtros, orden],
-	);
-
-	const setFiltro = (clave, valor) =>
-		setFiltros((prev) => {
-			const nuevo = { ...prev, [clave]: valor };
-			if (clave === 'categoria') nuevo.subcategoria = '';
-			return nuevo;
-		});
-
-	const cantidadFiltros = Object.values(filtros).filter((v) => v !== '').length;
-
-	const limpiarTodo = () => {
-		setFiltros(FILTROS_INICIALES);
-		setBusqueda('');
-	};
-
-	const cerrarSesion = () => {
-		localStorage.removeItem('usuario');
-		setUsuario(null);
-	};
-
-	useEffect(() => {
-		document.body.style.overflow = filtrosAbiertos ? 'hidden' : '';
-	}, [filtrosAbiertos]);
 
 	return (
 		<>
-			<Header carrito={carrito} usuario={usuario} onLogout={cerrarSesion} />
-			<Hero busqueda={busqueda} setBusqueda={setBusqueda} totalLibros={libros.length} />
+			<Header carrito={carrito} />
 
-			<main className='catalog'>
-				<Filtros
-					filtros={filtros}
-					setFiltro={setFiltro}
-					opciones={opciones}
-					onLimpiar={() => setFiltros(FILTROS_INICIALES)}
-					hayFiltros={cantidadFiltros > 0}
-					abierto={filtrosAbiertos}
-					onCerrar={() => setFiltrosAbiertos(false)}
+			<Routes>
+				<Route path='/' element={<Tienda carrito={carrito} />} />
+				<Route
+					path='/login'
+					element={
+						<SoloInvitados>
+							<Login />
+						</SoloInvitados>
+					}
 				/>
-
-				<section className='catalog-content' aria-label='Listado de libros'>
-					<Toolbar
-						resultados={resultado.length}
-						orden={orden}
-						setOrden={setOrden}
-						filtros={filtros}
-						setFiltro={setFiltro}
-						busqueda={busqueda}
-						setBusqueda={setBusqueda}
-						onAbrirFiltros={() => setFiltrosAbiertos(true)}
-						cantidadFiltros={cantidadFiltros}
-					/>
-					<ProductList
-						libros={resultado}
-						cargando={cargando}
-						error={error}
-						onReintentar={reintentar}
-						carrito={carrito}
-						onLimpiar={limpiarTodo}
-					/>
-				</section>
-			</main>
+				<Route
+					path='/registro'
+					element={
+						<SoloInvitados>
+							<Registro />
+						</SoloInvitados>
+					}
+				/>
+				<Route path='*' element={<Navigate to='/' replace />} />
+			</Routes>
 
 			<footer className='site-footer'>
-				<p>
-					© {new Date().getFullYear()} ByteBooks · Libros de programación
-				</p>
+				<p>© {new Date().getFullYear()} ByteBooks · Libros de programación</p>
 			</footer>
 		</>
 	);

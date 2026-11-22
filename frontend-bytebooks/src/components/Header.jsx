@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { Icon } from './Icon';
+import { Link } from 'react-router-dom';
 import { CartDropdown } from './CartDropdown';
+import { useAuth } from '../context/AuthContext';
 import './Header.css';
-
-const URL_LOGIN = import.meta.env.VITE_LOGIN_URL ?? '/login';
-const URL_REGISTRO = import.meta.env.VITE_REGISTRO_URL ?? '/registro';
 
 const useCerrarAlSalir = (abierto, cerrar) => {
 	const ref = useRef(null);
@@ -29,7 +28,8 @@ const iniciales = (nombre = '') =>
 		.map((p) => p[0]?.toUpperCase())
 		.join('');
 
-export const Header = ({ carrito, usuario, onLogout }) => {
+export const Header = ({ carrito }) => {
+	const { usuario, logout } = useAuth();
 	const [carritoAbierto, setCarritoAbierto] = useState(false);
 	const [menuUsuario, setMenuUsuario] = useState(false);
 	const refCarrito = useCerrarAlSalir(carritoAbierto, () => setCarritoAbierto(false));
@@ -38,12 +38,12 @@ export const Header = ({ carrito, usuario, onLogout }) => {
 	return (
 		<header className='site-header'>
 			<div className='header-inner'>
-				<a href='/' className='brand' aria-label='ByteBooks, ir al inicio'>
+				<Link to='/' className='brand' aria-label='ByteBooks, ir al inicio'>
 					<img src='/logo.png' alt='' className='brand-logo' width='48' height='48' />
 					<span className='brand-name'>
 						Byte<span>Books</span>
 					</span>
-				</a>
+				</Link>
 
 				<div className='header-actions'>
 					<div className='cart-wrapper' ref={refCarrito}>
@@ -74,10 +74,17 @@ export const Header = ({ carrito, usuario, onLogout }) => {
 							</button>
 							{menuUsuario && (
 								<div className='dropdown user-menu'>
-									<a href='/mi-cuenta'>
-										<Icon name='user' size={18} /> Mi cuenta
-									</a>
-									<button type='button' onClick={onLogout}>
+									<div className='user-menu-info'>
+										<strong>{usuario.nombre}</strong>
+										<span>{usuario.email}</span>
+									</div>
+									<button
+										type='button'
+										onClick={() => {
+											setMenuUsuario(false);
+											logout();
+										}}
+									>
 										<Icon name='logout' size={18} /> Cerrar sesión
 									</button>
 								</div>
@@ -85,13 +92,13 @@ export const Header = ({ carrito, usuario, onLogout }) => {
 						</div>
 					) : (
 						<div className='auth-buttons'>
-							<a href={URL_LOGIN} className='btn btn-ghost btn-login' aria-label='Iniciar sesión'>
+							<Link to='/login' className='btn btn-ghost btn-login' aria-label='Iniciar sesión'>
 								<Icon name='user' size={18} />
 								<span>Iniciar sesión</span>
-							</a>
-							<a href={URL_REGISTRO} className='btn btn-primary'>
+							</Link>
+							<Link to='/registro' className='btn btn-primary'>
 								Registrarse
-							</a>
+							</Link>
 						</div>
 					)}
 				</div>
