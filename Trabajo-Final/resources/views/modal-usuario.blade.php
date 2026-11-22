@@ -14,9 +14,12 @@
                 @if ($esCliente)
                   <div class="mb-2"><b>Domicilio:</b> {{ $domicilio ?? '—' }}</div>
                   <div class="mb-2"><b>Teléfono:</b> {{ $telefono ?? '—' }}</div>
+                  <div class="mb-2"><b>Fecha de nacimiento:</b> {{$fecha_nacimiento}} </div>
                 @endif
                 <div class="mb-2"> <b> Fecha de creacion: </b> {{$creado}} </div>
                 <div class="mb-2"> <b> Fecha de ultima actualización: </b> {{$actualizado}} </div>
+                <div class="mb-2"> <b> Usuario de creacion: </b> {{$usuario_creacion}} </div>
+                <div class="mb-2"> <b> Usuario de modificación: </b> {{$usuario_actualizacion}} </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-danger" data-bs-dismiss="modal" > Cerrar </button>

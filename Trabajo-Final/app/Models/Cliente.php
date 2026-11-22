@@ -12,12 +12,17 @@ class Cliente extends Model
 
     protected $fillable = [
         'user_id',
+        'fecha_nacimiento',
         'telefono',
         'domicilio_calle',
         'domicilio_numero',
         'domicilio_provincia',
         'domicilio_codigo_postal',
         'domicilio_localidad'
+    ];
+
+    protected $casts = [
+        'fecha_nacimiento' => 'date:Y-m-d',
     ];
 
      public function user(): BelongsTo

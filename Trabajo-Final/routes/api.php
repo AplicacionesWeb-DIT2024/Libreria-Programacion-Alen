@@ -23,6 +23,11 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::post('loginApi', [AuthApiController::class, 'loguearApi'])
     ->middleware('throttle:5,1');
 
+Route::post('/registro', [AuthApiController::class, 'registrarApi'])->middleware('throttle:5,1');
+
+
+
+
 Route::get('libros', [LibroController::class, 'index_api']);
 
 Route::get('libros/{id}', [LibroController::class, 'show_api']);
