@@ -100,8 +100,8 @@
                     'fecha_nacimiento' => $usuario->cliente?->fecha_nacimiento?->format('d/m/Y') ?? '—',
                     'creado' => $usuario->created_at->format('d/m/Y H:i:s'),
                     'actualizado' => $usuario->updated_at->format('d/m/Y H:i:s'),
-                    'usuario_creacion' => optional($usuario->usuarioCreacion)->username,
-                    'usuario_actualizacion' => optional($usuario->usuarioModificacion)->username ?? '—'
+                    'usuario_creacion' => optional($usuario->usuarioCreacion)->username ?? 'Registro propio',
+                    'usuario_actualizacion' => optional($usuario->usuarioModificacion)->username ?? '—',
                 ])
             @endforeach
         </tbody>

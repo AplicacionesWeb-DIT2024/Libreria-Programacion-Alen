@@ -16,6 +16,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Database\Console\Migrations\StatusCommand;
 use Illuminate\Http\Request;
 use App\Enums\Role;
+use Illuminate\Validation\Rules\Password;
 
 
 class UsuarioController extends Controller
@@ -111,6 +112,8 @@ class UsuarioController extends Controller
                 $usuario->role = Role::Admin;
                 $usuario->activo = true;
                 $usuario->debe_cambiar_password = true;
+                $usuario->usuario_creacion = Auth::id();  
+                $usuario->usuario_modificacion = Auth::id();  
                 $usuario->save();
 
                 Mail::to($usuario->email)->send(new NuevoAdmin($usuario, $passwordTemporal));
@@ -198,9 +201,10 @@ class UsuarioController extends Controller
             'nullable', 'current_password',
         ],
         'password' => [
-            Rule::requiredIf(fn () => $usuario->debe_cambiar_password),
-            'nullable', 'string', 'min:8', 'confirmed',
-            'different:current_password',
+             Rule::requiredIf(fn () => $usuario->debe_cambiar_password), 
+             'nullable', 'string', 'max:72', 
+             'confirmed','different:current_password', 
+             Password::min(8)->letters()->mixedCase()->numbers(),
         ],
         ], [
             'required'         => 'Este campo es obligatorio.',
@@ -215,6 +219,10 @@ class UsuarioController extends Controller
             'current_password.current_password' => 'La contraseña actual no es correcta.',
             'password.required'                 => 'Debe establecer una nueva contraseña.',
             'password.min'                      => 'La nueva contraseña debe tener al menos :min caracteres.',
+            'password.letters' => 'La contraseña debe incluir al menos una letra.',
+            'password.mixed'   => 'La contraseña debe incluir mayúsculas y minúsculas.',
+            'password.numbers' => 'La contraseña debe incluir al menos un número.',
+            'password.max'     => 'La contraseña no puede superar los 72 caracteres.',
             'password.confirmed'                => 'La confirmación de la contraseña no coincide.',
             'password.different'                => 'La nueva contraseña debe ser distinta de la actual.',
         ]);
@@ -231,7 +239,7 @@ class UsuarioController extends Controller
             $usuario->password = $data['password']; 
             $usuario->debe_cambiar_password = false;
         }
-
+        $usuario->usuario_modificacion = Auth::id();
         $usuario->save();
 
         if ($cambioPassword) {
@@ -243,9 +251,10 @@ class UsuarioController extends Controller
     }
 
     public function delete(User $usuario) {
-         abort_unless(auth()->user()->puedeGestionarA($usuario), 403);
+        abort_unless(auth()->user()->puedeGestionarA($usuario), 403);
 
         $usuario->activo = false;
+        $usuario->usuario_modificacion = Auth::id();
         $usuario->save();
         $usuario->tokens()->delete();
         return redirect()->back()->with('success', 'Usuario desactivado correctamente.');
@@ -254,8 +263,8 @@ class UsuarioController extends Controller
     public function activar(User $usuario)
     {
         abort_unless(auth()->user()->puedeGestionarA($usuario), 403);
-
         $usuario->activo = true;
+        $usuario->usuario_modificacion = Auth::id();
         $usuario->save();
         return redirect()->back()->with('success', 'Usuario reactivado correctamente.');
     }
@@ -277,9 +286,11 @@ class UsuarioController extends Controller
 
         DB::transaction(function () use ($actual, $usuario) {
             $usuario->role = Role::SuperAdmin;
+            $usuario->usuario_modificacion = $actual->id;
             $usuario->save();
 
             $actual->role = Role::Admin;
+            $usuario->usuario_modificacion = $actual->id;
             $actual->save();
         });
 
