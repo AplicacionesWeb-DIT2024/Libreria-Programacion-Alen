@@ -29,6 +29,10 @@ class AuthApiController extends Controller
             $user->activo = true;
             $user->save();
 
+            $user->usuario_creacion = $user->id;
+            $user->usuario_modificacion = $user->id;
+            $user->save();
+
             $cliente = new Cliente();
             $cliente->user_id = $user->id;
             $cliente->fecha_nacimiento = $datos['fecha_nacimiento'];
