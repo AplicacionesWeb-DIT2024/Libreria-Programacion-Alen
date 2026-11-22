@@ -1,113 +1,97 @@
-import React, { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { Icon } from './Icon';
+import { CartDropdown } from './CartDropdown';
 import './Header.css';
 
-export const Header = ({
-	cartProducts,
-	setCartProducts,
-	total,
-	countProducts,
-	setCountProducts,
-	setTotal,
-}) => {
-	const [active, setActive] = useState(false);
+const URL_LOGIN = import.meta.env.VITE_LOGIN_URL ?? '/login';
+const URL_REGISTRO = import.meta.env.VITE_REGISTRO_URL ?? '/registro';
 
-	const onDeleteProduct = product => {
-		const updatedCartProducts = cartProducts.filter((item) => item.id !== product.id);
-		setCartProducts(updatedCartProducts);
+const useCerrarAlSalir = (abierto, cerrar) => {
+	const ref = useRef(null);
+	useEffect(() => {
+		if (!abierto) return;
+		const onClick = (e) => ref.current && !ref.current.contains(e.target) && cerrar();
+		const onKey = (e) => e.key === 'Escape' && cerrar();
+		document.addEventListener('mousedown', onClick);
+		document.addEventListener('keydown', onKey);
+		return () => {
+			document.removeEventListener('mousedown', onClick);
+			document.removeEventListener('keydown', onKey);
+		};
+	}, [abierto, cerrar]);
+	return ref;
+};
 
-		setTotal(total - product.precio * product.quantity);
-		setCountProducts(countProducts - product.quantity);
-	};
+const iniciales = (nombre = '') =>
+	nombre
+		.split(' ')
+		.slice(0, 2)
+		.map((p) => p[0]?.toUpperCase())
+		.join('');
 
-	const onCleanCart = () => {
-		setCartProducts([]);
-		setTotal(0);
-		setCountProducts(0);
-	};
+export const Header = ({ carrito, usuario, onLogout }) => {
+	const [carritoAbierto, setCarritoAbierto] = useState(false);
+	const [menuUsuario, setMenuUsuario] = useState(false);
+	const refCarrito = useCerrarAlSalir(carritoAbierto, () => setCarritoAbierto(false));
+	const refUsuario = useCerrarAlSalir(menuUsuario, () => setMenuUsuario(false));
 
-	
 	return (
-		<header>
-			<div className = "logo-container">
-				<img src = "/logo.png" alt = "Logo de la Libreria Bytebooks" className="logo"></img>
-				<h1>Libreria Bytebooks </h1>
-			</div>
+		<header className='site-header'>
+			<div className='header-inner'>
+				<a href='/' className='brand' aria-label='ByteBooks, ir al inicio'>
+					<img src='/logo.png' alt='' className='brand-logo' width='48' height='48' />
+					<span className='brand-name'>
+						Byte<span>Books</span>
+					</span>
+				</a>
 
-			<div className='container-icon'>
-				<div
-					className='container-cart-icon'
-					onClick={() => setActive(!active)}
-				>
-					<svg
-						xmlns='http://www.w3.org/2000/svg'
-						fill='none'
-						viewBox='0 0 24 24'
-						strokeWidth='1.5'
-						stroke='currentColor'
-						className='icon-cart'
-					>
-						<path
-							strokeLinecap='round'
-							strokeLinejoin='round'
-							d='M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z'
-						/>
-					</svg>
-					<div className='count-products'>
-						<span id='contador-productos'>{countProducts}</span>
+				<div className='header-actions'>
+					<div className='cart-wrapper' ref={refCarrito}>
+						<button
+							type='button'
+							className='icon-btn'
+							onClick={() => setCarritoAbierto((v) => !v)}
+							aria-expanded={carritoAbierto}
+							aria-label={`Carrito, ${carrito.cantidad} productos`}
+						>
+							<Icon name='cart' size={24} />
+							{carrito.cantidad > 0 && <span className='badge'>{carrito.cantidad}</span>}
+						</button>
+						{carritoAbierto && <CartDropdown carrito={carrito} />}
 					</div>
-				</div>
 
-				<div
-					className={`container-cart-products ${
-						active ? '' : 'hidden-cart'
-					}`}
-				>
-					{cartProducts.length > 0 ? (
-						<>
-							<div className='row-product'>
-								{cartProducts.map(product => (
-									<div className='cart-product' key={product.id}>
-										<div className='info-cart-product'>
-											<span className='cantidad-producto-carrito'>
-												{product.quantity}
-											</span>
-											<p className='titulo-producto-carrito'>
-												{product.nombre}
-											</p>
-											<span className='precio-producto-carrito'>
-												${product.precio}
-											</span>
-										</div>
-										<svg
-											xmlns='http://www.w3.org/2000/svg'
-											fill='none'
-											viewBox='0 0 24 24'
-											strokeWidth='1.5'
-											stroke='currentColor'
-											className='icon-close'
-											onClick={() => onDeleteProduct(product)}
-										>
-											<path
-												strokeLinecap='round'
-												strokeLinejoin='round'
-												d='M6 18L18 6M6 6l12 12'
-											/>
-										</svg>
-									</div>
-								))}
-							</div>
-
-							<div className='cart-total'>
-								<h3>Total:</h3>
-								<span className='total-pagar'>${total}</span>
-							</div>
-
-							<button className='btn-clear-all' onClick={onCleanCart}>
-								Vaciar Carrito
+					{usuario ? (
+						<div className='user-wrapper' ref={refUsuario}>
+							<button
+								type='button'
+								className='user-btn'
+								onClick={() => setMenuUsuario((v) => !v)}
+								aria-expanded={menuUsuario}
+							>
+								<span className='avatar'>{iniciales(usuario.nombre)}</span>
+								<span className='user-name'>{usuario.nombre}</span>
+								<Icon name='chevronDown' size={16} />
 							</button>
-						</>
+							{menuUsuario && (
+								<div className='dropdown user-menu'>
+									<a href='/mi-cuenta'>
+										<Icon name='user' size={18} /> Mi cuenta
+									</a>
+									<button type='button' onClick={onLogout}>
+										<Icon name='logout' size={18} /> Cerrar sesión
+									</button>
+								</div>
+							)}
+						</div>
 					) : (
-						<p className='cart-empty'>El carrito está vacío</p>
+						<div className='auth-buttons'>
+							<a href={URL_LOGIN} className='btn btn-ghost'>
+								Iniciar sesión
+							</a>
+							<a href={URL_REGISTRO} className='btn btn-primary'>
+								Registrarse
+							</a>
+						</div>
 					)}
 				</div>
 			</div>
