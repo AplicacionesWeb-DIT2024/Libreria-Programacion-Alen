@@ -1,4 +1,5 @@
-import { useDeferredValue, useEffect, useMemo, useState } from 'react';
+import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react';
+import { SplashScreen } from '../components/SplashScreen';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Hero } from '../components/Hero';
 import { Filtros } from '../components/Filtros';
@@ -20,6 +21,22 @@ export const Tienda = ({ carrito }) => {
 	const [orden, setOrden] = useState('relevancia');
 	const [filtrosAbiertos, setFiltrosAbiertos] = useState(false);
 	const [bienvenida, setBienvenida] = useState(Boolean(location.state?.bienvenida));
+
+	const [mostrarIntro, setMostrarIntro] = useState(() => {
+		try {
+			return !sessionStorage.getItem('bytebooks-intro');
+		} catch {
+			return true;
+		}
+	});
+
+	const terminarIntro = useCallback(() => {
+		try {
+			sessionStorage.setItem('bytebooks-intro', 'visto');
+		} catch {
+		}
+		setMostrarIntro(false);
+	}, []);
 
 	const busquedaDiferida = useDeferredValue(busqueda);
 
@@ -63,6 +80,7 @@ export const Tienda = ({ carrito }) => {
 
 	return (
 		<>
+			{mostrarIntro && <SplashScreen listo={!cargando} onFin={terminarIntro} />}
 			{bienvenida && usuario && (
 				<div className='toast' role='status'>
 					<Icon name='check' size={18} strokeWidth={2.4} />
