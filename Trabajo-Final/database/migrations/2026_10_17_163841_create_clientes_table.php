@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->unique()->constrained()->cascadeOnDelete();
             $table->string('telefono')->nullable();
+            $table->date('fecha_nacimiento');
             $table->string('domicilio_calle');
             $table->string('domicilio_numero', 20);
             $table->string('domicilio_localidad');

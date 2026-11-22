@@ -44,6 +44,7 @@ class DatabaseSeeder extends Seeder
         Cliente::factory()->create([
             'user_id' => $usuarioCliente->id,
             'telefono' => '28041231421',
+            'fecha_nacimiento' => '1999-06-20',
             'domicilio_calle' => 'Mitre',
             'domicilio_numero' => '222',
             'domicilio_provincia' => 'Chubut',

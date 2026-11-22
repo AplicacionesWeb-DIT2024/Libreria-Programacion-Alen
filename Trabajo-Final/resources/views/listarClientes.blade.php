@@ -16,6 +16,7 @@
                 <th> Email </th> 
                 <th> Domicilio </th> 
                 <th> Telefono </th>
+                <th> Fecha de nacimiento </th>
                 <th>Estado</th>
                 <th class="text-end">Acciones</th>
             </tr>
@@ -30,6 +31,9 @@
                     <td> {{ $usuario->email}} </td>
                     <td> {{ $usuario->cliente?->domicilio_completo ?? '—' }} </td>
                     <td>{{ $usuario->cliente?->telefono ?? '—' }}</td>
+                    <td data-order="{{ $usuario->cliente?->fecha_nacimiento?->format('Y-m-d') }}">
+                        {{ $usuario->cliente?->fecha_nacimiento?->format('d/m/Y') ?? '—' }}
+                    </td>
                     <td>
                         <span class="d-none">{{ $usuario->activo ? 'Activo' : 'Inactivo' }}</span>
                         @if ($usuario->activo)
@@ -93,6 +97,7 @@
                     'esCliente' => $usuario->isCliente(),
                     'domicilio' => $usuario->cliente?->domicilio_completo ?? '—',
                     'telefono' => $usuario->cliente?->telefono ?? '—',
+                    'fecha_nacimiento' => $usuario->cliente?->fecha_nacimiento?->format('d/m/Y') ?? '—',
                     'creado' => $usuario->created_at->format('d/m/Y H:i:s'),
                     'actualizado' => $usuario->updated_at->format('d/m/Y H:i:s'),
                     'usuario_creacion' => optional($usuario->usuarioCreacion)->username,

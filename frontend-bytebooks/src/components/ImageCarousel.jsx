@@ -1,13 +1,20 @@
 import { useRef, useState } from 'react';
+import { Icon } from './Icon';
 
-const UMBRAL = 40; 
+const UMBRAL = 40;
 
 export const ImageCarousel = ({ images, alt }) => {
 	const [index, setIndex] = useState(0);
 	const inicio = useRef({ x: 0, y: 0 });
 	const total = images.length;
 
-	if (total === 0) return null;
+	if (total === 0) {
+		return (
+			<div className='carousel carousel-empty'>
+				<Icon name='book' size={56} strokeWidth={1.2} />
+			</div>
+		);
+	}
 
 	const anterior = () => setIndex((i) => (i - 1 + total) % total);
 	const siguiente = () => setIndex((i) => (i + 1) % total);
@@ -22,11 +29,9 @@ export const ImageCarousel = ({ images, alt }) => {
 		const t = e.changedTouches[0];
 		const dx = t.clientX - inicio.current.x;
 		const dy = t.clientY - inicio.current.y;
-
 		if (Math.abs(dx) < UMBRAL || Math.abs(dx) < Math.abs(dy)) return;
-
-		if (dx < 0) siguiente();   
-		else anterior();           
+		if (dx < 0) siguiente();
+		else anterior();
 	};
 
 	const onKeyDown = (e) => {
@@ -41,13 +46,14 @@ export const ImageCarousel = ({ images, alt }) => {
 			onTouchStart={onTouchStart}
 			onTouchEnd={onTouchEnd}
 			onKeyDown={onKeyDown}
-			tabIndex={0}
+			tabIndex={total > 1 ? 0 : -1}
 		>
 			<img
 				key={images[index]}
 				src={images[index]}
 				alt={`${alt} (${index + 1} de ${total})`}
 				draggable={false}
+				loading='lazy'
 			/>
 
 			{total > 1 && (
@@ -58,13 +64,14 @@ export const ImageCarousel = ({ images, alt }) => {
 					<button type='button' className='carousel-btn carousel-next' onClick={siguiente} aria-label='Imagen siguiente'>
 						&#10095;
 					</button>
-
 					<div className='carousel-dots'>
 						{images.map((_, i) => (
-							<span
+							<button
+								type='button'
 								key={i}
 								className={i === index ? 'dot active' : 'dot'}
 								onClick={() => setIndex(i)}
+								aria-label={`Ver imagen ${i + 1}`}
 							/>
 						))}
 					</div>
