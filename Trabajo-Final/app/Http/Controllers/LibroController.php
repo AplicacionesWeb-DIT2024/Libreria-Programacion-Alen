@@ -41,7 +41,42 @@ class LibroController extends Controller
 
 
     public function index_api() {
-        $libros = Libro::orderBy('nombre', 'asc')->get();
+        $activo = fn ($query) => $query->where('activo', true);
+
+        $libros = Libro::query()
+            ->where('activo', true)
+            ->whereHas('categoria_perteneciente', $activo)
+            ->whereHas('subcategoria_perteneciente', $activo)
+            ->whereHas('editorial_perteneciente', $activo)
+            ->whereHas('autor_origen', $activo)
+            ->where(fn ($q) => $q->whereNull('autor2')->orWhereHas('autor_secundario', $activo))
+            ->where(fn ($q) => $q->whereNull('autor3')->orWhereHas('autor_secundario2', $activo))
+            ->with([
+                'categoria_perteneciente',
+                'subcategoria_perteneciente',
+                'editorial_perteneciente',
+                'autor_origen',
+                'autor_secundario',
+                'autor_secundario2',
+            ])
+            ->orderBy('nombre', 'asc')
+            ->get()
+            ->map(fn (Libro $libro) => [
+                'id'                  => $libro->id,
+                'nombre'              => $libro->nombre,
+                'idioma'              => $libro->idioma,
+                'stock'               => $libro->stock,
+                'edicion'             => $libro->edicion,
+                'anio_publicacion'    => $libro->anio_publicacion,
+                'precio'              => (float) $libro->precio,
+                'categoria'           => $libro->categoria_perteneciente->nombre,
+                'subcategoria'        => $libro->subcategoria_perteneciente->nombre,
+                'editorial'           => $libro->editorial_perteneciente->nombre,
+                'autor'               => implode(', ', $libro->getAutores()),
+                'imagen_original'     => $libro->imagen_original,
+                'imagen_referencia_2' => $libro->imagen_referencia_2,
+                'imagen_referencia_3' => $libro->imagen_referencia_3,
+            ]);
         return response()->json($libros, 200);
 
     }
