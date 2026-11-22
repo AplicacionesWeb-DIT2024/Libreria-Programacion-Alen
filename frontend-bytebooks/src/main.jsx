@@ -4,6 +4,8 @@ import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import { AuthProvider } from './context/AuthContext'
 import './index.css'
+import '@fontsource/press-start-2p/400.css'
+
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
