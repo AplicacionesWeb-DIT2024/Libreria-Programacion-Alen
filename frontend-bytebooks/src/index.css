@@ -252,7 +252,6 @@ a {
 	cursor: pointer;
 }
 
-/* ============ Layout del catálogo ============ */
 .catalog {
 	max-width: var(--max);
 	margin: 0 auto;
@@ -263,7 +262,6 @@ a {
 	align-items: start;
 }
 
-/* ============ Filtros ============ */
 .filters {
 	position: sticky;
 	top: calc(var(--header-h) + 20px);
@@ -379,7 +377,6 @@ a {
 	padding-top: 4px;
 }
 
-/* ============ Toolbar (resultados + orden + chips) ============ */
 .toolbar {
 	margin-bottom: 20px;
 }
@@ -447,7 +444,6 @@ a {
 	background: #d4f0ee;
 }
 
-/* ============ Grilla de libros ============ */
 .grid {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
@@ -505,6 +501,14 @@ a {
 	-webkit-line-clamp: 2;
 	-webkit-box-orient: vertical;
 	overflow: hidden;
+}
+
+.card-category {
+	font-size: 13px;
+	font-weight: 700;
+	color: var(--brand-700);
+	line-height: 1.35;
+	margin-bottom: 4px;
 }
 
 .card-author {
@@ -638,7 +642,6 @@ a {
 	background: var(--brand);
 }
 
-/* Estados: cargando, vacío, error */
 .card-skeleton {
 	pointer-events: none;
 }

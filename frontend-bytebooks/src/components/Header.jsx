@@ -85,8 +85,9 @@ export const Header = ({ carrito, usuario, onLogout }) => {
 						</div>
 					) : (
 						<div className='auth-buttons'>
-							<a href={URL_LOGIN} className='btn btn-ghost'>
-								Iniciar sesión
+							<a href={URL_LOGIN} className='btn btn-ghost btn-login' aria-label='Iniciar sesión'>
+								<Icon name='user' size={18} />
+								<span>Iniciar sesión</span>
 							</a>
 							<a href={URL_REGISTRO} className='btn btn-primary'>
 								Registrarse

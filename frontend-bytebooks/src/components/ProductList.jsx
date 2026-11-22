@@ -4,7 +4,7 @@ import { Icon } from './Icon';
 import { formatearPrecio } from '../utils/libros';
 
 
-const formatearAutores = (texto) => {
+const formatearAutores = (texto = '') => {
 	const lista = texto.split(',').map((a) => a.trim()).filter(Boolean);
 	if (lista.length <= 1) return lista[0] ?? '';
 	return `${lista.slice(0, -1).join(', ')} y ${lista.at(-1)}`;
@@ -19,22 +19,28 @@ const ProductCard = ({ libro, enCarrito, onAgregar }) => {
 		setTimeout(() => setRecienAgregado(false), 1200);
 	};
 
-	const detalle = [libro.editorial, libro.anio].filter(Boolean).join(' · ');
+	const categoria = [libro.categoria, libro.subcategoria].filter(Boolean).join(' · ');
+	const autores = formatearAutores(libro.autor);
+	const editorialAnio = [libro.editorial, libro.anio].filter(Boolean).join(' · ');
 
 	return (
 		<article className='card'>
 			<figure className='card-media'>
 				<ImageCarousel alt={libro.nombre} images={libro.imagenes} />
-				{libro.categoria && (<span className='card-tag'> {[libro.categoria, libro.subcategoria].filter(Boolean).join(' · ')}</span>)}
 			</figure>
 
 			<div className='card-body'>
 				<h3 className='card-title' title={libro.nombre}>
 					{libro.nombre}
 				</h3>
-				{libro.autor && (<p className='card-author' title={formatearAutores(libro.autor)}>
-						{formatearAutores(libro.autor)}</p>)}
-				{detalle && <p className='card-meta'>{detalle}</p>}
+				{categoria && <p className='card-category'>{categoria}</p>}
+				{autores && (
+					<p className='card-author' title={autores}>
+						{autores}
+					</p>
+				)}
+				{editorialAnio && <p className='card-meta'>{editorialAnio}</p>}
+				{libro.edicion && <p className='card-meta'>{libro.edicion}ª edición</p>}
 
 				<div className='card-footer'>
 					<span className='card-price'>{formatearPrecio(libro.precio)}</span>
@@ -52,7 +58,6 @@ const ProductCard = ({ libro, enCarrito, onAgregar }) => {
 		</article>
 	);
 };
-
 const Skeleton = () => (
 	<div className='card card-skeleton' aria-hidden='true'>
 		<div className='sk sk-img' />
