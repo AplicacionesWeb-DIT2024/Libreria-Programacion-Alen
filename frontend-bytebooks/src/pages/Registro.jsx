@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Campo, InputPassword, ariaCampo } from '../components/Campo';
 import { Icon } from '../components/Icon';
+import { PAIS_POR_DEFECTO, buscarPais, limpiarTelefono } from '../utils/Paises';
 import {PROVINCIAS,fechaMaximaNacimiento,prepararRegistro,requisitosPassword,validarCampo,validarRegistro,} from '../utils/validaciones';
 import './Auth.css';
 
@@ -10,6 +11,7 @@ const INICIAL = {
 	nombre: '',
 	apellido: '',
 	fecha_nacimiento: '',
+	pais_telefono: PAIS_POR_DEFECTO,
 	telefono: '',
 	username: '',
 	email: '',
@@ -71,7 +73,11 @@ export const Registro = () => {
 
 		setEnviando(true);
 		try {
-			await registrar(prepararRegistro(datos));
+			const payload = prepararRegistro(datos);
+			const telefono = limpiarTelefono(datos.telefono);
+			payload.telefono = telefono || null;
+			payload.pais_telefono = telefono ? datos.pais_telefono : null;
+			await registrar(payload);
 			navigate('/', { replace: true, state: { bienvenida: true } });
 		} catch (err) {
 			if (err.status === 422 && Object.keys(err.errores).length) {
@@ -80,7 +86,7 @@ export const Registro = () => {
 				);
 				setErrores(delServidor);
 				enfocarPrimerError(delServidor);
-				setErrorGeneral('Revisá los campos marcados.');
+				setErrorGeneral('Revise los campos marcados.');
 			} else {
 				setErrorGeneral(err.message);
 			}
@@ -97,6 +103,10 @@ export const Registro = () => {
 	});
 
 	const requisitos = requisitosPassword(datos.password);
+
+	const telefonoLimpio = limpiarTelefono(datos.telefono);
+	const ayudaTelefono = telefonoLimpio ? `El número se guardará como ${buscarPais(datos.pais_telefono).prefijo} ${telefonoLimpio}`
+		: 'Código de área + número, sin 0 ni 15.';
 
 	return (
 		<main className='auth-page'>
@@ -131,24 +141,39 @@ export const Registro = () => {
 								id='fecha_nacimiento'
 								label='Fecha de nacimiento'
 								error={errores.fecha_nacimiento}
-								ayuda='Tenés que ser mayor de 18 años.'
+								ayuda='Debe ser mayor de 18 años.'
 							>
 								<input
-									{...props('fecha_nacimiento', 'Tenés que ser mayor de 18 años.')}
+									{...props('fecha_nacimiento', 'Debe ser mayor de 18 años.')}
 									type='date'
 									min='1900-01-01'
 									max={fechaMaximaNacimiento()}
 									autoComplete='bday'
 								/>
 							</Campo>
-							<Campo id='telefono' label='Teléfono' opcional error={errores.telefono}>
-								<input
-									{...props('telefono')}
-									type='tel'
-									inputMode='tel'
-									autoComplete='tel'
-									placeholder='Ej: 11 2345-6789'
-								/>
+							<Campo
+								id='telefono'
+								label='Teléfono'
+								opcional
+								error={errores.telefono || errores.pais_telefono}
+								ayuda={ayudaTelefono}
+							>
+								<div className='telefono-grupo'>
+									<SelectorPais
+										name='pais_telefono'
+										value={datos.pais_telefono}
+										onChange={cambiar}
+										onBlur={salir}
+										invalido={!!errores.pais_telefono}
+									/>
+									<input
+										{...props('telefono', ayudaTelefono)}
+										type='tel'
+										inputMode='tel'
+										autoComplete='tel-national'
+										placeholder='Ej: 2804252123'
+									/>
+								</div>
 							</Campo>
 						</div>
 					</fieldset>
@@ -189,7 +214,7 @@ export const Registro = () => {
 									))}
 								</ul>
 							</Campo>
-							<Campo id='password_confirmation' label='Repetí la contraseña' error={errores.password_confirmation}>
+							<Campo id='password_confirmation' label='Repita la contraseña' error={errores.password_confirmation}>
 								<InputPassword
 									{...props('password_confirmation')}
 									autoComplete='new-password'
@@ -214,7 +239,7 @@ export const Registro = () => {
 							<Campo id='domicilio_provincia' label='Provincia' error={errores.domicilio_provincia} className='span-2'>
 								<div className='select-wrap'>
 									<select {...props('domicilio_provincia')} autoComplete='address-level1'>
-										<option value=''>Elegí tu provincia</option>
+										<option value=''>Elija su provincia</option>
 										{PROVINCIAS.map((p) => (
 											<option key={p} value={p}>
 												{p}
@@ -243,7 +268,7 @@ export const Registro = () => {
 				</form>
 
 				<p className='auth-switch'>
-					¿Ya tenés cuenta? <Link to='/login'>Iniciá sesión</Link>
+					¿Ya tiene cuenta? <Link to='/login'>Inicia sesión aqui</Link>
 				</p>
 			</div>
 		</main>

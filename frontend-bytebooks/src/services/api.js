@@ -23,8 +23,6 @@ const request = async (ruta, { method = 'GET', body, token, signal } = {}) => {
 			method,
 			signal,
 			headers: {
-				// Sin "Accept: application/json", Laravel responde los errores
-				// de validación con una redirección en vez de un JSON 422.
 				Accept: 'application/json',
 				...(body ? { 'Content-Type': 'application/json' } : {}),
 				...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -33,7 +31,7 @@ const request = async (ruta, { method = 'GET', body, token, signal } = {}) => {
 		});
 	} catch (e) {
 		if (e.name === 'AbortError') throw e;
-		throw new ApiError(0, 'No pudimos conectarnos con el servidor. Revisá tu conexión e intentá de nuevo.');
+		throw new ApiError(0, 'No pudimos conectarnos con el servidor. Revise su conexión e intente de nuevo.');
 	}
 
 	const data = await res.json().catch(() => null);
@@ -42,7 +40,7 @@ const request = async (ruta, { method = 'GET', body, token, signal } = {}) => {
 		const mensaje =
 			data?.error ??
 			data?.message ??
-			(res.status === 429 ? 'Demasiados intentos. Esperá un minuto y volvé a probar.' : `Error ${res.status}`);
+			(res.status === 429 ? 'Demasiados intentos. Espere un minuto y vuelva a probar.' : `Error ${res.status}`);
 		throw new ApiError(res.status, mensaje, data?.errors ?? {});
 	}
 
