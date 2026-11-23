@@ -10,7 +10,7 @@ export const CartDropdown = ({ carrito }) => {
 				<div className='cart-empty'>
 					<Icon name='cart' size={40} strokeWidth={1.3} />
 					<p>Tu carrito está vacío</p>
-					<span>Agregá libros desde el catálogo.</span>
+					<span>Agregue libros desde el catálogo.</span>
 				</div>
 			</div>
 		);

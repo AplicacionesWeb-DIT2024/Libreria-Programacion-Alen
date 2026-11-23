@@ -26,8 +26,8 @@ export const Login = () => {
 	const enviar = async (e) => {
 		e.preventDefault();
 		const nuevos = {
-			username: datos.username.trim() ? null : 'Ingresá tu nombre de usuario.',
-			password: datos.password ? null : 'Ingresá tu contraseña.',
+			username: datos.username.trim() ? null : 'Ingrese su nombre de usuario.',
+			password: datos.password ? null : 'Ingrese su contraseña.',
 		};
 		setErrores(nuevos);
 		if (nuevos.username || nuevos.password) return;
@@ -54,7 +54,7 @@ export const Login = () => {
 				<div className='auth-head'>
 					<img src='/logo.png' alt='' width='72' height='72' />
 					<h1>Iniciar sesión</h1>
-					<p>Entrá a tu cuenta para comprar y seguir tus pedidos.</p>
+					<p>Ingrese a su cuenta para comprar y seguir sus pedidos.</p>
 				</div>
 
 				{errorGeneral && (
@@ -92,7 +92,7 @@ export const Login = () => {
 				</form>
 
 				<p className='auth-switch'>
-					¿No tenés cuenta? <Link to='/registro'>Registrate</Link>
+					¿No tienes cuenta? <Link to='/registro'>Registrate aquí</Link>
 				</p>
 			</div>
 		</main>

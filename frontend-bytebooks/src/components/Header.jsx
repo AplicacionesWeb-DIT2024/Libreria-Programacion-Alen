@@ -44,7 +44,7 @@ export const Header = ({ carrito }) => {
 		await logout();
 		setCerrando(false);
 		setMenuUsuario(false);
-		setAviso('Cerraste sesión. ¡Hasta pronto!');
+		setAviso('Ha cerrado sesión. ¡Hasta pronto!');
 	};
 
 	useEffect(() => {
