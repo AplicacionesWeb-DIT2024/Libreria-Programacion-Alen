@@ -25,7 +25,7 @@ export const useCarrito = () => {
 		setItems((prev) => {
 			const existe = prev.find((i) => i.id === libro.id);
 			if (existe) return prev.map((i) => (i.id === libro.id ? { ...i, quantity: i.quantity + 1 } : i));
-			return [...prev, { id: libro.id, nombre: libro.nombre, precio: libro.precio, imagen: libro.imagenes[0], quantity: 1 }];
+			return [...prev, { id: libro.id, nombre: libro.nombre, precio: libro.precio, imagen: libro.imagenes?.[0] ?? null, quantity: 1 }];
 		});
 
 	const cambiarCantidad = (id, delta) =>

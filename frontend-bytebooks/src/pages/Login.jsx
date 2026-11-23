@@ -10,6 +10,7 @@ export const Login = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const destino = location.state?.desde ?? '/';
+	const deCarrito = location.state?.motivo === 'checkout';
 
 	const [datos, setDatos] = useState({ username: '', password: '' });
 	const [errores, setErrores] = useState({});
@@ -57,6 +58,12 @@ export const Login = () => {
 					<p>Ingrese a su cuenta para comprar y seguir sus pedidos.</p>
 				</div>
 
+				{deCarrito && !errorGeneral && (
+					<div className='auth-info' role='status'>
+						<Icon name='cart' size={20} /> Inicie sesión para finalizar su compra. Su carrito se mantiene.
+					</div>
+				)}
+
 				{errorGeneral && (
 					<div className='auth-alert' role='alert'>
 						<Icon name='alert' size={20} /> {errorGeneral}
@@ -92,7 +99,7 @@ export const Login = () => {
 				</form>
 
 				<p className='auth-switch'>
-					¿No tienes cuenta? <Link to='/registro'>Registrate aquí</Link>
+					¿No tiene cuenta? <Link to='/registro'>Registrese aquí</Link>
 				</p>
 			</div>
 		</main>
