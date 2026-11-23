@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { normalizarLibro } from '../utils/libros';
-
-const URL_LIBROS = `${import.meta.env.VITE_API_URL}/api/api/libros`;
+import { getLibros } from '../services/api';
 
 export const useLibros = () => {
 	const [libros, setLibros] = useState([]);
@@ -12,10 +11,7 @@ export const useLibros = () => {
 		setCargando(true);
 		setError(null);
 		try {
-			const res = await fetch(URL_LIBROS, { signal });
-			if (!res.ok) throw new Error(`Error ${res.status}`);
-			const data = await res.json();
-			const lista = Array.isArray(data) ? data : data.data ?? [];
+			const lista = await getLibros(signal);
 			setLibros(lista.map(normalizarLibro));
 		} catch (e) {
 			if (e.name !== 'AbortError') {

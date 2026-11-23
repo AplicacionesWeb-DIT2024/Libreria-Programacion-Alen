@@ -79,7 +79,6 @@
 	}
 }
 
-/* Usuario logueado */
 .user-btn {
 	display: flex;
 	align-items: center;
@@ -135,7 +134,6 @@
 	color: var(--brand-700);
 }
 
-/* Carrito */
 .cart-dropdown {
 	width: 380px;
 	max-width: calc(100vw - 24px);
@@ -350,5 +348,86 @@
 
 	.hero-kicker {
 		font-size: 12px;
+	}
+}
+
+
+.user-menu-info {
+	display: flex;
+	flex-direction: column;
+	padding: 10px 12px 12px;
+	margin-bottom: 4px;
+	border-bottom: 1px solid var(--border);
+	font-size: 14px;
+	min-width: 0;
+}
+
+.user-menu-info span {
+	color: var(--muted);
+	font-size: 13px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+
+
+.logout-btn:disabled {
+	cursor: wait;
+	color: var(--brand-700);
+	background: var(--brand-50);
+}
+
+.spinner {
+	width: 18px;
+	height: 18px;
+	border-radius: 50%;
+	border: 2.5px solid color-mix(in srgb, var(--brand) 25%, transparent);
+	border-top-color: var(--brand);
+	animation: girar 0.7s linear infinite;
+	flex-shrink: 0;
+}
+
+@keyframes girar {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+.user-wrapper.is-leaving .user-btn {
+	opacity: 0.55;
+	pointer-events: none;
+	transition: opacity 0.3s;
+}
+.toast {
+	position: fixed;
+	left: 50%;
+	bottom: 24px;
+	transform: translateX(-50%);
+	z-index: 100;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	width: max-content;
+	max-width: calc(100vw - 32px);
+	padding: 12px 18px;
+	border-radius: 16px;
+	background: var(--ink);
+	color: #fff;
+	font-weight: 700;
+	font-size: 14px;
+	box-shadow: var(--shadow-md);
+	white-space: normal;
+	animation: toast-in 0.25s ease-out;
+}
+
+.toast svg {
+	color: var(--brand);
+	flex-shrink: 0;
+}
+
+@keyframes toast-in {
+	from {
+		opacity: 0;
+		transform: translate(-50%, 12px);
 	}
 }

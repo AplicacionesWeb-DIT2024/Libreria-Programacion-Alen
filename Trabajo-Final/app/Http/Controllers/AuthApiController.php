@@ -36,7 +36,14 @@ class AuthApiController extends Controller
             $cliente = new Cliente();
             $cliente->user_id = $user->id;
             $cliente->fecha_nacimiento = $datos['fecha_nacimiento'];
-            $cliente->telefono = $datos['telefono'] ?? null;
+            if (!empty($datos['telefono'])) {
+                $prefijo = config("paises_telefono.{$datos['pais_telefono']}.prefijo");
+                $cliente->pais_telefono = $datos['pais_telefono'];
+                $cliente->telefono = $prefijo . $datos['telefono'];
+            } else {
+                $cliente->pais_telefono = null;
+                $cliente->telefono = null;
+            }
             $cliente->domicilio_calle = $datos['domicilio_calle'];
             $cliente->domicilio_numero = $datos['domicilio_numero'];
             $cliente->domicilio_localidad = $datos['domicilio_localidad'];

@@ -45,9 +45,22 @@ class RegistroClienteRequest extends FormRequest
             $datos['email'] = mb_strtolower(trim((string) $this->input('email')));
         }
 
-        if (($datos['telefono'] ?? null) === '') {
-            $datos['telefono'] = null;
+        $pais = $this->filled('pais_telefono') ? mb_strtoupper(trim((string) $this->input('pais_telefono'))) : null;
+
+        if ($this->has('telefono')) {
+            $crudo = trim((string) $this->input('telefono'));
+            $telefono = preg_replace('/\D+/', '', $crudo);
+
+            $prefijo = $pais ? ltrim((string) config("paises_telefono.{$pais}.prefijo"), '+') : '';
+            if (str_starts_with($crudo, '+') && $prefijo !== '' && str_starts_with($telefono, $prefijo)) {
+                $telefono = substr($telefono, strlen($prefijo));
+            }
+
+            $telefono = ltrim($telefono, '0');
+
+            $datos['telefono'] = $telefono !== '' ? $telefono : null;
         }
+        $datos['pais_telefono'] = ($datos['telefono'] ?? null) ? $pais : null;
 
         $this->merge($datos);
     }
@@ -85,7 +98,11 @@ class RegistroClienteRequest extends FormRequest
                 'after_or_equal:1900-01-01',
                 'before_or_equal:' . $fechaMaxima,
             ],
-            'telefono' => ['nullable', 'string', 'max:20', 'regex:/^\+?[0-9\s-]{6,20}$/'],
+             'pais_telefono' => [
+                'nullable', 'required_with:telefono',
+                Rule::in(array_keys(config('paises_telefono'))),
+            ],
+            'telefono' => ['nullable', 'regex:/^\d{6,14}$/'],
             'domicilio_calle' => ['required', 'string', 'max:255'],
             'domicilio_numero' => ['required', 'string', 'max:20', 'regex:/^([0-9]+[A-Za-z]?|[Ss]\/[Nn])$/'],
             'domicilio_localidad' => ['required', 'string', 'max:255'],
@@ -118,12 +135,14 @@ class RegistroClienteRequest extends FormRequest
             'password.numbers' => 'La contraseña debe incluir al menos un número.',
 
             'fecha_nacimiento.date_format' => 'Ingresá una fecha de nacimiento válida.',
-            'fecha_nacimiento.before_or_equal' => 'Tenés que ser mayor de 18 años para registrarte.',
-            'fecha_nacimiento.after_or_equal' => 'Ingresá una fecha de nacimiento válida.',
+            'fecha_nacimiento.before_or_equal' => 'Debe ser mayor de 18 años para registrarte.',
+            'fecha_nacimiento.after_or_equal' => 'Ingrese una fecha de nacimiento válida.',
 
-            'telefono.regex' => 'El teléfono solo puede tener números, espacios, guiones y un + al inicio (entre 6 y 20 caracteres).',
+            'pais_telefono.required_with' => 'Elija el país del teléfono.',
+            'pais_telefono.in' => 'Elija un país de la lista.',
+            'telefono.regex' => 'Ingrese el teléfono sin el código de país: entre 6 y 14 números (ej: 2804252123).',
             'domicilio_numero.regex' => 'Ingrese un número de calle válido (por ejemplo 1234, 12B o S/N).',
-            'domicilio_provincia.in' => 'Elegí una provincia de la lista.',
+            'domicilio_provincia.in' => 'Elija una provincia de la lista.',
             'domicilio_codigo_postal.regex' => 'El código postal debe tener 4 números.',
         ];
     }
@@ -137,6 +156,7 @@ class RegistroClienteRequest extends FormRequest
             'email' => 'email',
             'password' => 'contraseña',
             'fecha_nacimiento' => 'fecha de nacimiento',
+            'pais_telefono' => 'país del teléfono',
             'telefono' => 'teléfono',
             'domicilio_calle' => 'calle',
             'domicilio_numero' => 'número',
