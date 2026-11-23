@@ -45,7 +45,9 @@
 	display: block;
 	width: 22px;
 	height: 16px;
-	object-fit: cover;
+	line-height: 16px;
+	background-size: cover;
+	background-position: center;
 	border-radius: 2px;
 	box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
 	flex-shrink: 0;

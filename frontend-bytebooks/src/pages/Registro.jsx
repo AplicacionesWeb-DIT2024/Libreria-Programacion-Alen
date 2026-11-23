@@ -75,7 +75,7 @@ export const Registro = () => {
 		setEnviando(true);
 		try {
 			const payload = prepararRegistro(datos);
-			const telefono = limpiarTelefono(datos.telefono);
+			const telefono = limpiarTelefono(datos.telefono, datos.pais_telefono);
 			payload.telefono = telefono || null;
 			payload.pais_telefono = telefono ? datos.pais_telefono : null;
 			await registrar(payload);
@@ -105,7 +105,7 @@ export const Registro = () => {
 
 	const requisitos = requisitosPassword(datos.password);
 
-	const telefonoLimpio = limpiarTelefono(datos.telefono);
+	const telefonoLimpio = limpiarTelefono(datos.telefono, datos.pais_telefono);
 	const ayudaTelefono = telefonoLimpio ? `El número se guardará como ${buscarPais(datos.pais_telefono).prefijo} ${telefonoLimpio}`
 		: 'Código de área + número, sin 0 ni 15.';
 
@@ -119,7 +119,7 @@ export const Registro = () => {
 				<div className='auth-head'>
 					<img src='/logo.png' alt='' width='72' height='72' />
 					<h1>Crear cuenta</h1>
-					<p>Registrate para comprar libros y recibirlos en tu casa.</p>
+					<p>Registrese para comprar libros y recibirlos en su casa.</p>
 				</div>
 
 				{errorGeneral && (

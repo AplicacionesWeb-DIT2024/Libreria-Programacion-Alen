@@ -1,5 +1,5 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
-import { PAISES, buscarPais, urlBandera } from '../utils/Paises';
+import { PAISES, buscarPais } from '../utils/Paises';
 import { Icon } from './Icon';
 import './SelectorPais.css';
 
@@ -10,10 +10,7 @@ const normalizar = (t) =>
 		.replace(/[̀-ͯ]/g, '')
 		.trim();
 
-const Bandera = ({ codigo }) => (
-	<img className='bandera' src={urlBandera(codigo)} alt='' width='22' height='16' loading='lazy' />
-);
-
+const Bandera = ({ codigo }) => <span className={`bandera fi fi-${codigo.toLowerCase()}`} aria-hidden='true' />;
 
 export const SelectorPais = ({ name, value, onChange, onBlur, invalido = false, disabled = false }) => {
 	const [abierto, setAbierto] = useState(false);
