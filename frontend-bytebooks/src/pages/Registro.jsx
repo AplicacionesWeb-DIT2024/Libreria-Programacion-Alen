@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Campo, InputPassword, ariaCampo } from '../components/Campo';
 import { Icon } from '../components/Icon';
+import { SelectorPais } from '../components/SelectorPais';
 import { PAIS_POR_DEFECTO, buscarPais, limpiarTelefono } from '../utils/Paises';
 import {PROVINCIAS,fechaMaximaNacimiento,prepararRegistro,requisitosPassword,validarCampo,validarRegistro,} from '../utils/validaciones';
 import './Auth.css';
