@@ -1,0 +1,116 @@
+.telefono-grupo {
+	display: flex;
+	align-items: stretch;
+}
+
+.telefono-grupo > input {
+	flex: 1;
+	min-width: 0;
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
+}
+
+.selector-pais {
+	position: relative;
+	flex-shrink: 0;
+}
+
+.selector-pais-boton {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	height: 100%;
+	padding: 0 10px;
+	border: 1px solid var(--color-border, #d0d5dd);
+	border-right: none;
+	border-radius: var(--radius, 8px) 0 0 var(--radius, 8px);
+	background: var(--color-surface-alt, #f8f9fb);
+	color: inherit;
+	font: inherit;
+	cursor: pointer;
+}
+
+.selector-pais-boton:focus-visible {
+	outline: 2px solid var(--color-primary, #2563eb);
+	outline-offset: 1px;
+	position: relative;
+	z-index: 1;
+}
+
+.selector-pais.invalido .selector-pais-boton {
+	border-color: var(--color-error, #d92d20);
+}
+
+.bandera {
+	display: block;
+	width: 22px;
+	height: 16px;
+	line-height: 16px;
+	background-size: cover;
+	background-position: center;
+	border-radius: 2px;
+	box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+	flex-shrink: 0;
+}
+
+.selector-pais-prefijo {
+	font-variant-numeric: tabular-nums;
+	color: var(--color-text-muted, #475467);
+}
+
+.selector-pais-panel {
+	position: absolute;
+	top: calc(100% + 4px);
+	left: 0;
+	z-index: 20;
+	width: 280px;
+	max-width: calc(100vw - 32px);
+	background: var(--color-surface, #fff);
+	border: 1px solid var(--color-border, #d0d5dd);
+	border-radius: var(--radius, 8px);
+	box-shadow: 0 10px 24px rgba(16, 24, 40, 0.12);
+	overflow: hidden;
+}
+
+.selector-pais-buscador {
+	width: 100%;
+	padding: 10px 12px;
+	border: none;
+	border-bottom: 1px solid var(--color-border, #d0d5dd);
+	font: inherit;
+	outline: none;
+	border-radius: 0;
+}
+
+.selector-pais-lista {
+	list-style: none;
+	margin: 0;
+	padding: 4px 0;
+	max-height: 260px;
+	overflow-y: auto;
+}
+
+.selector-pais-lista li {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 8px 12px;
+	cursor: pointer;
+}
+
+.selector-pais-lista li.activo {
+	background: var(--color-surface-alt, #f2f4f7);
+}
+
+.selector-pais-lista li.elegido .selector-pais-nombre {
+	font-weight: 600;
+}
+
+.selector-pais-nombre {
+	flex: 1;
+}
+
+.selector-pais-vacio {
+	color: var(--color-text-muted, #475467);
+	cursor: default !important;
+}

@@ -10,6 +10,7 @@ export const Login = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const destino = location.state?.desde ?? '/';
+	const deCarrito = location.state?.motivo === 'checkout';
 
 	const [datos, setDatos] = useState({ username: '', password: '' });
 	const [errores, setErrores] = useState({});
@@ -26,8 +27,8 @@ export const Login = () => {
 	const enviar = async (e) => {
 		e.preventDefault();
 		const nuevos = {
-			username: datos.username.trim() ? null : 'Ingresá tu nombre de usuario.',
-			password: datos.password ? null : 'Ingresá tu contraseña.',
+			username: datos.username.trim() ? null : 'Ingrese su nombre de usuario.',
+			password: datos.password ? null : 'Ingrese su contraseña.',
 		};
 		setErrores(nuevos);
 		if (nuevos.username || nuevos.password) return;
@@ -54,8 +55,14 @@ export const Login = () => {
 				<div className='auth-head'>
 					<img src='/logo.png' alt='' width='72' height='72' />
 					<h1>Iniciar sesión</h1>
-					<p>Entrá a tu cuenta para comprar y seguir tus pedidos.</p>
+					<p>Ingrese a su cuenta para comprar y seguir sus pedidos.</p>
 				</div>
+
+				{deCarrito && !errorGeneral && (
+					<div className='auth-info' role='status'>
+						<Icon name='cart' size={20} /> Inicie sesión para finalizar su compra. Su carrito se mantiene.
+					</div>
+				)}
 
 				{errorGeneral && (
 					<div className='auth-alert' role='alert'>
@@ -92,7 +99,7 @@ export const Login = () => {
 				</form>
 
 				<p className='auth-switch'>
-					¿No tenés cuenta? <Link to='/registro'>Registrate</Link>
+					¿No tiene cuenta? <Link to='/registro'>Registrese aquí</Link>
 				</p>
 			</div>
 		</main>

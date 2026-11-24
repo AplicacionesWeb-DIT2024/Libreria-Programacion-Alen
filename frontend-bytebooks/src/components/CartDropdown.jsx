@@ -1,8 +1,26 @@
 import { Icon } from './Icon';
 import { formatearPrecio } from '../utils/libros';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+
+const RUTA_CHECKOUT = '/checkout';
 
 export const CartDropdown = ({ carrito }) => {
 	const { items, total, cambiarCantidad, quitar, vaciar } = carrito;
+	const { usuario } = useAuth();
+	const navigate = useNavigate();
+
+	const finalizarCompra = () => {
+		onCerrar?.();
+
+		if (!usuario) {
+			navigate('/login', { state: { desde: RUTA_CHECKOUT, motivo: 'checkout' } });
+			return;
+		}
+
+		navigate(RUTA_CHECKOUT);
+	};
+
 
 	if (items.length === 0) {
 		return (
@@ -10,7 +28,7 @@ export const CartDropdown = ({ carrito }) => {
 				<div className='cart-empty'>
 					<Icon name='cart' size={40} strokeWidth={1.3} />
 					<p>Tu carrito está vacío</p>
-					<span>Agregá libros desde el catálogo.</span>
+					<span>Agregue libros desde el catálogo.</span>
 				</div>
 			</div>
 		);
@@ -58,9 +76,10 @@ export const CartDropdown = ({ carrito }) => {
 					<span>Total</span>
 					<strong>{formatearPrecio(total)}</strong>
 				</div>
-				<button type='button' className='btn btn-primary btn-block'>
+				<button type='button' className='btn btn-primary btn-block' onClick={finalizarCompra}>
 					Finalizar compra
 				</button>
+				{!usuario && <p className='cart-login-hint'>Debe iniciar sesión para terminar la compra.</p>}
 				<button type='button' className='btn btn-link' onClick={vaciar}>
 					Vaciar carrito
 				</button>

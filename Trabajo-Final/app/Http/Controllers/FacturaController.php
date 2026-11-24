@@ -6,12 +6,16 @@ use App\Models\DetalleFactura;
 use App\Models\Factura;
 use App\Models\Libro;
 use App\Models\User;
-use Exception;
 use Illuminate\Http\Request;
 use App\Enums\EstadoFactura;
 use Illuminate\Support\Facades\DB;
-
-use function PHPUnit\Framework\throwException;
+use Illuminate\Support\Facades\Log;
+use App\Exceptions\PedidoInvalidoException;
+use MercadoPago\Client\Payment\PaymentClient;
+use MercadoPago\Client\Preference\PreferenceClient;
+use MercadoPago\Exceptions\MPApiException;
+use MercadoPago\MercadoPagoConfig;
+use MercadoPago\Client\Payment\PaymentRefundClient;
 
 class FacturaController extends Controller
 {
@@ -106,14 +110,12 @@ class FacturaController extends Controller
 
 
     
-   
-    public function store (Request $request) {
-
+    public function store(Request $request)
+    {
         $cliente = $request->user();
         if (!$cliente->isCliente() || !$cliente->activo) {
             return response()->json(['error' => 'El usuario no posee permisos para realizar esta acción'], 403);
         }
-
 
         $request->validate([
             'detalles' => ['required', 'array', 'min:1'],
@@ -127,8 +129,7 @@ class FacturaController extends Controller
         ]);
 
         try {
-            $factura = DB::transaction(function () use ($request,$cliente) {
-
+            [$factura, $preferencia] = DB::transaction(function () use ($request, $cliente) {
                 $factura = Factura::create([
                     'cliente' => $cliente->id,
                     'fecha' => now()->toDateString(),
@@ -150,12 +151,16 @@ class FacturaController extends Controller
 
                 $total = 0;
                 $cantidadTotal = 0;
+                $itemsMp = [];
 
                 foreach ($detalles as $libroId => $cantidad) {
                     $libro = Libro::find($libroId);
 
                     if ($libro === null) {
-                        throw new Exception("El libro con id {$libroId} no existe");
+                        throw new PedidoInvalidoException(
+                            'Uno de los libros del carrito ya no está disponible.',
+                            ['libro' => (int) $libroId, 'disponible' => 0],
+                        );
                     }
 
                     $afectadas = Libro::where('id', $libroId)
@@ -163,7 +168,14 @@ class FacturaController extends Controller
                         ->decrement('stock', $cantidad);
 
                     if ($afectadas === 0) {
-                        throw new Exception("Stock insuficiente para el libro: " . $libro->nombre);
+                        $disponible = (int) Libro::whereKey($libroId)->value('stock');
+
+                        throw new PedidoInvalidoException(
+                            $disponible === 0
+                                ? "\"{$libro->nombre}\" ya no tiene stock."
+                                : "De \"{$libro->nombre}\" solo quedan {$disponible}.",
+                            ['libro' => $libro->id, 'disponible' => $disponible],
+                        );
                     }
 
                     $precioTotal = $libro->precio * $cantidad;
@@ -176,23 +188,139 @@ class FacturaController extends Controller
                         'precio_total' => $precioTotal,
                     ]);
 
+                    $itemsMp[] = [
+                        'id' => (string) $libro->id,
+                        'title' => $libro->nombre,
+                        'quantity' => (int) $cantidad,
+                        'unit_price' => (float) $libro->precio,
+                        'currency_id' => 'ARS',
+                    ];
 
                     $cantidadTotal += $cantidad;
                     $total += $precioTotal;
                 }
 
                 $factura->update(['precioTotal' => $total, 'cantidadTotal' => $cantidadTotal]);
-                 return $factura;
 
+                $preferencia = $this->crearPreferencia($factura, $itemsMp);
+
+                return [$factura, $preferencia];
             });
-            return response()->json(
-                ['message' => "Factura creada correctamente",
+
+            return response()->json([
+                'message' => 'Factura creada correctamente',
                 'id' => $factura->id,
-                'estado'=> $factura->estado],
-                200);
-    
-        }catch (\Exception $error) {
-            return response()->json(['error' => $error->getMessage()], 400);
-        } 
+                'estado' => $factura->estado,
+                'init_point' => $preferencia->init_point,
+                'vence_en' => $this->vencimiento($factura)->toIso8601String(),
+            ], 201);
+        } catch (MPApiException $error) {
+            Log::error('Mercado Pago: error al crear la preferencia', [
+                'status' => $error->getApiResponse()?->getStatusCode(),
+                'respuesta' => $error->getApiResponse()?->getContent(),
+            ]);
+
+            return response()->json(['error' => 'No se pudo iniciar el pago con Mercado Pago. Intente de nuevo.'], 502);
+        } catch (PedidoInvalidoException $error) {
+            return response()->json(['error' => $error->getMessage(), ...$error->datos], 409);
+        } catch (\Throwable $error) {
+            report($error); 
+            return response()->json(['error' => 'No se pudo crear el pedido. Intente de nuevo.'], 500);
+        }
+    }
+
+    public function webhookMercadoPago(Request $request)
+    {
+        $tipo = $request->input('type') ?? $request->query('topic');
+        $pagoId = $request->input('data.id') ?? $request->query('data_id') ?? $request->query('id');
+
+        if ($tipo !== 'payment' || !$pagoId) {
+            return response()->json(['ok' => true]);
+        }
+
+        MercadoPagoConfig::setAccessToken(config('services.mercadopago.access_token'));
+
+        try {
+            $pago = (new PaymentClient())->get((int) $pagoId);
+        } catch (MPApiException $error) {
+            Log::warning('Mercado Pago: no se pudo consultar el pago', ['id' => $pagoId]);
+
+            return response()->json(['error' => 'No se pudo consultar el pago'], 500); 
+        }
+
+        $factura = Factura::find($pago->external_reference);
+
+        if (!$factura) {
+            return response()->json(['ok' => true]);
+        }
+
+        if ($pago->status === 'approved') {
+            $aceptada = $factura->cerrarComo(EstadoFactura::Aceptada);
+
+            if (!$aceptada) {
+                $estadoActual = $factura->fresh()->estado;
+
+                if ($estadoActual !== EstadoFactura::Aceptada) {
+                    try {
+                        (new PaymentRefundClient())->refundTotal($pago->id);
+
+                        Log::warning('Mercado Pago: pago devuelto por factura no pendiente', [
+                            'factura' => $factura->id,
+                            'estado' => $estadoActual->value,
+                            'pago' => $pago->id,
+                        ]);
+                    } catch (MPApiException $error) {
+                        Log::critical('Mercado Pago: NO se pudo devolver el pago, hacerlo a mano', [
+                            'factura' => $factura->id,
+                            'estado' => $estadoActual->value,
+                            'pago' => $pago->id,
+                            'respuesta' => $error->getApiResponse()?->getContent(),
+                        ]);
+                    }
+                }
+            }
+        }
+
+        return response()->json(['ok' => true]);
+    }
+
+    private function vencimiento(Factura $factura)
+    {
+        return $factura->created_at->copy()->addMinutes((int) config('pedidos.minutos_vencimiento'));
+    }
+
+    private function crearPreferencia(Factura $factura, array $items)
+    {
+        MercadoPagoConfig::setAccessToken(config('services.mercadopago.access_token'));
+
+        $frontend = rtrim(config('services.mercadopago.frontend_url'), '/');
+
+        $datos = [
+            'items' => $items,
+            'external_reference' => (string) $factura->id,
+            'back_urls' => [
+                'success' => "{$frontend}/?pago=aprobado",
+                'pending' => "{$frontend}/?pago=pendiente",
+                'failure' => "{$frontend}/?pago=rechazado",
+            ],
+            'notification_url' => route('mercadopago.webhook'),
+
+            'expires' => true,
+            'expiration_date_from' => $factura->created_at->format('Y-m-d\TH:i:s.vP'),
+            'expiration_date_to' => $this->vencimiento($factura)->format('Y-m-d\TH:i:s.vP'),
+
+            'payment_methods' => [
+                'excluded_payment_types' => [
+                    ['id' => 'ticket'],
+                    ['id' => 'atm'],
+                ],
+            ],
+        ];
+
+        if (str_starts_with($frontend, 'https://')) {
+            $datos['auto_return'] = 'approved';
+        }
+
+        return (new PreferenceClient())->create($datos);
     }
 }

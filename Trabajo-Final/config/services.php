@@ -33,4 +33,9 @@ return [
 
     'cron' => ['secret' => env('CRON_SECRET')],
 
+    'mercadopago' => [
+        'access_token' => env('MP_ACCESS_TOKEN'),
+        'frontend_url' => env('FRONTEND_URL'),
+    ],
+
 ];
