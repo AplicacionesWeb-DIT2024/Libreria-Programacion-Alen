@@ -1,5 +1,6 @@
 import { createContext, useContext, useState } from 'react';
-import { loginApi, logoutApi, registroApi } from '../services/api';
+import { cancelarPedidoApi, loginApi, logoutApi, registroApi } from '../services/api';
+import { leerPedidoPendiente } from '../utils/pedidoPendiente';
 
 const CLAVE = 'bytebooks-sesion';
 const AuthContext = createContext(null);
@@ -31,6 +32,8 @@ const aSesion = ({ token, user }) => ({
 	},
 });
 
+const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
+
 export const AuthProvider = ({ children }) => {
 	const [sesion, setSesion] = useState(leerSesion);
 
@@ -48,10 +51,17 @@ export const AuthProvider = ({ children }) => {
 	const logout = async () => {
 		const token = sesion?.token;
 
-		const minimo = new Promise((r) => setTimeout(r, 600));
+		const minimo = esperar(600);
 
 		const avisarServidor = token
-			? Promise.race([logoutApi(token).catch(() => {}), new Promise((r) => setTimeout(r, 5000))])
+			? (async () => {
+					const pedido = leerPedidoPendiente();
+					if (pedido && pedido.usuarioId === sesion.usuario.id) {
+						await Promise.race([cancelarPedidoApi(pedido.id, token).catch(() => {}), esperar(5000)]);
+					}
+
+					await Promise.race([logoutApi(token).catch(() => {}), esperar(5000)]);
+				})()
 			: null;
 
 		await Promise.all([minimo, avisarServidor]);

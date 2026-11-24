@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { cancelarPedidoApi } from '../services/api';
+import { CLAVE_PEDIDO } from '../utils/pedidoPendiente';
 
 const CLAVE = 'bytebooks-carrito';
-const CLAVE_PEDIDO = 'bytebooks-pedido-pendiente';
 
 const leer = (clave, porDefecto) => {
 	try {
@@ -21,8 +22,8 @@ const guardar = (clave, valor) => {
 };
 
 export const useCarrito = () => {
-	
-	const { usuario } = useAuth();
+	const { usuario, token } = useAuth();
+
 	const [items, setItems] = useState(() => leer(CLAVE, []));
 
 	const [pedido, setPedido] = useState(() => leer(CLAVE_PEDIDO, null));
@@ -32,12 +33,14 @@ export const useCarrito = () => {
 	useEffect(() => guardar(CLAVE, items), [items]);
 	useEffect(() => guardar(CLAVE_PEDIDO, pedido), [pedido]);
 
+	
 	useEffect(() => {
 		if (pedido && pedido.usuarioId !== usuario?.id) {
 			setPedido(null);
 		}
 	}, [usuario?.id, pedido]);
 
+	
 	useEffect(() => {
 		if (!pedido) return;
 
@@ -57,8 +60,15 @@ export const useCarrito = () => {
 		return () => clearTimeout(timer);
 	}, [pedido]);
 
-	const modificar = (cambio) => {
+
+	const cancelarPendiente = () => {
+		if (!pedido) return;
+		if (token) cancelarPedidoApi(pedido.id, token).catch(() => {});
 		setPedido(null);
+	};
+
+	const modificar = (cambio) => {
+		cancelarPendiente();
 		setItems(cambio);
 	};
 
