@@ -6,10 +6,10 @@ import { Icon } from '../components/Icon';
 import { useToast } from '../context/ToastContext';
 import './Auth.css';
 
-const mostrarToast = useToast();
 
 export const Login = () => {
 	const { login } = useAuth();
+	const mostrarToast = useToast();
 	const navigate = useNavigate();
 	const location = useLocation();
 	const destino = location.state?.desde ?? '/';

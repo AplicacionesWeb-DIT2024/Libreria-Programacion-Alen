@@ -6,7 +6,6 @@ import { useAuth } from '../context/AuthContext';
 import './Header.css';
 import { useToast } from '../context/ToastContext';
 
-const mostrarToast = useToast();
 
 
 const useCerrarAlSalir = (abierto, cerrar) => {
@@ -34,6 +33,7 @@ const iniciales = (nombre = '') =>
 
 export const Header = ({ carrito }) => {
 	const { usuario, logout } = useAuth();
+	const mostrarToast = useToast();
 	const [carritoAbierto, setCarritoAbierto] = useState(false);
 	const [menuUsuario, setMenuUsuario] = useState(false);
 	const [cerrando, setCerrando] = useState(false);

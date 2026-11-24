@@ -26,10 +26,10 @@ const INICIAL = {
 	domicilio_codigo_postal: '',
 };
 
-const mostrarToast = useToast();
 
 export const Registro = () => {
 	const { registrar } = useAuth();
+	const mostrarToast = useToast();
 	const navigate = useNavigate();
 	const formRef = useRef(null);
 
