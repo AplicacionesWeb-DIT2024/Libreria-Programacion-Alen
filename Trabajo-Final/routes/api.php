@@ -63,3 +63,6 @@ Route::post('cron/cancelar-pedidos', function (Request $request) {
 });
 
 
+Route::post('webhooks/mercadopago', [FacturaController::class, 'webhookMercadoPago'])
+    ->name('mercadopago.webhook');
+
