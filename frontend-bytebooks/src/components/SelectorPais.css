@@ -17,28 +17,30 @@
 
 .selector-pais-boton {
 	display: flex;
+	cursor: pointer;
+	transition: border-color 0.2s;
 	align-items: center;
 	gap: 6px;
 	height: 100%;
 	padding: 0 10px;
-	border: 1px solid var(--color-border, #d0d5dd);
+	border: 1px solid var(--border);
 	border-right: none;
-	border-radius: var(--radius, 8px) 0 0 var(--radius, 8px);
-	background: var(--color-surface-alt, #f8f9fb);
+	border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+	background: var(--bg);
 	color: inherit;
 	font: inherit;
 	cursor: pointer;
 }
 
 .selector-pais-boton:focus-visible {
-	outline: 2px solid var(--color-primary, #2563eb);
-	outline-offset: 1px;
+	outline: 3px solid color-mix(in srgb, var(--brand) 55%, transparent);
+	outline-offset: 2px;
 	position: relative;
 	z-index: 1;
 }
 
 .selector-pais.invalido .selector-pais-boton {
-	border-color: var(--color-error, #d92d20);
+	border-color: var(--danger);
 }
 
 .bandera {
@@ -55,9 +57,10 @@
 
 .selector-pais-prefijo {
 	font-variant-numeric: tabular-nums;
-	color: var(--color-text-muted, #475467);
+	color: var(--muted);
 }
 
+/* Panel desplegable */
 .selector-pais-panel {
 	position: absolute;
 	top: calc(100% + 4px);
@@ -65,10 +68,10 @@
 	z-index: 20;
 	width: 280px;
 	max-width: calc(100vw - 32px);
-	background: var(--color-surface, #fff);
-	border: 1px solid var(--color-border, #d0d5dd);
-	border-radius: var(--radius, 8px);
-	box-shadow: 0 10px 24px rgba(16, 24, 40, 0.12);
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-sm);
+	box-shadow: var(--shadow-md);
 	overflow: hidden;
 }
 
@@ -76,7 +79,7 @@
 	width: 100%;
 	padding: 10px 12px;
 	border: none;
-	border-bottom: 1px solid var(--color-border, #d0d5dd);
+	border-bottom: 1px solid var(--border);
 	font: inherit;
 	outline: none;
 	border-radius: 0;
@@ -99,7 +102,7 @@
 }
 
 .selector-pais-lista li.activo {
-	background: var(--color-surface-alt, #f2f4f7);
+	background: var(--brand-50);
 }
 
 .selector-pais-lista li.elegido .selector-pais-nombre {
@@ -111,6 +114,14 @@
 }
 
 .selector-pais-vacio {
-	color: var(--color-text-muted, #475467);
+	color: var(--muted);
 	cursor: default !important;
+}
+
+.selector-pais-boton:hover:not(:disabled) {
+	border-color: var(--brand);
+}
+
+.selector-pais-lista li.elegido {
+	color: var(--brand-700);
 }
