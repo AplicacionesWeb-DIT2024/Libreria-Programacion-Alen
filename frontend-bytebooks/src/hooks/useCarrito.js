@@ -3,7 +3,9 @@ import { useAuth } from '../context/AuthContext';
 import { cancelarPedidoApi } from '../services/api';
 import { CLAVE_PEDIDO } from '../utils/pedidoPendiente';
 
-const CLAVE = 'bytebooks-carrito';
+const CLAVE_INVITADO = 'bytebooks-carrito';
+
+const claveCarrito = (usuarioId) => (usuarioId ? `bytebooks-carrito-${usuarioId}` : CLAVE_INVITADO);
 
 const leer = (clave, porDefecto) => {
 	try {
@@ -21,19 +23,55 @@ const guardar = (clave, valor) => {
 	}
 };
 
+const combinar = (base, extra) => {
+	const resultado = base.map((i) => ({ ...i }));
+	for (const item of extra) {
+		const existente = resultado.find((i) => i.id === item.id);
+		if (existente) existente.quantity += item.quantity;
+		else resultado.push({ ...item });
+	}
+	return resultado;
+};
+
 export const useCarrito = () => {
 	const { usuario, token } = useAuth();
+	const clave = claveCarrito(usuario?.id);
 
-	const [items, setItems] = useState(() => leer(CLAVE, []));
+	
+	const [carrito, setCarrito] = useState(() => ({ clave, items: leer(clave, []) }));
 
 	const [pedido, setPedido] = useState(() => leer(CLAVE_PEDIDO, null));
 
 	const [pedidoVencido, setPedidoVencido] = useState(false);
 
-	useEffect(() => guardar(CLAVE, items), [items]);
+	useEffect(() => {
+		if (carrito.clave === clave) return;
+
+		let items = leer(clave, []);
+
+		if (carrito.clave === CLAVE_INVITADO && clave !== CLAVE_INVITADO) {
+			items = combinar(items, leer(CLAVE_INVITADO, []));
+			guardar(CLAVE_INVITADO, null);
+		}
+
+		setCarrito({ clave, items });
+	}, [clave, carrito.clave]);
+
+	useEffect(() => {
+		guardar(carrito.clave, carrito.items);
+	}, [carrito]);
+
 	useEffect(() => guardar(CLAVE_PEDIDO, pedido), [pedido]);
 
-	
+	const items = carrito.clave === clave ? carrito.items : [];
+
+	const setItems = (cambio) =>
+		setCarrito((actual) => ({
+			...actual,
+			items: typeof cambio === 'function' ? cambio(actual.items) : cambio,
+		}));
+
+
 	useEffect(() => {
 		if (pedido && pedido.usuarioId !== usuario?.id) {
 			setPedido(null);
@@ -60,13 +98,14 @@ export const useCarrito = () => {
 		return () => clearTimeout(timer);
 	}, [pedido]);
 
-
+	
 	const cancelarPendiente = () => {
 		if (!pedido) return;
 		if (token) cancelarPedidoApi(pedido.id, token).catch(() => {});
 		setPedido(null);
 	};
 
+	
 	const modificar = (cambio) => {
 		cancelarPendiente();
 		setItems(cambio);
