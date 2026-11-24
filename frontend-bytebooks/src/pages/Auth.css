@@ -279,3 +279,22 @@
 		grid-column: auto;
 	}
 }
+
+
+.auth-info {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 12px 14px;
+	margin-bottom: 16px;
+	border: 1px solid color-mix(in srgb, var(--brand) 35%, transparent);
+	border-radius: var(--radius-sm);
+	background: var(--brand-50);
+	color: var(--brand-700);
+	font-size: 14px;
+	font-weight: 700;
+}
+
+.auth-info svg {
+	flex-shrink: 0;
+}

@@ -99,7 +99,7 @@ export const Login = () => {
 				</form>
 
 				<p className='auth-switch'>
-					¿No tiene cuenta? <Link to='/registro'>Registrese aquí</Link>
+					¿No tiene cuenta? <Link to='/registro' state={location.state}>Registrese aquí</Link>
 				</p>
 			</div>
 		</main>

@@ -6,13 +6,15 @@ export const RUTAS = {
 	login: '/loginApi',
 	registro: '/registro',
 	logout: '/logoutApi',
+	crearPedido: '/crearPedido',
 };
 
 export class ApiError extends Error {
-	constructor(status, mensaje, errores = {}) {
+	constructor(status, mensaje, errores = {}, datos = {}) {
 		super(mensaje);
 		this.status = status;
 		this.errores = errores;
+		this.datos = datos;
 	}
 }
 
@@ -58,3 +60,5 @@ export const loginApi = (username, password) =>
 export const registroApi = (datos) => request(RUTAS.registro, { method: 'POST', body: datos });
 
 export const logoutApi = (token) => request(RUTAS.logout, { method: 'POST', token });
+
+export const crearPedidoApi = (pedido, token) => request(RUTAS.crearPedido, { method: 'POST', body: pedido, token });
