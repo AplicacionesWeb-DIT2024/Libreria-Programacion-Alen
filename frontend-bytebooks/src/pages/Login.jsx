@@ -3,7 +3,10 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Campo, InputPassword, ariaCampo } from '../components/Campo';
 import { Icon } from '../components/Icon';
+import { useToast } from '../context/ToastContext';
 import './Auth.css';
+
+const mostrarToast = useToast();
 
 export const Login = () => {
 	const { login } = useAuth();
@@ -35,7 +38,8 @@ export const Login = () => {
 
 		setEnviando(true);
 		try {
-			await login(datos.username.trim(), datos.password);
+			const usuario = await login(datos.username.trim(), datos.password);
+			mostrarToast(`¡Hola de nuevo, ${usuario.nombre}!`);
 			navigate(destino, { replace: true });
 		} catch (err) {
 			setErrorGeneral(err.message);

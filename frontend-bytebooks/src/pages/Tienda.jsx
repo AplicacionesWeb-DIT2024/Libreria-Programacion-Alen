@@ -1,26 +1,19 @@
 import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react';
 import { SplashScreen } from '../components/SplashScreen';
-import { useLocation, useNavigate } from 'react-router-dom';
 import { Hero } from '../components/Hero';
 import { Filtros } from '../components/Filtros';
 import { Toolbar } from '../components/Toolbar';
 import { ProductList } from '../components/ProductList';
-import { Icon } from '../components/Icon';
 import { useLibros } from '../hooks/useLibros';
-import { useAuth } from '../context/AuthContext';
 import { FILTROS_INICIALES, filtrarLibros, obtenerOpciones, ordenarLibros } from '../utils/libros';
 
 export const Tienda = ({ carrito }) => {
 	const { libros, cargando, error, reintentar } = useLibros();
-	const { usuario } = useAuth();
-	const location = useLocation();
-	const navigate = useNavigate();
 
 	const [busqueda, setBusqueda] = useState('');
 	const [filtros, setFiltros] = useState(FILTROS_INICIALES);
 	const [orden, setOrden] = useState('relevancia');
 	const [filtrosAbiertos, setFiltrosAbiertos] = useState(false);
-	const [bienvenida, setBienvenida] = useState(Boolean(location.state?.bienvenida));
 
 	const [mostrarIntro, setMostrarIntro] = useState(() => {
 		try {
@@ -62,31 +55,15 @@ export const Tienda = ({ carrito }) => {
 	};
 
 	useEffect(() => {
-			if (!bienvenida) return;
-			const t = setTimeout(() => setBienvenida(false), 4000);
-			return () => clearTimeout(t);
-	}, [bienvenida]);
-
-	useEffect(() => {
 		document.body.style.overflow = filtrosAbiertos ? 'hidden' : '';
 		return () => {
 			document.body.style.overflow = '';
 		};
 	}, [filtrosAbiertos]);
 
-	useEffect(() => {
-		if (location.state?.bienvenida) navigate('.', { replace: true, state: null });
-	}, [location.state, navigate]);
-
 	return (
 		<>
 			{mostrarIntro && <SplashScreen listo={!cargando} onFin={terminarIntro} />}
-			{bienvenida && usuario && (
-				<div className='toast' role='status'>
-					<Icon name='check' size={18} strokeWidth={2.4} />
-					<span>¡Bienvenido/a, {usuario.nombre}! Tu cuenta ha sido creada.</span>h
-				</div>
-			)}
 
 			<Hero busqueda={busqueda} setBusqueda={setBusqueda} />
 
