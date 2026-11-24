@@ -188,13 +188,20 @@ class FacturaController extends Controller
                         'precio_total' => $precioTotal,
                     ]);
 
-                    $itemsMp[] = [
+                    $itemsMp[] = array_filter([
                         'id' => (string) $libro->id,
-                        'title' => $libro->nombre,
-                        'quantity' => (int) $cantidad,
-                        'unit_price' => (float) $libro->precio,
+                        'title' => mb_substr(
+                            $cantidad > 1 ? "{$libro->nombre} (x{$cantidad})" : $libro->nombre,
+                            0,
+                            250,
+                        ),
+                        'description' => mb_substr("Libro: {$libro->nombre}", 0, 250),
+                        'picture_url' => $this->urlImagenPublica($libro),
+                        'category_id' => 'others',
+                        'quantity' => 1,
+                        'unit_price' => round((float) $precioTotal, 2),
                         'currency_id' => 'ARS',
-                    ];
+                    ], fn ($valor) => $valor !== null);
 
                     $cantidadTotal += $cantidad;
                     $total += $precioTotal;
@@ -227,6 +234,22 @@ class FacturaController extends Controller
             report($error); 
             return response()->json(['error' => 'No se pudo crear el pedido. Intente de nuevo.'], 500);
         }
+    }
+
+
+
+    public function cancelarPedido(Request $request, Factura $factura)
+    {
+        if ((int) $factura->cliente !== (int) $request->user()->id) {
+            return response()->json(['error' => 'Pedido no encontrado'], 404);
+        }
+
+        $cancelada = $factura->cerrarComo(EstadoFactura::Cancelada);
+
+        return response()->json([
+            'cancelada' => $cancelada,
+            'estado' => $factura->fresh()->estado,
+        ]);
     }
 
     public function webhookMercadoPago(Request $request)
@@ -323,4 +346,18 @@ class FacturaController extends Controller
 
         return (new PreferenceClient())->create($datos);
     }
+
+
+    private function urlImagenPublica(Libro $libro): ?string
+    {
+        $url = $libro->imagen_original;
+
+        if (!$url || !str_contains($url, '/upload/')) {
+            return null;
+        }
+
+        return str_replace('/upload/', '/upload/w_300,h_300,c_pad,b_white/', $url);
+    }
+
+
 }

@@ -15,6 +15,7 @@ Route::get('/user', function (Request $request) {
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('crearPedido', [FacturaController::class, 'store']);
+    Route::post('cancelarPedido/{factura}', [FacturaController::class, 'cancelarPedido']);
     Route::post('logoutApi', [AuthApiController::class, 'desloguearApi']);
 });
 
