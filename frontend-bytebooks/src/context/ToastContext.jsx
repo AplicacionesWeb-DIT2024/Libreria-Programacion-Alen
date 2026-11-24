@@ -8,8 +8,8 @@ const ToastContext = createContext(null);
 export const ToastProvider = ({ children }) => {
 	const [toast, setToast] = useState(null); 
 
-	const mostrarToast = useCallback((mensaje, duracion = 3500) => {
-		setToast({ id: Date.now(), mensaje, duracion });
+	const mostrarToast = useCallback((mensaje, { tipo = 'ok', duracion = 3500 } = {}) => {
+		setToast({ id: Date.now(), mensaje, tipo, duracion });
 	}, []);
 
 	useEffect(() => {
@@ -23,8 +23,12 @@ export const ToastProvider = ({ children }) => {
 			{children}
 			{toast &&
 				createPortal(
-					<div key={toast.id} className='toast' role='status'>
-						<Icon name='check' size={18} strokeWidth={2.4} />
+					<div
+						key={toast.id}
+						className={`toast ${toast.tipo === 'error' ? 'toast-error' : ''}`}
+						role={toast.tipo === 'error' ? 'alert' : 'status'}
+					>
+						<Icon name={toast.tipo === 'error' ? 'alert' : 'check'} size={18} strokeWidth={2.4} />
 						<span>{toast.mensaje}</span>
 					</div>,
 					document.body,

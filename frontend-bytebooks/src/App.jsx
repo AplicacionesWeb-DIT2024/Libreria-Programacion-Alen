@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Navigate, Route, Routes, useLocation, useSearchParams } from 'react-router-dom';
 import { Header } from './components/Header';
-import { Icon } from './components/Icon';
 import { Tienda } from './pages/Tienda';
 import { Login } from './pages/Login';
 import { Registro } from './pages/Registro';
 import { useCarrito } from './hooks/useCarrito';
 import { useCuentaRegresiva } from './hooks/useCuentaRegresiva';
 import { useAuth } from './context/AuthContext';
+import { useToast } from './context/ToastContext';
 
 const SoloInvitados = ({ children }) => {
 	const { usuario } = useAuth();
@@ -23,61 +23,51 @@ const ScrollArriba = () => {
 	return null;
 };
 
+
 const AvisoPago = ({ carrito }) => {
 	const [params, setParams] = useSearchParams();
 	const pago = params.get('pago');
 	const { pedido, pedidoVencido, completarPedido, ocultarAvisoVencido } = carrito;
 	const tiempoRestante = useCuentaRegresiva(pedido?.venceEn);
+	const mostrarToast = useToast();
 
 	useEffect(() => {
-		if (pago === 'aprobado' || pago === 'pendiente') completarPedido();
+		if (!pago) return;
+
+		if (pago === 'aprobado') {
+			completarPedido();
+			mostrarToast('¡Pago aprobado! Su pedido fue registrado.', { duracion: 5000 });
+		} else if (pago === 'pendiente') {
+			completarPedido();
+			mostrarToast('Su pago está en revisión. Le avisaremos cuando se acredite.', { duracion: 5000 });
+		} else if (pago === 'rechazado') {
+			mostrarToast('El pago no se pudo completar. Puede reintentarlo antes de que venza el pedido.', {
+				tipo: 'error',
+				duracion: 6000,
+			});
+		}
+
+		setParams({}, { replace: true });
 	}, [pago]);
 
-	const limpiarUrl = () => setParams({}, { replace: true });
-
-	let tipo = null;
-	let texto = null;
-	let accion = null;
-
-	if (pago === 'aprobado') {
-		tipo = 'ok';
-		texto = '¡Pago aprobado! Su pedido fue registrado.';
-	} else if (pago === 'pendiente') {
-		tipo = 'info';
-		texto = 'Su pago está en revisión. Le avisaremos cuando se acredite.';
-	} else if (pedido) {
-		tipo = 'error';
-		texto =
-			pago === 'rechazado'
-				? `El pago no se pudo completar. Tiene ${tiempoRestante} para reintentarlo; después el pedido se cancela y se vacía el carrito.`
-				: `Tiene un pago pendiente. Quedan ${tiempoRestante} para completarlo; después el pedido se cancela y se vacía el carrito.`;
-		accion = (
-			<button type='button' className='btn btn-primary' onClick={() => (window.location.href = pedido.initPoint)}>
-				Reintentar pago
-			</button>
-		);
-	} else if (pedidoVencido) {
-		tipo = 'error';
-		texto = 'El tiempo para pagar venció y el pedido fue cancelado. Puede volver a armar su carrito.';
-	}
-
-	if (!texto) return null;
-
-	const cerrar = () => {
-		limpiarUrl();
+	useEffect(() => {
+		if (!pedidoVencido) return;
+		mostrarToast('El tiempo para pagar venció y el pedido fue cancelado.', { tipo: 'error', duracion: 6000 });
 		ocultarAvisoVencido();
-	};
+	}, [pedidoVencido]);
+
+	if (!pedido) return null;
 
 	return (
-		<div className={`aviso-pago aviso-pago-${tipo}`} role='status'>
-			<span>{texto}</span>
+		<div className='aviso-pago aviso-pago-error' role='status'>
+			<span>
+				Tiene un pago pendiente. Quedan <strong>{tiempoRestante}</strong> para completarlo; después el pedido se
+				cancela y se vacía el carrito.
+			</span>
 			<div className='aviso-pago-acciones'>
-				{accion}
-				{!pedido && (
-					<button type='button' className='icon-btn icon-btn-sm' onClick={cerrar} aria-label='Cerrar aviso'>
-						<Icon name='x' size={16} />
-					</button>
-				)}
+				<button type='button' className='btn btn-primary' onClick={() => (window.location.href = pedido.initPoint)}>
+					Reintentar pago
+				</button>
 			</div>
 		</div>
 	);
