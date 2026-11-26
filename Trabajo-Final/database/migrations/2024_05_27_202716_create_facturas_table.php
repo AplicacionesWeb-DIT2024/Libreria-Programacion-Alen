@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('domicilio_localidad');
             $table->string('domicilio_provincia');
             $table->string('domicilio_codigo_postal', 4);
+            $table->string('mp_init_point')->nullable();
             $table->timestamps();
         });
     }

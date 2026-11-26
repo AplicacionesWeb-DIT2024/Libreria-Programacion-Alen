@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use App\Enums\EstadoFactura;
 use App\Models\Factura;
+use App\Models\Carrito;
 
 class CancelarPedidosVencidos extends Command
 {
@@ -37,6 +38,7 @@ class CancelarPedidosVencidos extends Command
             ->chunkById(100, function ($facturas) use (&$canceladas) {
                 foreach ($facturas as $factura) {
                     if ($factura->cerrarComo(EstadoFactura::Cancelada)) {
+                        Carrito::where('user_id', $factura->cliente)->delete();
                         $canceladas++;
                     }
                 }
