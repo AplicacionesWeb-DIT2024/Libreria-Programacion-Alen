@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\DetalleFactura;
+use App\Models\Carrito;
 use App\Models\Factura;
 use App\Models\Libro;
 use App\Models\User;
@@ -173,8 +174,8 @@ class FacturaController extends Controller
                         throw new PedidoInvalidoException(
                             $disponible === 0
                                 ? "\"{$libro->nombre}\" ya no tiene stock."
-                                : "De \"{$libro->nombre}\" solo quedan {$disponible}.",
-                            ['libro' => $libro->id, 'disponible' => $disponible],
+                                : "No hay stock suficiente de \"{$libro->nombre}\" para la cantidad pedida.",
+                            ['libro' => $libro->id, 'disponible' => $disponible === 0 ? 0 : null],
                         );
                     }
 
@@ -279,6 +280,9 @@ class FacturaController extends Controller
 
         if ($pago->status === 'approved') {
             $aceptada = $factura->cerrarComo(EstadoFactura::Aceptada);
+            if ($aceptada) {
+                Carrito::where('user_id', $factura->cliente)->delete();
+            }
 
             if (!$aceptada) {
                 $estadoActual = $factura->fresh()->estado;
