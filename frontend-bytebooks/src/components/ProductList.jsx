@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { ImageCarousel } from './ImageCarousel';
 import { Icon } from './Icon';
+import { BotonDeseado } from './BotonDeseado';
 import { formatearPrecio } from '../utils/libros';
-
 
 const formatearAutores = (texto = '') => {
 	const lista = texto.split(',').map((a) => a.trim()).filter(Boolean);
@@ -10,8 +10,10 @@ const formatearAutores = (texto = '') => {
 	return `${lista.slice(0, -1).join(', ')} y ${lista.at(-1)}`;
 };
 
-const ProductCard = ({ libro, enCarrito, onAgregar }) => {
+export const ProductCard = ({ libro, enCarrito, onAgregar }) => {
 	const [recienAgregado, setRecienAgregado] = useState(false);
+
+	const disponible = libro.disponible !== false;
 
 	const agregar = () => {
 		onAgregar(libro);
@@ -24,9 +26,11 @@ const ProductCard = ({ libro, enCarrito, onAgregar }) => {
 	const editorialAnio = [libro.editorial, libro.anio].filter(Boolean).join(' · ');
 
 	return (
-		<article className='card'>
+		<article className={`card ${disponible ? '' : 'card-no-disponible'}`}>
 			<figure className='card-media'>
 				<ImageCarousel alt={libro.nombre} images={libro.imagenes} />
+				{!disponible && <span className='card-tag card-tag-no-disponible'>No disponible</span>}
+				<BotonDeseado libro={libro} />
 			</figure>
 
 			<div className='card-body'>
@@ -44,21 +48,28 @@ const ProductCard = ({ libro, enCarrito, onAgregar }) => {
 
 				<div className='card-footer'>
 					<span className='card-price'>{formatearPrecio(libro.precio)}</span>
-					<button
-						type='button'
-						className={`btn btn-primary btn-add ${recienAgregado ? 'is-added' : ''}`}
-						onClick={agregar}
-					>
-						<Icon name={recienAgregado ? 'check' : 'cart'} size={18} />
-						{recienAgregado ? 'Agregado' : 'Agregar'}
-					</button>
+					{disponible ? (
+						<button
+							type='button'
+							className={`btn btn-primary btn-add ${recienAgregado ? 'is-added' : ''}`}
+							onClick={agregar}
+						>
+							<Icon name={recienAgregado ? 'check' : 'cart'} size={18} />
+							{recienAgregado ? 'Agregado' : 'Agregar'}
+						</button>
+					) : (
+						<button type='button' className='btn btn-primary btn-add' disabled>
+							No disponible
+						</button>
+					)}
 				</div>
-				{enCarrito > 0 && <p className='card-incart'>Ya tenés {enCarrito} en el carrito</p>}
+				{disponible && enCarrito > 0 && <p className='card-incart'>Ya tenés {enCarrito} en el carrito</p>}
 			</div>
 		</article>
 	);
 };
-const Skeleton = () => (
+
+export const Skeleton = () => (
 	<div className='card card-skeleton' aria-hidden='true'>
 		<div className='sk sk-img' />
 		<div className='card-body'>

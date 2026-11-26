@@ -1,12 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { Icon } from './Icon';
 import { Link } from 'react-router-dom';
-import { CartDropdown } from './CartDropdown';
 import { useAuth } from '../context/AuthContext';
-import './Header.css';
 import { useToast } from '../context/ToastContext';
-
-
+import { useDeseados } from '../context/DeseadosContext';
+import { CartDropdown } from './CartDropdown';
+import { Icon } from './Icon';
 
 const useCerrarAlSalir = (abierto, cerrar) => {
 	const ref = useRef(null);
@@ -43,6 +41,7 @@ const iniciales = (nombre = '') =>
 export const Header = ({ carrito }) => {
 	const { usuario, logout } = useAuth();
 	const mostrarToast = useToast();
+	const { cantidad: cantidadDeseados } = useDeseados();
 	const [carritoAbierto, setCarritoAbierto] = useState(false);
 	const [menuUsuario, setMenuUsuario] = useState(false);
 	const [cerrando, setCerrando] = useState(false);
@@ -79,7 +78,7 @@ export const Header = ({ carrito }) => {
 							<Icon name='cart' size={24} />
 							{carrito.cantidad > 0 && <span className='badge'>{carrito.cantidad}</span>}
 						</button>
-						{carritoAbierto && <CartDropdown carrito={carrito} />}
+						{carritoAbierto && <CartDropdown carrito={carrito} onCerrar={() => setCarritoAbierto(false)} />}
 					</div>
 
 					{usuario ? (
@@ -100,6 +99,12 @@ export const Header = ({ carrito }) => {
 										<strong>{usuario.nombre}</strong>
 										<span>{usuario.email}</span>
 									</div>
+
+									<Link to='/deseados' className='user-menu-link' onClick={() => setMenuUsuario(false)}>
+										<Icon name='heart' size={18} /> Lista de deseados
+										{cantidadDeseados > 0 && <span className='badge badge-inline'>{cantidadDeseados}</span>}
+									</Link>
+
 									<button
 										type='button'
 										className='logout-btn'

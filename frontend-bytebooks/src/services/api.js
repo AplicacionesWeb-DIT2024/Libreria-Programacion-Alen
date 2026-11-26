@@ -82,3 +82,10 @@ export const fusionarCarritoApi = (items, token) =>
 		body: { items: items.map((i) => ({ libro: i.id, cantidad: i.quantity })) },
 		token,
 	});
+
+
+export const getDeseadosApi = (token, signal) => request('/listaDeseados', { token, signal });
+
+export const agregarDeseadoApi = (libroId, token) => request(`/listaDeseados/agregarLibro/${libroId}`, { method: 'POST', token });
+
+export const quitarDeseadoApi = (libroId, token) => request(`/deseados/quitarLibro/${libroId}`, { method: 'DELETE', token });

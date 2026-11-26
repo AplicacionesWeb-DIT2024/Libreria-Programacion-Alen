@@ -7,15 +7,18 @@ import './index.css'
 import '@fontsource/press-start-2p/400.css'
 import 'flag-icons/css/flag-icons.min.css';
 import { ToastProvider } from './context/ToastContext';
+import { DeseadosProvider } from './context/DeseadosContext';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
 	    <AuthProvider>
-		    <ToastProvider>
-			    <App />
-		    </ToastProvider>
-	    </AuthProvider>
+			<ToastProvider>
+				<DeseadosProvider>
+					<App />
+				</DeseadosProvider>
+			</ToastProvider>
+		</AuthProvider>
     </BrowserRouter>
   </React.StrictMode>
 )

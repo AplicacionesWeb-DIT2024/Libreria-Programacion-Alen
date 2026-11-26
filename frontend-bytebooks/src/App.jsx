@@ -4,6 +4,7 @@ import { Header } from './components/Header';
 import { Tienda } from './pages/Tienda';
 import { Login } from './pages/Login';
 import { Registro } from './pages/Registro';
+import { Deseados } from './pages/Deseados';
 import { useCarrito } from './hooks/useCarrito';
 import { useCuentaRegresiva } from './hooks/useCuentaRegresiva';
 import { useAuth } from './context/AuthContext';
@@ -13,6 +14,13 @@ const SoloInvitados = ({ children }) => {
 	const { usuario } = useAuth();
 	const [yaLogueado] = useState(Boolean(usuario));
 	return yaLogueado ? <Navigate to='/' replace /> : children;
+};
+
+const RequiereSesion = ({ children }) => {
+	const { usuario } = useAuth();
+	const location = useLocation();
+	if (!usuario) return <Navigate to='/login' replace state={{ desde: location.pathname }} />;
+	return children;
 };
 
 const ScrollArriba = () => {
@@ -47,6 +55,7 @@ const AvisoPago = ({ carrito }) => {
 			});
 		}
 
+	
 		setParams({}, { replace: true });
 	}, [pago]);
 
@@ -98,6 +107,14 @@ function App() {
 						<SoloInvitados>
 							<Registro />
 						</SoloInvitados>
+					}
+				/>
+				<Route
+					path='/deseados'
+					element={
+						<RequiereSesion>
+							<Deseados carrito={carrito} />
+						</RequiereSesion>
 					}
 				/>
 				<Route path='*' element={<Navigate to='/' replace />} />
