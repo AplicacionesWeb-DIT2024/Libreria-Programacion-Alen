@@ -211,6 +211,7 @@ class FacturaController extends Controller
                 $factura->update(['precioTotal' => $total, 'cantidadTotal' => $cantidadTotal]);
 
                 $preferencia = $this->crearPreferencia($factura, $itemsMp);
+                $factura->update(['mp_init_point' => $preferencia->init_point]);
 
                 return [$factura, $preferencia];
             });

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 use App\Models\Carrito;
 use App\Models\Libro;
+use App\Models\Factura;
+use App\Enums\EstadoFactura;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -34,21 +36,32 @@ class CarritoController extends Controller
             'cantidad.max' => 'No se pueden agregar más de ' . self::CANTIDAD_MAXIMA . ' unidades de un mismo libro.',
         ]);
 
-        if ($datos['cantidad'] === 0) {
-            Carrito::where('user_id', $cliente->id)->where('libro_id', $libro->id)->delete();
-        } else {
-            if (!$libro->activo) {
-                return response()->json(['error' => 'Este libro ya no está disponible.'], 422);
-            }
-            Carrito::updateOrCreate(['user_id' => $cliente->id, 'libro_id' => $libro->id],['cantidad' => $datos['cantidad']],);
+         if ($datos['cantidad'] > 0 && !$libro->activo) {
+            return response()->json(['error' => 'Este libro ya no está disponible.'], 422);
         }
+
+        DB::transaction(function () use ($cliente, $libro, $datos) {
+            $this->cancelarPedidoPendiente($cliente);
+
+            if ($datos['cantidad'] === 0) {
+                Carrito::where('user_id', $cliente->id)->where('libro_id', $libro->id)->delete();
+            } else {
+                Carrito::updateOrCreate(
+                    ['user_id' => $cliente->id, 'libro_id' => $libro->id],
+                    ['cantidad' => $datos['cantidad']],
+                );
+            }
+        });
         return response()->json($this->armarCarrito($cliente));
     }
 
      public function quitar(Request $request, Libro $libro){
         $cliente = $this->validarCliente($request);
 
-        Carrito::where('user_id', $cliente->id)->where('libro_id', $libro->id)->delete();
+        DB::transaction(function () use ($cliente, $libro) {
+            $this->cancelarPedidoPendiente($cliente);
+            Carrito::where('user_id', $cliente->id)->where('libro_id', $libro->id)->delete();
+        });
 
         return response()->json($this->armarCarrito($cliente));
     }
@@ -56,7 +69,10 @@ class CarritoController extends Controller
 
     public function vaciar(Request $request){
         $cliente = $this->validarCliente($request);
-        Carrito::where('user_id', $cliente->id)->delete();
+        DB::transaction(function () use ($cliente) {
+            $this->cancelarPedidoPendiente($cliente);
+            Carrito::where('user_id', $cliente->id)->delete();
+        });
         return response()->json($this->armarCarrito($cliente));
     }
 
@@ -109,6 +125,35 @@ class CarritoController extends Controller
             })
             ->values();
         return ['items' => $items,'total' => round($items->sum('subtotal'), 2),
-        'cantidad' => $items->sum('quantity'),];
+        'cantidad' => $items->sum('quantity'), $this->pedidoPendiente($cliente)];
+    }
+
+    private function cancelarPedidoPendiente(User $cliente): void{
+        Factura::where('cliente', $cliente->id)
+            ->where('estado', EstadoFactura::Pendiente)
+            ->get()
+            ->each(fn (Factura $factura) => $factura->cerrarComo(EstadoFactura::Cancelada));
+    }
+
+
+     private function pedidoPendiente(User $cliente): ?array {
+        $minutos = (int) config('pedidos.minutos_vencimiento');
+
+        $factura = Factura::where('cliente', $cliente->id)
+            ->where('estado', EstadoFactura::Pendiente)
+            ->whereNotNull('mp_init_point')
+            ->where('created_at', '>', now()->subMinutes($minutos))
+            ->latest('id')
+            ->first();
+
+        if (!$factura) {
+            return null;
+        }
+
+        return [
+            'id' => $factura->id,
+            'init_point' => $factura->mp_init_point,
+            'vence_en' => $factura->created_at->copy()->addMinutes($minutos)->toIso8601String(),
+        ];
     }
 }

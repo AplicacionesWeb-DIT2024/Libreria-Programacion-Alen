@@ -5,6 +5,7 @@ import { Icon } from './Icon';
 import { formatearPrecio } from '../utils/libros';
 import { useCuentaRegresiva } from '../hooks/useCuentaRegresiva';
 import { crearPedidoApi } from '../services/api';
+import { ModalConfirmacion } from './ModalConfirmacion';
 
 export const CartDropdown = ({ carrito, onCerrar }) => {
 	const { items, total, cambiarCantidad, quitar, vaciar, pedido, registrarPedido } = carrito;
@@ -18,13 +19,16 @@ export const CartDropdown = ({ carrito, onCerrar }) => {
 
 	const [sinStock, setSinStock] = useState(null);
 
+	const [confirmando, setConfirmando] = useState(false);
+
 	useEffect(() => {
 		setSinStock(null);
 		setError('');
 	}, [items]);
 
-	const finalizarCompra = async () => {
+	const finalizarCompra = () => {
 		setSinStock(null);
+		setError('');
 
 		if (!usuario) {
 			onCerrar?.();
@@ -38,12 +42,15 @@ export const CartDropdown = ({ carrito, onCerrar }) => {
 			return;
 		}
 
-		const cliente = usuario.cliente;
-		if (!cliente) {
+		if (!usuario.cliente) {
 			setError('No encontramos sus datos de envío. Cierre sesión y vuelva a ingresar.');
 			return;
 		}
+		setConfirmando(true);
+	};
 
+	const confirmarCompra = async () => {
+		const cliente = usuario.cliente;
 		setProcesando(true);
 		setError('');
 
@@ -68,6 +75,8 @@ export const CartDropdown = ({ carrito, onCerrar }) => {
 
 			window.location.href = datos.init_point;
 		} catch (err) {
+			setConfirmando(false);
+
 			if (err.status === 409 && err.datos?.libro) {
 				setSinStock({ libro: err.datos.libro, disponible: err.datos.disponible });
 			}
@@ -108,7 +117,7 @@ export const CartDropdown = ({ carrito, onCerrar }) => {
 								<p className='cart-error'>
 									{sinStock.disponible === 0
 										? 'Sin stock: quítelo para continuar.'
-										: `Solo quedan ${sinStock.disponible}: ajuste la cantidad.`}
+										: 'No hay stock suficiente: reduzca la cantidad.'}
 								</p>
 							)}
 							<div className='qty'>
@@ -169,7 +178,7 @@ export const CartDropdown = ({ carrito, onCerrar }) => {
 				</button>
 				{pedido && (
 					<p className='cart-login-hint'>
-						Si modifica el carrito, el pedido pendiente se descarta y se arma uno nuevo.
+						Si modifica o vacía el carrito, el pedido pendiente se cancela.
 					</p>
 				)}
 				{!usuario && <p className='cart-login-hint'>Debe iniciar sesión para terminar la compra.</p>}
@@ -177,6 +186,45 @@ export const CartDropdown = ({ carrito, onCerrar }) => {
 					Vaciar carrito
 				</button>
 			</div>
+
+			<ModalConfirmacion
+				abierto={confirmando}
+				titulo='¿Está seguro de querer realizar la compra?'
+				textoConfirmar='Confirmar y pagar'
+				textoProcesando='Redirigiendo a Mercado Pago…'
+				procesando={procesando}
+				onConfirmar={confirmarCompra}
+				onCancelar={() => setConfirmando(false)}
+			>
+				<ul className='modal-resumen'>
+					{items.map((item) => (
+						<li key={item.id}>
+							<span>
+								{item.nombre}
+								{item.quantity > 1 && <span className='modal-cantidad'> × {item.quantity}</span>}
+							</span>
+							<span>{formatearPrecio(item.precio * item.quantity)}</span>
+						</li>
+					))}
+				</ul>
+
+				<div className='modal-total'>
+					<span>Total</span>
+					<strong>{formatearPrecio(total)}</strong>
+				</div>
+
+				{usuario?.cliente && (
+					<p className='modal-nota'>
+						<strong>Envío a:</strong> {usuario.cliente.domicilio_calle} {usuario.cliente.domicilio_numero},{' '}
+						{usuario.cliente.domicilio_localidad}, {usuario.cliente.domicilio_provincia} (
+						{usuario.cliente.domicilio_codigo_postal})
+					</p>
+				)}
+
+				<p className='modal-nota'>
+					Será redirigido a Mercado Pago. Se le reservaran los libros durante 20 minutos.
+				</p>
+			</ModalConfirmacion>
 		</div>
 	);
 };

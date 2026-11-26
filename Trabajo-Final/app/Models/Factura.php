@@ -64,6 +64,7 @@ class Factura extends Model
         'domicilio_localidad',
         'domicilio_provincia', 
         'domicilio_codigo_postal',
+        'mp_init_point'
     ];
 
     public function getDomicilioCompletoAttribute(): string
