@@ -124,8 +124,11 @@ class CarritoController extends Controller
                 ];
             })
             ->values();
-        return ['items' => $items,'total' => round($items->sum('subtotal'), 2),
-        'cantidad' => $items->sum('quantity'), $this->pedidoPendiente($cliente)];
+        return ['items' => $items,
+                'total' => round($items->sum('subtotal'), 2),
+                'cantidad' => $items->sum('quantity'),  
+                'pedido' => $this->pedidoPendiente($cliente),
+        ];
     }
 
     private function cancelarPedidoPendiente(User $cliente): void{

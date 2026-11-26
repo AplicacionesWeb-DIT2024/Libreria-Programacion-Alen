@@ -3,7 +3,6 @@ import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import {
 	actualizarCarritoApi,
-	cancelarPedidoApi,
 	fusionarCarritoApi,
 	getCarritoApi,
 	quitarDelCarritoApi,
@@ -12,8 +11,8 @@ import {
 
 
 const CLAVE_INVITADO = 'bytebooks-carrito';
-const clavePedido = (usuarioId) => `bytebooks-pedido-${usuarioId}`;
 const claveVieja = (usuarioId) => `bytebooks-carrito-${usuarioId}`;
+const clavePedidoVieja = (usuarioId) => `bytebooks-pedido-${usuarioId}`;
 
 const leer = (clave) => {
 	try {
@@ -25,30 +24,22 @@ const leer = (clave) => {
 
 const guardar = (clave, valor) => {
 	try {
-		if (valor === null || valor === undefined) 
-			localStorage.removeItem(clave);
-		else 
-			localStorage.setItem(clave, JSON.stringify(valor));
+		if (valor === null || valor === undefined) localStorage.removeItem(clave);
+		else localStorage.setItem(clave, JSON.stringify(valor));
 	} catch {
 	}
 };
 
 const itemsDe = (dato) => (Array.isArray(dato) ? dato : dato?.items ?? []);
 
-const yaVencio = (pedido) => Boolean(pedido) && new Date(pedido.venceEn).getTime() <= Date.now();
-
-const cargarPedido = (usuarioId) => {
-	const pedido = leer(clavePedido(usuarioId)) ?? leer(claveVieja(usuarioId))?.pedido ?? null;
-	if (yaVencio(pedido)) return { pedido: null, vencio: true };
-	return { pedido, vencio: false };
-};
+const pedidoDe = (pedido) =>
+	pedido ? { id: pedido.id, initPoint: pedido.init_point, venceEn: pedido.vence_en } : null;
 
 const combinar = (base, extra) => {
 	const resultado = base.map((i) => ({ ...i }));
 	for (const item of extra) {
 		const existente = resultado.find((i) => i.id === item.id);
-		if (existente) 
-			existente.quantity = Math.max(existente.quantity, item.quantity);
+		if (existente) existente.quantity = Math.max(existente.quantity, item.quantity);
 		else resultado.push({ ...item });
 	}
 	return resultado;
@@ -58,7 +49,7 @@ const cantidadDe = (lista, id) => lista.find((i) => i.id === id)?.quantity ?? 0;
 
 const estadoInicial = (usuarioId, clave) =>
 	usuarioId
-		? { clave, items: [], ...cargarPedido(usuarioId), cargando: true }
+		? { clave, items: [], pedido: null, vencio: false, cargando: true }
 		: { clave, items: itemsDe(leer(CLAVE_INVITADO)), pedido: null, vencio: false, cargando: false };
 
 export const useCarrito = () => {
@@ -67,13 +58,18 @@ export const useCarrito = () => {
 
 	const usuarioId = usuario?.id ?? null;
 	const clave = usuarioId ? `usuario-${usuarioId}` : 'invitado';
-
 	const [estado, setEstado] = useState(() => estadoInicial(usuarioId, clave));
 
 	const itemsRef = useRef(estado.items);
 	itemsRef.current = estado.items;
 
 	const cola = useRef(Promise.resolve());
+	const pendientes = useRef(0);
+
+	const aplicarServidor = (carrito) =>
+		setEstado((e) =>
+			e.clave === clave ? { ...e, items: carrito.items, pedido: pedidoDe(carrito.pedido), cargando: false } : e,
+		);
 
 	useEffect(() => {
 		if (!usuarioId) {
@@ -83,9 +79,8 @@ export const useCarrito = () => {
 
 		let activo = true;
 		const control = new AbortController();
-		const { pedido, vencio } = cargarPedido(usuarioId);
 
-		setEstado({ clave, items: [], pedido, vencio, cargando: true });
+		setEstado(estadoInicial(usuarioId, clave));
 
 		(async () => {
 			const delInvitado = itemsDe(leer(CLAVE_INVITADO));
@@ -93,20 +88,14 @@ export const useCarrito = () => {
 			const aSumar = combinar(viejos, delInvitado);
 			guardar(CLAVE_INVITADO, null);
 			guardar(claveVieja(usuarioId), null);
+			guardar(clavePedidoVieja(usuarioId), null);
 
 			try {
 				const carrito = aSumar.length
 					? await fusionarCarritoApi(aSumar, token)
 					: await getCarritoApi(token, control.signal);
 
-				let pedidoFinal = pedido;
-				if (pedido && delInvitado.length > 0) {
-					cancelarPedidoApi(pedido.id, token).catch(() => {});
-					pedidoFinal = null;
-				}
-
-				if (!activo) return;
-				setEstado((e) => (e.clave === clave ? { ...e, items: carrito.items, pedido: pedidoFinal, cargando: false } : e));
+				if (activo) aplicarServidor(carrito);
 			} catch (err) {
 				if (err.name === 'AbortError') return;
 
@@ -125,23 +114,40 @@ export const useCarrito = () => {
 	}, [clave]);
 
 	useEffect(() => {
+		if (!usuarioId) return;
+
+		const refrescar = async () => {
+			if (document.visibilityState !== 'visible' || pendientes.current > 0) return;
+			try {
+				const carrito = await getCarritoApi(token);
+				if (pendientes.current === 0) aplicarServidor(carrito);
+			} catch {
+			}
+		};
+
+		document.addEventListener('visibilitychange', refrescar);
+		return () => document.removeEventListener('visibilitychange', refrescar);
+	}, [clave]);
+
+	useEffect(() => {
 		if (clave === 'invitado' && estado.clave === 'invitado') guardar(CLAVE_INVITADO, estado.items);
 	}, [clave, estado.clave, estado.items]);
 
-	useEffect(() => {
-		if (usuarioId && estado.clave === clave) guardar(clavePedido(usuarioId), estado.pedido);
-	}, [usuarioId, clave, estado.clave, estado.pedido]);
-
 	const encolar = (tarea) => {
-		cola.current = cola.current.then(tarea).catch(async (err) => {
-			mostrarToast(err.message ?? 'No se pudo actualizar el carrito.', { tipo: 'error' });
+		pendientes.current += 1;
+		cola.current = cola.current
+			.then(tarea)
+			.catch(async (err) => {
+				mostrarToast(err.message ?? 'No se pudo actualizar el carrito.', { tipo: 'error' });
 
-			try {
-				const carrito = await getCarritoApi(token);
-				setEstado((e) => (e.clave === clave ? { ...e, items: carrito.items } : e));
-			} catch {
-			}
-		});
+				try {
+					aplicarServidor(await getCarritoApi(token));
+				} catch {
+				}
+			})
+			.finally(() => {
+				pendientes.current -= 1;
+			});
 	};
 
 	const sincronizar = (antes, despues) => {
@@ -161,20 +167,16 @@ export const useCarrito = () => {
 		}
 	};
 
-	const vaciarSinCancelar = () => {
-		const antes = itemsRef.current;
-		itemsRef.current = [];
-		setEstado((e) => ({ ...e, items: [], pedido: null }));
-		sincronizar(antes, []);
-	};
-
+	
 	useEffect(() => {
 		const pedido = estado.pedido;
 		if (!pedido || estado.clave !== clave) return;
 
 		const vencer = () => {
-			vaciarSinCancelar();
-			setEstado((e) => ({ ...e, vencio: true }));
+			const antes = itemsRef.current;
+			itemsRef.current = [];
+			setEstado((e) => ({ ...e, items: [], pedido: null, vencio: true }));
+			sincronizar(antes, []);
 		};
 
 		const restante = new Date(pedido.venceEn).getTime() - Date.now();
@@ -200,8 +202,6 @@ export const useCarrito = () => {
 		const despues = typeof cambio === 'function' ? cambio(antes) : cambio;
 		itemsRef.current = despues;
 
-		if (estado.pedido && token) cancelarPedidoApi(estado.pedido.id, token).catch(() => {});
-
 		setEstado((e) => ({ ...e, items: despues, pedido: null }));
 		sincronizar(antes, despues);
 	};
@@ -224,10 +224,12 @@ export const useCarrito = () => {
 	const quitar = (id) => modificar((prev) => prev.filter((i) => i.id !== id));
 	const vaciar = () => modificar([]);
 
-	const registrarPedido = ({ id, init_point, vence_en }) =>
-		setEstado((e) => ({ ...e, pedido: { id, initPoint: init_point, venceEn: vence_en }, vencio: false }));
+	const registrarPedido = (datos) => setEstado((e) => ({ ...e, pedido: pedidoDe(datos), vencio: false }));
 
-	const completarPedido = () => vaciarSinCancelar();
+	const completarPedido = () => {
+		itemsRef.current = [];
+		setEstado((e) => ({ ...e, items: [], pedido: null }));
+	};
 
 	const ocultarAvisoVencido = () => setEstado((e) => ({ ...e, vencio: false }));
 
