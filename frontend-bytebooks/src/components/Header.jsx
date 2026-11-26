@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
-import { useDeseados } from '../context/DeseadosContext';
+import { useDeseados } from '../context/ListaDeseadosContext';
 import { CartDropdown } from './CartDropdown';
 import { Icon } from './Icon';
 
