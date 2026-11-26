@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useDeseados } from '../context/DeseadosContext';
+import { useDeseados } from '../context/ListaDeseadosContext';
 import { useToast } from '../context/ToastContext';
 import { Icon } from './Icon';
 
