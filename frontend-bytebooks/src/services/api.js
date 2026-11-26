@@ -64,3 +64,21 @@ export const logoutApi = (token) => request(RUTAS.logout, { method: 'POST', toke
 export const crearPedidoApi = (pedido, token) => request(RUTAS.crearPedido, { method: 'POST', body: pedido, token });
 
 export const cancelarPedidoApi = (id, token) => request(`/cancelarPedido/${id}`, { method: 'POST', token });
+
+
+
+export const getCarritoApi = (token, signal) => request('/carrito', { token, signal });
+
+export const actualizarCarritoApi = (libroId, cantidad, token) =>
+	request(`/carrito/actualizarLibro/${libroId}`, { method: 'PUT', body: { cantidad }, token });
+
+export const quitarDelCarritoApi = (libroId, token) => request(`/carrito/quitarLibro/${libroId}`, { method: 'DELETE', token });
+
+export const vaciarCarritoApi = (token) => request('/carrito/vaciarCarrito', { method: 'DELETE', token });
+
+export const fusionarCarritoApi = (items, token) =>
+	request('/carrito/fusionar', {
+		method: 'POST',
+		body: { items: items.map((i) => ({ libro: i.id, cantidad: i.quantity })) },
+		token,
+	});
