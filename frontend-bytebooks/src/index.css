@@ -1033,3 +1033,90 @@ a {
 		width: 100%;
 	}
 }
+
+
+.btn-deseado {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	z-index: 2;
+	display: grid;
+	place-items: center;
+	width: 38px;
+	height: 38px;
+	border: none;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.92);
+	color: var(--ink-2);
+	box-shadow: var(--shadow-sm);
+	cursor: pointer;
+	transition: transform 0.15s, color 0.2s;
+}
+
+.btn-deseado:hover {
+	color: var(--danger);
+	transform: scale(1.08);
+}
+
+.btn-deseado.activo {
+	color: var(--danger);
+}
+
+.btn-deseado.activo svg {
+	fill: currentColor;
+}
+
+.card-no-disponible .card-media,
+.card-no-disponible .card-body > *:not(.card-footer) {
+	opacity: 0.55;
+}
+
+.card-no-disponible .btn-deseado {
+	opacity: 1;
+}
+
+.card-tag-no-disponible {
+	z-index: 2;
+	background: rgba(60, 85, 83, 0.92);
+}
+
+.user-menu-link {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 10px 12px;
+	border-radius: var(--radius-sm);
+	color: var(--ink);
+	text-decoration: none;
+	font-weight: 700;
+}
+
+.user-menu-link:hover {
+	background: var(--brand-50);
+	color: var(--brand-700);
+}
+
+.user-menu-link .badge {
+	margin-left: auto;
+}
+
+.deseados-page {
+	max-width: var(--max);
+	margin: 0 auto;
+	padding: 32px 20px 64px;
+}
+
+.deseados-head {
+	margin-bottom: 24px;
+}
+
+.deseados-head h1 {
+	font-family: var(--pixel);
+	font-size: clamp(16px, 2.4vw, 22px);
+	font-weight: 400;
+	line-height: 1.6;
+}
+
+.deseados-head p {
+	color: var(--muted);
+}
