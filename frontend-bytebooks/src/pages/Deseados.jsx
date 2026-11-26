@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Icon } from '../components/Icon';
 import { ProductCard, Skeleton } from '../components/ProductList';
-import { useDeseados } from '../context/DeseadosContext';
+import { useDeseados } from '../context/ListaDeseadosContext';
 
 export const Deseados = ({ carrito }) => {
 	const { items, cantidad, cargando } = useDeseados();
