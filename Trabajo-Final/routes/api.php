@@ -26,7 +26,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('carrito/fusionar', [CarritoController::class, 'fusionar']);
     Route::get('listaDeseados', [ListaDeseadosController::class, 'index']);
     Route::post('listaDeseados/agregarLibro/{libro}', [ListaDeseadosController::class, 'agregar']);
-    Route::post('listaDeseados/quitarLibro/{libro}', [ListaDeseadosController::class, 'quitar']);
+    Route::delete('listaDeseados/quitarLibro/{libro}', [ListaDeseadosController::class, 'quitar']);
 });
 
 
