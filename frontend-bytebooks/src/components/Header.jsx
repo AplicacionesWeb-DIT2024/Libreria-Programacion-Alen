@@ -12,8 +12,17 @@ const useCerrarAlSalir = (abierto, cerrar) => {
 	const ref = useRef(null);
 	useEffect(() => {
 		if (!abierto) return;
-		const onClick = (e) => ref.current && !ref.current.contains(e.target) && cerrar();
-		const onKey = (e) => e.key === 'Escape' && cerrar();
+
+		const hayModal = () => document.querySelector('[data-ignorar-clic-afuera]');
+
+		const onClick = (e) => {
+			if (e.target.closest('[data-ignorar-clic-afuera]')) return;
+			if (ref.current && !ref.current.contains(e.target)) cerrar();
+		};
+		const onKey = (e) => {
+			if (e.key === 'Escape' && !hayModal()) cerrar();
+		};
+
 		document.addEventListener('mousedown', onClick);
 		document.addEventListener('keydown', onKey);
 		return () => {

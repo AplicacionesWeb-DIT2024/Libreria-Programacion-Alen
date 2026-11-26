@@ -189,7 +189,7 @@ export const CartDropdown = ({ carrito, onCerrar }) => {
 
 			<ModalConfirmacion
 				abierto={confirmando}
-				titulo='¿Confirma la compra?'
+				titulo='¿Está seguro de querer realizar la compra?'
 				textoConfirmar='Confirmar y pagar'
 				textoProcesando='Redirigiendo a Mercado Pago…'
 				procesando={procesando}
