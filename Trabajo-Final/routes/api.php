@@ -5,6 +5,7 @@ use App\Http\Controllers\LibroController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\CarritoController;
 use App\Http\Controllers\AuthApiController;
+use App\Http\Controllers\ListaDeseadosController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
@@ -23,6 +24,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('carrito/quitarLibro/{libro}', [CarritoController::class, 'quitar']);
     Route::delete('carrito/vaciarCarrito', [CarritoController::class, 'vaciar']);
     Route::post('carrito/fusionar', [CarritoController::class, 'fusionar']);
+    Route::get('listaDeseados', [ListaDeseadosController::class, 'index']);
+    Route::post('listaDeseados/agregarLibro/{libro}', [ListaDeseadosController::class, 'agregar']);
+    Route::post('listaDeseados/quitarLibro/{libro}', [ListaDeseadosController::class, 'quitar']);
 });
 
 

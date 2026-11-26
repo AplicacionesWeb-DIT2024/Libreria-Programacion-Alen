@@ -61,6 +61,11 @@ class User extends Authenticatable
         return $this->hasMany(Factura::class, 'cliente');
     }
 
+    public function deseados(){
+        return $this->belongsToMany(Libro::class, 'lista_deseados', 'user_id', 'libro_id')
+            ->withTimestamps();
+    }
+
 
     /**
      * Get the attributes that should be cast.
