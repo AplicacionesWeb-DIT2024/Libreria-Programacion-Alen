@@ -3,6 +3,7 @@
 use App\Http\Controllers\FacturaController;
 use App\Http\Controllers\LibroController;
 use App\Http\Controllers\UsuarioController;
+use App\Http\Controllers\CarritoController;
 use App\Http\Controllers\AuthApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -17,6 +18,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('crearPedido', [FacturaController::class, 'store']);
     Route::post('cancelarPedido/{factura}', [FacturaController::class, 'cancelarPedido']);
     Route::post('logoutApi', [AuthApiController::class, 'desloguearApi']);
+    Route::get('carrito', [CarritoController::class, 'index']);
+    Route::put('carrito/actualizarLibro/{libro}', [CarritoController::class, 'actualizar']);
+    Route::delete('carrito/quitarLibro/{libro}', [CarritoController::class, 'quitar']);
+    Route::delete('carrito/vaciarCarrito', [CarritoController::class, 'vaciar']);
+    Route::post('carrito/fusionar', [CarritoController::class, 'fusionar']);
 });
 
 

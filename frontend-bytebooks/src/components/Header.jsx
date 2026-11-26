@@ -3,8 +3,9 @@ import { Icon } from './Icon';
 import { Link } from 'react-router-dom';
 import { CartDropdown } from './CartDropdown';
 import { useAuth } from '../context/AuthContext';
-import { createPortal } from 'react-dom';
 import './Header.css';
+import { useToast } from '../context/ToastContext';
+
 
 
 const useCerrarAlSalir = (abierto, cerrar) => {
@@ -32,10 +33,10 @@ const iniciales = (nombre = '') =>
 
 export const Header = ({ carrito }) => {
 	const { usuario, logout } = useAuth();
+	const mostrarToast = useToast();
 	const [carritoAbierto, setCarritoAbierto] = useState(false);
 	const [menuUsuario, setMenuUsuario] = useState(false);
 	const [cerrando, setCerrando] = useState(false);
-	const [aviso, setAviso] = useState('');
 	const refCarrito = useCerrarAlSalir(carritoAbierto, () => setCarritoAbierto(false));
 	const refUsuario = useCerrarAlSalir(menuUsuario && !cerrando, () => setMenuUsuario(false));
 
@@ -44,14 +45,8 @@ export const Header = ({ carrito }) => {
 		await logout();
 		setCerrando(false);
 		setMenuUsuario(false);
-		setAviso('Ha cerrado sesión. ¡Hasta pronto!');
+		mostrarToast('Ha cerrado sesión. ¡Hasta pronto!');
 	};
-
-	useEffect(() => {
-		if (!aviso) return;
-		const t = setTimeout(() => setAviso(''), 3000);
-		return () => clearTimeout(t);
-	}, [aviso]);
 
 	return (
 		<header className='site-header'>
@@ -129,14 +124,6 @@ export const Header = ({ carrito }) => {
 					)}
 				</div>
 			</div>
-			{aviso &&
-				createPortal(
-					<div className='toast' role='status'>
-						<Icon name='check' size={18} strokeWidth={2.4} />
-						{aviso}
-					</div>,
-					document.body,
-				)}
 		</header>
 	);
 };

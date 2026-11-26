@@ -1,14 +1,16 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { cancelarPedidoApi } from '../services/api';
 
-const CLAVE = 'bytebooks-carrito';
-const CLAVE_PEDIDO = 'bytebooks-pedido-pendiente';
+const CLAVE_INVITADO = 'bytebooks-carrito';
 
-const leer = (clave, porDefecto) => {
+const claveCarrito = (usuarioId) => (usuarioId ? `bytebooks-carrito-${usuarioId}` : CLAVE_INVITADO);
+
+const leer = (clave) => {
 	try {
-		return JSON.parse(localStorage.getItem(clave)) ?? porDefecto;
+		return JSON.parse(localStorage.getItem(clave));
 	} catch {
-		return porDefecto;
+		return null;
 	}
 };
 
@@ -20,34 +22,70 @@ const guardar = (clave, valor) => {
 	}
 };
 
+const leerCarrito = (clave) => {
+	const dato = leer(clave);
+	if (Array.isArray(dato)) return { items: dato, pedido: null };
+	return { items: dato?.items ?? [], pedido: dato?.pedido ?? null };
+};
+
+const yaVencio = (pedido) => Boolean(pedido) && new Date(pedido.venceEn).getTime() <= Date.now();
+
+const cargar = (clave) => {
+	const { items, pedido } = leerCarrito(clave);
+	if (yaVencio(pedido)) return { clave, items: [], pedido: null, vencio: true };
+	return { clave, items, pedido, vencio: false };
+};
+
+const combinar = (base, extra) => {
+	const resultado = base.map((i) => ({ ...i }));
+	for (const item of extra) {
+		const existente = resultado.find((i) => i.id === item.id);
+		if (existente) existente.quantity += item.quantity;
+		else resultado.push({ ...item });
+	}
+	return resultado;
+};
+
 export const useCarrito = () => {
-	
-	const { usuario } = useAuth();
-	const [items, setItems] = useState(() => leer(CLAVE, []));
+	const { usuario, token } = useAuth();
+	const clave = claveCarrito(usuario?.id);
 
-	const [pedido, setPedido] = useState(() => leer(CLAVE_PEDIDO, null));
 
-	const [pedidoVencido, setPedidoVencido] = useState(false);
-
-	useEffect(() => guardar(CLAVE, items), [items]);
-	useEffect(() => guardar(CLAVE_PEDIDO, pedido), [pedido]);
+	const [estado, setEstado] = useState(() => cargar(clave));
 
 	useEffect(() => {
-		if (pedido && pedido.usuarioId !== usuario?.id) {
-			setPedido(null);
+		if (estado.clave === clave) return;
+
+		const nuevo = cargar(clave);
+
+		if (estado.clave === CLAVE_INVITADO && clave !== CLAVE_INVITADO) {
+			const delInvitado = leerCarrito(CLAVE_INVITADO).items;
+
+			if (delInvitado.length > 0) {
+				if (nuevo.pedido && token) cancelarPedidoApi(nuevo.pedido.id, token).catch(() => {});
+				nuevo.pedido = null;
+				nuevo.items = combinar(nuevo.items, delInvitado);
+			}
+
+			guardar(CLAVE_INVITADO, null);
 		}
-	}, [usuario?.id, pedido]);
+
+		setEstado(nuevo);
+	}, [clave, estado.clave]);
 
 	useEffect(() => {
+		guardar(estado.clave, { items: estado.items, pedido: estado.pedido });
+	}, [estado.clave, estado.items, estado.pedido]);
+
+	
+	useEffect(() => {
+		const pedido = estado.pedido;
 		if (!pedido) return;
 
-		const restante = new Date(pedido.venceEn).getTime() - Date.now();
-		const vencer = () => {
-			setPedido(null);
-			setItems([]);
-			setPedidoVencido(true);
-		};
+		const vencer = () =>
+			setEstado((e) => (e.pedido?.id === pedido.id ? { ...e, items: [], pedido: null, vencio: true } : e));
 
+		const restante = new Date(pedido.venceEn).getTime() - Date.now();
 		if (restante <= 0) {
 			vencer();
 			return;
@@ -55,11 +93,21 @@ export const useCarrito = () => {
 
 		const timer = setTimeout(vencer, restante);
 		return () => clearTimeout(timer);
-	}, [pedido]);
+	}, [estado.pedido]);
 
+	const esActual = estado.clave === clave;
+	const items = esActual ? estado.items : [];
+	const pedido = esActual ? estado.pedido : null;
+
+	
 	const modificar = (cambio) => {
-		setPedido(null);
-		setItems(cambio);
+		if (estado.pedido && token) cancelarPedidoApi(estado.pedido.id, token).catch(() => {});
+
+		setEstado((e) => ({
+			...e,
+			pedido: null,
+			items: typeof cambio === 'function' ? cambio(e.items) : cambio,
+		}));
 	};
 
 	const agregar = (libro) =>
@@ -80,17 +128,12 @@ export const useCarrito = () => {
 	const quitar = (id) => modificar((prev) => prev.filter((i) => i.id !== id));
 	const vaciar = () => modificar([]);
 
-	const registrarPedido = ({ id, init_point, vence_en }) => {
-		setPedidoVencido(false);
-		setPedido({ id, initPoint: init_point, venceEn: vence_en, usuarioId: usuario?.id });
-	};
+	const registrarPedido = ({ id, init_point, vence_en }) =>
+		setEstado((e) => ({ ...e, pedido: { id, initPoint: init_point, venceEn: vence_en }, vencio: false }));
 
-	const completarPedido = () => {
-		setPedido(null);
-		setItems([]);
-	};
+	const completarPedido = () => setEstado((e) => ({ ...e, items: [], pedido: null }));
 
-	const ocultarAvisoVencido = () => setPedidoVencido(false);
+	const ocultarAvisoVencido = () => setEstado((e) => ({ ...e, vencio: false }));
 
 	const { total, cantidad } = useMemo(
 		() => ({
@@ -109,7 +152,7 @@ export const useCarrito = () => {
 		quitar,
 		vaciar,
 		pedido,
-		pedidoVencido,
+		pedidoVencido: esActual && estado.vencio,
 		registrarPedido,
 		completarPedido,
 		ocultarAvisoVencido,

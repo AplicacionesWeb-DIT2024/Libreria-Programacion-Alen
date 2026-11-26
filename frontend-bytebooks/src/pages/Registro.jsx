@@ -7,6 +7,7 @@ import { SelectorPais } from '../components/SelectorPais';
 import { PAIS_POR_DEFECTO, buscarPais, limpiarTelefono } from '../utils/Paises';
 import {PROVINCIAS,fechaMaximaNacimiento,prepararRegistro,requisitosPassword,validarCampo,validarRegistro,} from '../utils/validaciones';
 import './Auth.css';
+import { useToast } from '../context/ToastContext';
 
 const INICIAL = {
 	nombre: '',
@@ -25,8 +26,10 @@ const INICIAL = {
 	domicilio_codigo_postal: '',
 };
 
+
 export const Registro = () => {
 	const { registrar } = useAuth();
+	const mostrarToast = useToast();
 	const navigate = useNavigate();
 	const formRef = useRef(null);
 
@@ -78,8 +81,9 @@ export const Registro = () => {
 			const telefono = limpiarTelefono(datos.telefono, datos.pais_telefono);
 			payload.telefono = telefono || null;
 			payload.pais_telefono = telefono ? datos.pais_telefono : null;
-			await registrar(payload);
-			navigate('/', { replace: true, state: { bienvenida: true } });
+			const nuevo = await registrar(payload);
+			mostrarToast(`¡Bienvenido/a, ${nuevo.nombre}! Su cuenta fue creada.`);
+			navigate(location.state?.desde ?? '/', { replace: true });
 		} catch (err) {
 			if (err.status === 422 && Object.keys(err.errores).length) {
 				const delServidor = Object.fromEntries(

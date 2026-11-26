@@ -62,3 +62,5 @@ export const registroApi = (datos) => request(RUTAS.registro, { method: 'POST', 
 export const logoutApi = (token) => request(RUTAS.logout, { method: 'POST', token });
 
 export const crearPedidoApi = (pedido, token) => request(RUTAS.crearPedido, { method: 'POST', body: pedido, token });
+
+export const cancelarPedidoApi = (id, token) => request(`/cancelarPedido/${id}`, { method: 'POST', token });

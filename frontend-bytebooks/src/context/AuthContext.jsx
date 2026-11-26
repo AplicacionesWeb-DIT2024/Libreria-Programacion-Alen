@@ -31,6 +31,8 @@ const aSesion = ({ token, user }) => ({
 	},
 });
 
+const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
+
 export const AuthProvider = ({ children }) => {
 	const [sesion, setSesion] = useState(leerSesion);
 
@@ -48,10 +50,10 @@ export const AuthProvider = ({ children }) => {
 	const logout = async () => {
 		const token = sesion?.token;
 
-		const minimo = new Promise((r) => setTimeout(r, 600));
+		const minimo = esperar(600);
 
 		const avisarServidor = token
-			? Promise.race([logoutApi(token).catch(() => {}), new Promise((r) => setTimeout(r, 5000))])
+			? Promise.race([logoutApi(token).catch(() => {}), esperar(5000)])
 			: null;
 
 		await Promise.all([minimo, avisarServidor]);
