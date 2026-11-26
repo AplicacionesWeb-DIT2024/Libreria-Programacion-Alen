@@ -5,6 +5,7 @@ import { useToast } from '../context/ToastContext';
 import { useDeseados } from '../context/ListaDeseadosContext';
 import { CartDropdown } from './CartDropdown';
 import { Icon } from './Icon';
+import './Header.css';
 
 const useCerrarAlSalir = (abierto, cerrar) => {
 	const ref = useRef(null);
