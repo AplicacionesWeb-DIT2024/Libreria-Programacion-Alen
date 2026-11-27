@@ -9,6 +9,7 @@ import { useCarrito } from './hooks/useCarrito';
 import { useCuentaRegresiva } from './hooks/useCuentaRegresiva';
 import { useAuth } from './context/AuthContext';
 import { useToast } from './context/ToastContext';
+import { MisPedidos } from './pages/MisPedidos';
 
 const SoloInvitados = ({ children }) => {
 	const { usuario } = useAuth();
@@ -114,6 +115,14 @@ function App() {
 					element={
 						<RequiereSesion>
 							<Deseados carrito={carrito} />
+						</RequiereSesion>
+					}
+				/>
+				<Route
+					path='/mis-pedidos'
+					element={
+						<RequiereSesion>
+							<MisPedidos carrito={carrito} />
 						</RequiereSesion>
 					}
 				/>

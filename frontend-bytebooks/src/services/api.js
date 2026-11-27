@@ -89,3 +89,5 @@ export const getDeseadosApi = (token, signal) => request('/listaDeseados', { tok
 export const agregarDeseadoApi = (libroId, token) => request(`/listaDeseados/agregarLibro/${libroId}`, { method: 'POST', token });
 
 export const quitarDeseadoApi = (libroId, token) => request(`/listaDeseados/quitarLibro/${libroId}`, { method: 'DELETE', token });
+
+export const getPedidosApi = (token, signal) => request('/listaPedidos', { token, signal });
