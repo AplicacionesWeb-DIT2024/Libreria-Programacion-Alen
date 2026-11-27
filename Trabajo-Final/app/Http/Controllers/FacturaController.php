@@ -15,6 +15,7 @@ use App\Exceptions\PedidoInvalidoException;
 use MercadoPago\Client\Payment\PaymentClient;
 use MercadoPago\Client\Preference\PreferenceClient;
 use MercadoPago\Exceptions\MPApiException;
+use Illuminate\Support\Facades\Auth;
 use MercadoPago\MercadoPagoConfig;
 use MercadoPago\Client\Payment\PaymentRefundClient;
 
@@ -26,7 +27,7 @@ class FacturaController extends Controller
         $cliente = $this->validarCliente($request);
 
         $pedidos = Factura::where('cliente', $cliente->id)      
-            ->with('detalles.datosLibro')                         
+            ->with(['detalles.datosLibro', 'historial'])                       
             ->orderByDesc('created_at')                           
             ->get()
             ->map(fn (Factura $factura) => [
@@ -45,6 +46,11 @@ class FacturaController extends Controller
                     'cantidad'        => (int) $detalle->cantidad,
                     'precio_unitario' => (float) $detalle->precio_unitario,
                     'precio_total'    => (float) $detalle->precio_total,
+                ])->values(),
+                'historial'  => $factura->historial->map(fn ($cambio) => 
+                [    
+                    'estado' => $cambio->estado->value,
+                    'fecha'  => $cambio->created_at->toIso8601String(),
                 ])->values(),
             ]);
         return response()->json($pedidos, 200);
@@ -108,8 +114,7 @@ class FacturaController extends Controller
 
 
 
-    public function avanzarEstado(Factura $factura)
-    {
+    public function avanzarEstado(Factura $factura){
         $actual = $factura->estado;
         $siguiente = $actual->siguiente();
 
@@ -117,9 +122,17 @@ class FacturaController extends Controller
             return back()->with('error', 'Este pedido no puede avanzar de estado.');
         }
 
-        $cambiadas = Factura::where('id', $factura->id)
-            ->where('estado', $actual)
-            ->update(['estado' => $siguiente]);
+        $cambiadas = DB::transaction(function () use ($factura, $actual, $siguiente) {
+            $cambiadas = Factura::where('id', $factura->id)
+                ->where('estado', $actual)
+                ->update(['estado' => $siguiente]);
+
+            if ($cambiadas > 0) {
+                $factura->registrarEstado($siguiente, Auth::id());
+            }
+
+            return $cambiadas;
+        });
 
         if ($cambiadas === 0) {
             return back()->with('error', 'El pedido ya fue modificado. Actualice la página');
@@ -163,6 +176,8 @@ class FacturaController extends Controller
                         'domicilio_codigo_postal',
                     ]),
                 ]);
+
+                $factura->registrarEstado(EstadoFactura::Pendiente, $cliente->id);
 
                 $detalles = collect($request->detalles)
                     ->groupBy('libro')

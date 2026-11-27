@@ -23,6 +23,7 @@ class Factura extends Model
             if ($cambiadas === 0) {
                 return false; 
             }
+            $this->registrarEstado($nuevoEstado);
 
             if ($nuevoEstado->devuelveStock()) {
                 foreach (DetalleFactura::where('factura', $this->id)->get() as $detalle) {
@@ -32,6 +33,15 @@ class Factura extends Model
 
             return true;
         });
+    }
+
+
+     public function registrarEstado(EstadoFactura $estado, ?int $usuarioId = null): void{
+        FacturaEstado::create([
+            'factura_id' => $this->id,
+            'estado' => $estado,
+            'user_id' => $usuarioId,
+        ]);
     }
 
 
@@ -50,6 +60,10 @@ class Factura extends Model
 
     public function detalles() {
         return $this->hasMany('App\Models\DetalleFactura', 'factura');
+    }
+
+    public function historial(){
+        return $this->hasMany(FacturaEstado::class, 'factura_id')->orderBy('created_at');
     }
 
     protected $fillable = [
