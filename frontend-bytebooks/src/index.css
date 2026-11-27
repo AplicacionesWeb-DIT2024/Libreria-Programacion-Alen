@@ -537,6 +537,38 @@ a {
 	font-weight: 900;
 }
 
+
+.card-sin-stock .card-media img {
+	filter: grayscale(1);
+	opacity: 0.45;
+}
+
+.sello-sin-stock {
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	margin: auto;
+	width: max-content;
+	height: max-content;
+	padding: 8px 16px;
+	border: 2px solid var(--ink);
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.9);
+	color: var(--ink);
+	font-size: 14px;
+	font-weight: 900;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	pointer-events: none;
+}
+
+.card-sin-stock .card-title,
+.card-sin-stock .card-category,
+.card-sin-stock .card-author,
+.card-sin-stock .card-meta {
+	opacity: 0.6;
+}
+
 .btn-add {
 	padding: 10px 14px;
 	font-size: 14px;

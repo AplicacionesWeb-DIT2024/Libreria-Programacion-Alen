@@ -14,6 +14,8 @@ export const ProductCard = ({ libro, enCarrito, onAgregar }) => {
 	const [recienAgregado, setRecienAgregado] = useState(false);
 
 	const disponible = libro.disponible !== false;
+	const sinStock = disponible && libro.sin_stock === true;
+	const sePuedeComprar = disponible && !sinStock;
 
 	const agregar = () => {
 		onAgregar(libro);
@@ -26,10 +28,11 @@ export const ProductCard = ({ libro, enCarrito, onAgregar }) => {
 	const editorialAnio = [libro.editorial, libro.anio].filter(Boolean).join(' · ');
 
 	return (
-		<article className={`card ${disponible ? '' : 'card-no-disponible'}`}>
+		<article className={`card ${disponible ? '' : 'card-no-disponible'} ${sinStock ? 'card-sin-stock' : ''}`}>
 			<figure className='card-media'>
 				<ImageCarousel alt={libro.nombre} images={libro.imagenes} />
 				{!disponible && <span className='card-tag card-tag-no-disponible'>No disponible</span>}
+				{sinStock && <span className='sello-sin-stock'>Sin stock</span>}
 				<BotonDeseado libro={libro} />
 			</figure>
 
@@ -48,7 +51,7 @@ export const ProductCard = ({ libro, enCarrito, onAgregar }) => {
 
 				<div className='card-footer'>
 					<span className='card-price'>{formatearPrecio(libro.precio)}</span>
-					{disponible ? (
+					{sePuedeComprar ? (
 						<button
 							type='button'
 							className={`btn btn-primary btn-add ${recienAgregado ? 'is-added' : ''}`}
@@ -59,11 +62,11 @@ export const ProductCard = ({ libro, enCarrito, onAgregar }) => {
 						</button>
 					) : (
 						<button type='button' className='btn btn-primary btn-add' disabled>
-							No disponible
+							{sinStock ? 'Sin stock' : 'No disponible'}
 						</button>
 					)}
 				</div>
-				{disponible && enCarrito > 0 && <p className='card-incart'>Ya tenés {enCarrito} en el carrito</p>}
+				{sePuedeComprar && enCarrito > 0 && <p className='card-incart'>Ya tenés {enCarrito} en el carrito</p>}
 			</div>
 		</article>
 	);
@@ -109,7 +112,7 @@ export const ProductList = ({ libros, cargando, error, onReintentar, carrito, on
 			<div className='state'>
 				<Icon name='search' size={48} strokeWidth={1.2} />
 				<h3>No encontramos libros</h3>
-				<p>Probá con otras palabras o quitá algunos filtros.</p>
+				<p>Pruebe con otras palabras o quite algunos filtros.</p>
 				<button type='button' className='btn btn-ghost' onClick={onLimpiar}>
 					Limpiar búsqueda y filtros
 				</button>

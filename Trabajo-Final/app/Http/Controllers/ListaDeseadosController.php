@@ -59,6 +59,7 @@ class ListaDeseadosController extends Controller
                 'nombre'              => $libro->nombre,
                 'idioma'              => $libro->idioma,
                 'edicion'             => $libro->edicion,
+                'sin_stock'           => $libro->stock <= 0,
                 'anio_publicacion'    => $libro->anio_publicacion,
                 'precio'              => (float) $libro->precio,
                 'categoria'           => $libro->categoria_perteneciente?->nombre,

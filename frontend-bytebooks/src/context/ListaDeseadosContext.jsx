@@ -2,16 +2,9 @@ import { createContext, useContext, useEffect, useMemo, useRef, useState } from 
 import { useAuth } from './AuthContext';
 import { useToast } from './ToastContext';
 import { agregarDeseadoApi, getDeseadosApi, quitarDeseadoApi } from '../services/api';
+import { normalizarLibro } from '../utils/libros';
 
 const DeseadosContext = createContext(null);
-
-const normalizar = (libro) => ({
-	...libro,
-	anio: libro.anio ?? libro.anio_publicacion,
-	imagenes:
-		libro.imagenes ?? [libro.imagen_original, libro.imagen_referencia_2, libro.imagen_referencia_3].filter(Boolean),
-});
-
 
 export const DeseadosProvider = ({ children }) => {
 	const { usuario, token } = useAuth();
@@ -33,7 +26,7 @@ export const DeseadosProvider = ({ children }) => {
 		setCargando(true);
 
 		getDeseadosApi(token, control.signal)
-			.then((datos) => activo && setItems(datos.items.map(normalizar)))
+			.then((datos) => activo && setItems(datos.items.map(normalizarLibro)))
 			.catch((err) => {
 				if (activo && err.name !== 'AbortError') {
 					mostrarToast('No pudimos cargar su lista de deseados.', { tipo: 'error' });
@@ -50,7 +43,6 @@ export const DeseadosProvider = ({ children }) => {
 	const ids = useMemo(() => new Set(items.map((i) => i.id)), [items]);
 	const esDeseado = (libroId) => ids.has(libroId);
 
-
 	const alternar = async (libro) => {
 		if (!usuario || enCurso.current.has(libro.id)) return;
 		enCurso.current.add(libro.id);
@@ -58,7 +50,7 @@ export const DeseadosProvider = ({ children }) => {
 		const estaba = ids.has(libro.id);
 
 		setItems((prev) =>
-			estaba ? prev.filter((i) => i.id !== libro.id) : [normalizar({ ...libro, disponible: true }), ...prev],
+			estaba ? prev.filter((i) => i.id !== libro.id) : [{ ...libro, disponible: true }, ...prev],
 		);
 
 		try {
@@ -71,7 +63,7 @@ export const DeseadosProvider = ({ children }) => {
 			}
 		} catch (err) {
 			setItems((prev) =>
-				estaba ? [normalizar(libro), ...prev.filter((i) => i.id !== libro.id)] : prev.filter((i) => i.id !== libro.id),
+				estaba ? [libro, ...prev.filter((i) => i.id !== libro.id)] : prev.filter((i) => i.id !== libro.id),
 			);
 			mostrarToast(err.message ?? 'No se pudo actualizar la lista de deseados.', { tipo: 'error' });
 		} finally {
