@@ -163,21 +163,19 @@
 
 .ruta {
 	position: relative;
-	height: 56px;
-	margin: 0 28px 18px;
+	height: 72px;
+	margin-bottom: 10px;
 }
 
 .ruta-calle,
 .ruta-progreso {
 	position: absolute;
-	left: 0;
-	bottom: 6px;
+	bottom: 10px;
 	height: 6px;
 	border-radius: 999px;
 }
 
 .ruta-calle {
-	right: 0;
 	background: repeating-linear-gradient(90deg, var(--border) 0 14px, transparent 14px 22px);
 }
 
@@ -186,9 +184,50 @@
 	transition: width 0.8s ease;
 }
 
+.ruta.sin-envio {
+	height: 32px;
+}
+
+.ruta-punto {
+	position: absolute;
+	bottom: 2px;
+	z-index: 1;
+	display: grid;
+	place-items: center;
+	width: 22px;
+	height: 22px;
+	border-radius: 50%;
+	border: 3px solid var(--border);
+	background: var(--surface);
+	color: #fff;
+	transform: translateX(-50%);
+	transition: background-color 0.4s, border-color 0.4s;
+}
+
+.ruta-punto.lleno {
+	background: var(--brand);
+	border-color: var(--brand);
+}
+
+.ruta-punto.final {
+	width: 28px;
+	height: 28px;
+	bottom: -1px;
+	background: var(--brand-700);
+	border-color: var(--brand-700);
+	box-shadow: 0 0 0 5px color-mix(in srgb, var(--brand) 25%, transparent);
+	animation: tilde-aparece 0.4s ease-out;
+}
+
+@keyframes tilde-aparece {
+	from {
+		transform: translateX(-50%) scale(0.4);
+	}
+}
+
 .ruta-camion {
 	position: absolute;
-	bottom: 10px;
+	bottom: 28px;
 	transform: translateX(-50%);
 	transition: left 0.8s ease;
 }
@@ -251,38 +290,20 @@
 	list-style: none;
 	display: grid;
 	grid-template-columns: repeat(4, 1fr);
-	gap: 12px;
+	gap: 8px;
+	text-align: center;
 }
 
 .paso {
-	display: flex;
-	gap: 8px;
-	align-items: flex-start;
 	font-size: 13px;
-}
-
-.paso-punto {
-	flex-shrink: 0;
-	width: 14px;
-	height: 14px;
-	margin-top: 2px;
-	border-radius: 50%;
-	border: 2px solid var(--border);
-	background: var(--surface);
-}
-
-.paso-hecho .paso-punto {
-	background: var(--brand);
-	border-color: var(--brand);
-}
-
-.paso-actual .paso-punto {
-	border-color: var(--brand);
-	box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand) 25%, transparent);
 }
 
 .paso-titulo {
 	font-weight: 700;
+}
+
+.paso-actual .paso-titulo {
+	color: var(--brand-700);
 }
 
 .paso-pendiente .paso-titulo {
@@ -301,8 +322,21 @@
 }
 
 @media (max-width: 640px) {
-	.pasos {
-		grid-template-columns: 1fr;
+	.paso {
+		font-size: 11px;
+	}
+
+	.paso-texto {
+		display: none;
+	}
+
+	.paso time {
+		font-size: 10px;
+	}
+
+	.camion {
+		width: 44px;
+		height: 28px;
 	}
 }
 
