@@ -94,8 +94,10 @@ const comparar = {
 	'nombre-asc': (a, b) => a.nombre.localeCompare(b.nombre, 'es'),
 };
 
-export const ordenarLibros = (libros, orden) =>
-	comparar[orden] ? [...libros].sort(comparar[orden]) : libros;
+export const ordenarLibros = (libros, orden) => {
+	const ordenados = comparar[orden] ? [...libros].sort(comparar[orden]) : [...libros];
+	return ordenados.sort((a, b) => Number(a.sin_stock === true) - Number(b.sin_stock === true));
+};
 
 export const formatearPrecio = (valor) =>
 	new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(valor);

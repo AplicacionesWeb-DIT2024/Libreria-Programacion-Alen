@@ -65,7 +65,7 @@ class LibroController extends Controller
                 'id'                  => $libro->id,
                 'nombre'              => $libro->nombre,
                 'idioma'              => $libro->idioma,
-                'stock'               => $libro->stock,
+                'sin_stock'           => $libro->stock <= 0,
                 'edicion'             => $libro->edicion,
                 'anio_publicacion'    => $libro->anio_publicacion,
                 'precio'              => (float) $libro->precio,
