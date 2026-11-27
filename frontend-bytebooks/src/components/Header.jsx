@@ -100,9 +100,11 @@ export const Header = ({ carrito }) => {
 										<strong>{usuario.nombre}</strong>
 										<span>{usuario.email}</span>
 									</div>
-
+									<Link to='/mis-pedidos' className='user-menu-link' onClick={() => setMenuUsuario(false)}>
+										<Icon name='cart' size={18} /> Mis pedidos
+									</Link>
 									<Link to='/deseados' className='user-menu-link' onClick={() => setMenuUsuario(false)}>
-										<Icon name='heart' size={18} /> Lista de deseados
+										<Icon name='heart' size={18} /> Mi lista de deseados
 										{cantidadDeseados > 0 && <span className='badge badge-inline'>{cantidadDeseados}</span>}
 									</Link>
 
