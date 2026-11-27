@@ -249,7 +249,7 @@ export const CartDropdown = ({ carrito, onCerrar }) => {
 				abierto={confirmando}
 				titulo='¿Está seguro de querer realizar la compra?'
 				textoConfirmar='Confirmar y pagar'
-				textoProcesando='Redirigiendo a Mercado Pago…'
+				textoProcesando='Redirigiendo...'
 				procesando={procesando}
 				onConfirmar={confirmarCompra}
 				onCancelar={() => setConfirmando(false)}
