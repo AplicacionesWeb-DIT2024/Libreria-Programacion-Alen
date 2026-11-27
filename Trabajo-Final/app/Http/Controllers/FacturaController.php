@@ -18,7 +18,8 @@ use MercadoPago\Exceptions\MPApiException;
 use Illuminate\Support\Facades\Auth;
 use MercadoPago\MercadoPagoConfig;
 use MercadoPago\Client\Payment\PaymentRefundClient;
-
+use Illuminate\Validation\Rule;
+use App\Http\Requests\RegistroClienteRequest;
 class FacturaController extends Controller
 {
 
@@ -155,9 +156,9 @@ class FacturaController extends Controller
             'detalles.*.libro' => ['required', 'integer', 'exists:libros,id'],
             'detalles.*.cantidad' => ['required', 'integer', 'min:1'],
             'domicilio_calle' => ['required', 'string', 'max:255'],
-            'domicilio_numero' => ['required', 'string', 'max:20'],
             'domicilio_localidad' => ['required', 'string', 'max:255'],
-            'domicilio_provincia' => ['required', 'string', 'max:255'],
+            'domicilio_numero' => ['required', 'string', 'max:20', 'regex:/^([0-9]+[A-Za-z]?|[Ss]\/[Nn])$/'],
+            'domicilio_provincia' => ['required', 'string', Rule::in(RegistroClienteRequest::PROVINCIAS)],
             'domicilio_codigo_postal' => ['required', 'digits:4'],
         ]);
 

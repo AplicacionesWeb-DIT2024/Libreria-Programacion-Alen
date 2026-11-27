@@ -6,6 +6,17 @@ import { formatearPrecio } from '../utils/libros';
 import { useCuentaRegresiva } from '../hooks/useCuentaRegresiva';
 import { crearPedidoApi } from '../services/api';
 import { ModalConfirmacion } from './ModalConfirmacion';
+import {
+	CAMPOS_DOMICILIO,
+	DOMICILIO_VACIO,
+	EnvioPedido,
+	domicilioCompleto,
+	domicilioDelCliente,
+	idCampoEnvio,
+	limpiarDomicilio,
+	textoDomicilio,
+	validarDomicilio,
+} from './EnvioPedido';
 
 export const CartDropdown = ({ carrito, onCerrar }) => {
 	const { items, total, cambiarCantidad, quitar, vaciar, pedido, registrarPedido } = carrito;
@@ -20,6 +31,34 @@ export const CartDropdown = ({ carrito, onCerrar }) => {
 	const [sinStock, setSinStock] = useState(null);
 
 	const [confirmando, setConfirmando] = useState(false);
+
+	const [tipoEnvio, setTipoEnvio] = useState('propio');
+	const [otroDomicilio, setOtroDomicilio] = useState(DOMICILIO_VACIO);
+	const [erroresEnvio, setErroresEnvio] = useState({});
+
+	const domicilioElegido =
+		tipoEnvio === 'propio' ? domicilioDelCliente(usuario?.cliente) : limpiarDomicilio(otroDomicilio);
+
+	const cambiarOtroDomicilio = (campo, valor) => {
+		setOtroDomicilio((d) => ({ ...d, [campo]: valor }));
+		setErroresEnvio((e) => ({ ...e, [campo]: undefined }));
+	};
+
+	const enfocarPrimerError = (errores) => {
+		const primero = CAMPOS_DOMICILIO.find((c) => errores[c]);
+		if (primero) document.getElementById(idCampoEnvio(primero))?.focus();
+	};
+
+	useEffect(() => {
+		const alVolver = (e) => {
+			if (e.persisted) {
+				setProcesando(false);
+				setConfirmando(false);
+			}
+		};
+		window.addEventListener('pageshow', alVolver);
+		return () => window.removeEventListener('pageshow', alVolver);
+	}, []);
 
 	useEffect(() => {
 		setSinStock(null);
@@ -46,23 +85,31 @@ export const CartDropdown = ({ carrito, onCerrar }) => {
 			setError('No encontramos sus datos de envío. Cierre sesión y vuelva a ingresar.');
 			return;
 		}
+
+		setTipoEnvio('propio');
+		setErroresEnvio({});
 		setConfirmando(true);
 	};
 
 	const confirmarCompra = async () => {
-		const cliente = usuario.cliente;
+		if (tipoEnvio === 'otro') {
+			const errores = validarDomicilio(domicilioElegido);
+			if (Object.keys(errores).length > 0) {
+				setErroresEnvio(errores);
+				enfocarPrimerError(errores);
+				return;
+			}
+		}
+
 		setProcesando(true);
 		setError('');
+		setErroresEnvio({});
 
 		try {
 			const datos = await crearPedidoApi(
 				{
 					detalles: items.map((i) => ({ libro: i.id, cantidad: i.quantity })),
-					domicilio_calle: cliente.domicilio_calle,
-					domicilio_numero: cliente.domicilio_numero,
-					domicilio_localidad: cliente.domicilio_localidad,
-					domicilio_provincia: cliente.domicilio_provincia,
-					domicilio_codigo_postal: cliente.domicilio_codigo_postal,
+					...domicilioElegido,
 				},
 				token,
 			);
@@ -75,13 +122,24 @@ export const CartDropdown = ({ carrito, onCerrar }) => {
 
 			window.location.href = datos.init_point;
 		} catch (err) {
+			setProcesando(false);
+
+			const erroresDomicilio = Object.fromEntries(
+				Object.entries(err.errores ?? {})
+					.filter(([campo]) => CAMPOS_DOMICILIO.includes(campo))
+					.map(([campo, mensajes]) => [campo, mensajes[0]]),
+			);
+			if (err.status === 422 && tipoEnvio === 'otro' && Object.keys(erroresDomicilio).length > 0) {
+				setErroresEnvio(erroresDomicilio);
+				enfocarPrimerError(erroresDomicilio);
+				return;
+			}
 			setConfirmando(false);
 
 			if (err.status === 409 && err.datos?.libro) {
 				setSinStock({ libro: err.datos.libro, disponible: err.datos.disponible });
 			}
 			setError(err.message);
-			setProcesando(false);
 		}
 	};
 
@@ -213,17 +271,29 @@ export const CartDropdown = ({ carrito, onCerrar }) => {
 					<strong>{formatearPrecio(total)}</strong>
 				</div>
 
-				{usuario?.cliente && (
-					<p className='modal-nota'>
-						<strong>Envío a:</strong> {usuario.cliente.domicilio_calle} {usuario.cliente.domicilio_numero},{' '}
-						{usuario.cliente.domicilio_localidad}, {usuario.cliente.domicilio_provincia} (
-						{usuario.cliente.domicilio_codigo_postal})
-					</p>
-				)}
+				<EnvioPedido
+					cliente={usuario?.cliente}
+					tipo={tipoEnvio}
+					onTipo={(tipo) => {
+						setTipoEnvio(tipo);
+						setErroresEnvio({});
+					}}
+					otro={otroDomicilio}
+					onCambiarOtro={cambiarOtroDomicilio}
+					errores={erroresEnvio}
+					deshabilitado={procesando}
+				/>
 
-				<p className='modal-nota'>
-					Será redirigido a Mercado Pago. Se le reservaran los libros durante 20 minutos.
+				<p className='modal-nota' aria-live='polite'>
+					<strong>Envío a:</strong>{' '}
+					{domicilioCompleto(domicilioElegido) ? (
+						textoDomicilio(domicilioElegido)
+					) : (
+						<span className='modal-nota-pendiente'>complete la dirección de entrega</span>
+					)}
 				</p>
+
+				<p className='modal-nota'>Será redirigido a Mercado Pago. Se le reservarán los libros durante 20 minutos.</p>
 			</ModalConfirmacion>
 		</div>
 	);
