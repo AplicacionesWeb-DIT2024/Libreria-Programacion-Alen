@@ -27,16 +27,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('listaDeseados', [ListaDeseadosController::class, 'index']);
     Route::post('listaDeseados/agregarLibro/{libro}', [ListaDeseadosController::class, 'agregar']);
     Route::delete('listaDeseados/quitarLibro/{libro}', [ListaDeseadosController::class, 'quitar']);
+    Route::get('listaPedidos', [FacturaController::class, 'index_api']);
 });
-
 
 
 Route::post('loginApi', [AuthApiController::class, 'loguearApi'])
     ->middleware('throttle:5,1');
 
 Route::post('/registro', [AuthApiController::class, 'registrarApi'])->middleware('throttle:5,1');
-
-
 
 
 Route::get('libros', [LibroController::class, 'index_api']);
@@ -49,16 +47,7 @@ Route::get('/usuarios/{id}', [UsuarioController::class, 'show_api']);
 Route::post('/agregarUsuario', [UsuarioController::class, 'store_api']);
 
 
-
-
-
-Route::get('facturas/', [FacturaController::class, 'index_api']);
-
-Route::get('facturas/{id}', [FacturaController::class, 'show_api']);
-
 Route::get('{cliente}/facturas', [UsuarioController::class, 'show_api_factura_cliente']);
-
-
 
 
 Route::post('cron/cancelar-pedidos', function (Request $request) {
