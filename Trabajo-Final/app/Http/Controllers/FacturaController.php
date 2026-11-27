@@ -22,22 +22,41 @@ class FacturaController extends Controller
 {
 
 
-    public function index_api() {
-            $facturas = Factura::orderBy('id', 'asc') -> get();
-            return response()->json($facturas, 200);
-    
+    public function index_api(Request $request){
+        $cliente = $this->validarCliente($request);
+
+        $pedidos = Factura::where('cliente', $cliente->id)      
+            ->with('detalles.datosLibro')                         
+            ->orderByDesc('created_at')                           
+            ->get()
+            ->map(fn (Factura $factura) => [
+                'id'        => $factura->id,
+                'fecha'     => $factura->fecha->toDateString(),
+                'hora'      => $factura->hora,
+                'estado'    => $factura->estado->value,          
+                'estado_texto' => $factura->estado->label(),     
+                'total'     => (float) $factura->precioTotal,
+                'cantidad'  => (int) $factura->cantidadTotal,
+                'domicilio' => $factura->domicilio_completo,
+                'items'     => $factura->detalles->map(fn ($detalle) => [
+                    'libro'           => $detalle->libro,
+                    'nombre'          => $detalle->datosLibro?->nombre ?? 'Libro no disponible',
+                    'imagen'          => $detalle->datosLibro?->imagen_original,
+                    'cantidad'        => (int) $detalle->cantidad,
+                    'precio_unitario' => (float) $detalle->precio_unitario,
+                    'precio_total'    => (float) $detalle->precio_total,
+                ])->values(),
+            ]);
+        return response()->json($pedidos, 200);
     }
 
-    public function show_api(Request $request) {
-        $factura = Factura::where ('id', $request->id) -> with('detalles')-> first();
-        if ($factura) {
-            return response()->json($factura, 200);
-        } else {
-            return response()->json(['message' => 'factura no encontrada'], 404);
 
-        }
-
+    private function validarCliente(Request $request): User{
+        $usuario = $request->user();
+        abort_unless($usuario->isCliente() && $usuario->activo, 403, 'El usuario no posee permisos para realizar esta acción',);
+        return $usuario;
     }
+
 
     public function listarPorCliente(User $usuario) {
         abort_unless($usuario->isCliente(), 404);
